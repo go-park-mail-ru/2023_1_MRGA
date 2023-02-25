@@ -3,7 +3,6 @@ package app
 import (
 	"net/http"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/repository"
 )
 
@@ -12,8 +11,10 @@ type Application struct {
 	repo   *repository.Repository
 }
 
-func main() {
+func New() *Application {
 	router := http.NewServeMux()
-	dsnStr := dsn.FromEnv()
-	repo, err := repository.New(dsnStr)
+	repo := repository.New()
+	a := &Application{repo: repo, Router: router}
+
+	return a
 }
