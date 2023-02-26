@@ -6,7 +6,7 @@ func (r *Repository) CheckUsername(username string) error {
 	for _, user := range *r.Users {
 		if username == user.Username {
 
-			return fmt.Errorf("email is not unique")
+			return fmt.Errorf("username is not unique")
 		}
 	}
 

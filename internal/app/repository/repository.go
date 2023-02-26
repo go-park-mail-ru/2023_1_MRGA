@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"fmt"
-
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
 )
 
@@ -24,16 +22,16 @@ func (r *Repository) AddUser(user *ds.User) error {
 
 	if err := r.CheckUsername(user.Username); err != nil {
 
-		return fmt.Errorf("username is not unique")
+		return err
 	}
 
 	if err := r.CheckEmail(user.Email); err != nil {
 
-		return fmt.Errorf("username is not unique")
+		return err
 	}
 
 	if err := CheckAge(user.Age); err != nil {
-		return fmt.Errorf("username is not unique")
+		return err
 	}
 
 	usersDB := *r.Users

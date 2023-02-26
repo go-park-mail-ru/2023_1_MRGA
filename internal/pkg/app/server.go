@@ -2,10 +2,12 @@ package app
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func (a *Application) StartServer() {
+	log.Println("Server start up")
 	router := a.Router
 
 	server := &http.Server{
@@ -22,6 +24,8 @@ func (a *Application) StartServer() {
 
 	err := server.ListenAndServe()
 	if err != nil {
-		panic(fmt.Sprintf("server.ListenAndServe: %s", err))
+		log.Println("ListenServer failed")
 	}
+
+	log.Println("Server down")
 }
