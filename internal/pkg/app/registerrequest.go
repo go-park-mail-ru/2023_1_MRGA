@@ -13,7 +13,18 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/utils"
 )
 
-func (a *Application) register(w http.ResponseWriter, r *http.Request) {
+type LoginInput struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LogoutInput struct {
+	Username string
+	Email    string
+}
+
+func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
@@ -64,10 +75,111 @@ func (a *Application) register(w http.ResponseWriter, r *http.Request) {
 	utils.Respond(w, m)
 }
 
+func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
+		http.Error(w, "error method", http.StatusNotFound)
+
+		return
+	}
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error cant read json", http.StatusBadRequest)
+
+		return
+	}
+
+	var logInp LoginInput
+	err = json.Unmarshal(reqBody, &logInp)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error cant parse json", http.StatusBadRequest)
+
+		return
+	}
+
+	hashPass := CreatePass(logInp.Password)
+
+	var userId uint
+
+	if logInp.Email != "" {
+		userId, err = a.repo.LoginEmail(logInp.Email, hashPass)
+	} else if logInp.Username != "" {
+		userId, err = a.repo.LoginUsername(logInp.Username, hashPass)
+	} else {
+		logger.Log(http.StatusBadRequest, "email and username are empty", r.Method, r.URL.Path)
+		http.Error(w, "error cant login", http.StatusBadRequest)
+	}
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error cant login", http.StatusBadRequest)
+	}
+
+	token := token2.CreateToken()
+	a.repo.SaveToken(userId, token)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    token,
+		Expires:  time.Now().Add(120 * time.Second),
+		HttpOnly: true,
+	})
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	m := utils.Message(true, "success")
+	utils.Respond(w, m)
+}
+
+func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
+		http.Error(w, "error method", http.StatusNotFound)
+
+		return
+	}
+
+	Stoken, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+			http.Error(w, "error you are not authorised", http.StatusUnauthorized)
+			return
+		}
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+	Strtoken := Stoken.Value
+	err = a.repo.DeleteToken(Strtoken)
+
+	if err != nil {
+		logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error you are not authorised", http.StatusUnauthorized)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Expires:  time.Now().Add(-120 * time.Second),
+		HttpOnly: true,
+	})
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	m := utils.Message(true, "success")
+	utils.Respond(w, m)
+}
+
 func CreatePass(password string) string {
 	h := sha1.New()
 	h.Write([]byte(password))
-	bs := h.Sum([]byte{})
+	bs := h.Sum([]byte("123456789"))
 
 	return string(bs)
 }
+
+/*func CreatePass(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(hashedPassword), err
+}
+*/

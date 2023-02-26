@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
 )
 
@@ -47,4 +49,73 @@ func (r *Repository) SaveToken(userId uint, token string) {
 	tokenUser := *r.UserToken
 	tokenUser[userId] = token
 	r.UserToken = &tokenUser
+}
+
+func (r *Repository) LoginEmail(email string, password string) (userId uint, err error) {
+	var userpassword string
+
+	for _, u := range *r.Users {
+		if u.Email == email {
+			userpassword = u.Password
+			userId = u.UserId
+			break
+		}
+	}
+
+	if password == "" {
+
+		err = fmt.Errorf("cant find user with such email")
+		return
+	}
+
+	if userpassword == password {
+
+		return
+	}
+
+	err = fmt.Errorf("password is not correct")
+	return
+}
+
+func (r *Repository) LoginUsername(username string, password string) (userId uint, err error) {
+	var userpassword string
+	for _, u := range *r.Users {
+		if u.Username == username {
+			userpassword = u.Password
+			userId = u.UserId
+		}
+	}
+
+	if password == "" {
+		err = fmt.Errorf("cant find user with such email")
+		return
+	}
+	if userpassword == password {
+
+		return userId, nil
+	}
+
+	err = fmt.Errorf("password is not correct")
+	return
+}
+
+func (r *Repository) DeleteToken(token string) error {
+	var userId uint
+	flagFound := false
+	for i, t := range *r.UserToken {
+		if t == token {
+			userId = i
+			flagFound = true
+			break
+		}
+	}
+
+	if !flagFound {
+
+		return fmt.Errorf("UnAuthorised")
+	}
+
+	delete(*r.UserToken, userId)
+
+	return nil
 }

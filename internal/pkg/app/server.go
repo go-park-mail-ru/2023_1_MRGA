@@ -20,7 +20,9 @@ func (a *Application) StartServer() {
 			fmt.Fprintln(w, "Addr:", ":8080", "URL:", r.URL.String())
 		})
 
-	router.HandleFunc("/register", a.register)
+	router.HandleFunc("/register", a.Register)
+	router.HandleFunc("/login", a.Login)
+	router.HandleFunc("/logout", a.Logout)
 
 	err := server.ListenAndServe()
 	if err != nil {
