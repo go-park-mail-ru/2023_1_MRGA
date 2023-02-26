@@ -1,6 +1,8 @@
 package ds
 
-import "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/constform"
+import (
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
+)
 
 type User struct {
 	UserId      uint          `json:"userId"`

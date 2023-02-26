@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/logger"
+	token2 "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/utils"
 )
 
@@ -48,6 +50,14 @@ func (a *Application) register(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	token := token2.CreateToken()
+	a.repo.SaveToken(userJson.UserId, token)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    token,
+		Expires:  time.Now().Add(120 * time.Second),
+		HttpOnly: true,
+	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	m := utils.Message(true, "success")

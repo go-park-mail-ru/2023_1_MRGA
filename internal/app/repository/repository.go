@@ -5,14 +5,16 @@ import (
 )
 
 type Repository struct {
-	Users  *[]ds.User
-	Cities *[]ds.City
+	Users     *[]ds.User
+	Cities    *[]ds.City
+	UserToken *map[uint]string
 }
 
 func New() *Repository {
 	var u []ds.User
 	var c []ds.City
-	r := Repository{&u, &c}
+	t := make(map[uint]string)
+	r := Repository{&u, &c, &t}
 	return &r
 }
 
@@ -39,4 +41,10 @@ func (r *Repository) AddUser(user *ds.User) error {
 	r.Users = &usersDB
 
 	return nil
+}
+
+func (r *Repository) SaveToken(userId uint, token string) {
+	tokenUser := *r.UserToken
+	tokenUser[userId] = token
+	r.UserToken = &tokenUser
 }
