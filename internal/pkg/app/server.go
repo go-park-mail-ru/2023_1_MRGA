@@ -23,6 +23,7 @@ func (a *Application) StartServer() {
 	router.HandleFunc("/register", a.Register)
 	router.HandleFunc("/login", a.Login)
 	router.HandleFunc("/logout", a.Logout)
+	router.HandleFunc("/cities", a.GetCities)
 
 	err := server.ListenAndServe()
 	if err != nil {

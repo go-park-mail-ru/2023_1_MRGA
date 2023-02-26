@@ -3,8 +3,11 @@ package app
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
@@ -17,11 +20,6 @@ type LoginInput struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-type LogoutInput struct {
-	Username string
-	Email    string
 }
 
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
@@ -168,6 +166,39 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	m := utils.Message(true, "success")
 	utils.Respond(w, m)
+}
+
+func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
+		http.Error(w, "error method", http.StatusNotFound)
+
+		return
+	}
+
+	fileCity, err := os.Open("./files/city.txt")
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error cant read json", http.StatusInternalServerError)
+
+		return
+	}
+
+	AllCities, err := io.ReadAll(fileCity)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error cant read json", http.StatusInternalServerError)
+
+		return
+	}
+
+	AllCitiesStr := string(AllCities)
+	cities := strings.Split(AllCitiesStr, "\n")
+	mapResp := make(map[string][]string)
+	mapResp["city"] = cities
+
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(mapResp)
 }
 
 func CreatePass(password string) string {
