@@ -4,10 +4,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/repository"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCheckAge(t *testing.T) {

@@ -69,8 +69,8 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	m := utils.Message(true, "success")
-	utils.Respond(w, m)
+	rsp := utils.Response(true, "success")
+	utils.Respond(w, rsp)
 }
 
 func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
@@ -124,8 +124,8 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	m := utils.Message(true, "success")
-	utils.Respond(w, m)
+	rsp := utils.Response(true, "success")
+	utils.Respond(w, rsp)
 }
 
 func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
@@ -164,8 +164,8 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	m := utils.Message(true, "success")
-	utils.Respond(w, m)
+	rsp := utils.Response(true, "success")
+	utils.Respond(w, rsp)
 }
 
 func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {

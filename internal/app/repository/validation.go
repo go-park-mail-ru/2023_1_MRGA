@@ -25,7 +25,7 @@ func (r *Repository) CheckEmail(email string) error {
 }
 
 func CheckAge(age int) error {
-	if age > 100 || age < 18 {
+	if age > 150 || age < 18 {
 
 		return fmt.Errorf("age is not correct")
 	}
