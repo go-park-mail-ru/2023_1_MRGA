@@ -184,7 +184,7 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	AllCities, err := io.ReadAll(fileCity)
+	allCities, err := io.ReadAll(fileCity)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		http.Error(w, "error cant read json", http.StatusInternalServerError)
@@ -192,8 +192,8 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	AllCitiesStr := string(AllCities)
-	cities := strings.Split(AllCitiesStr, "\n")
+	allCitiesStr := string(allCities)
+	cities := strings.Split(allCitiesStr, "\n")
 	mapResp := make(map[string][]string)
 	mapResp["city"] = cities
 
@@ -208,9 +208,3 @@ func CreatePass(password string) string {
 
 	return string(bs)
 }
-
-/*func CreatePass(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(hashedPassword), err
-}
-*/

@@ -13,10 +13,10 @@ type Repository struct {
 }
 
 func New() *Repository {
-	var u []ds.User
-	var c []ds.City
-	t := make(map[uint]string)
-	r := Repository{&u, &c, &t}
+	var userDS []ds.User
+	var cityDS []ds.City
+	tokenDS := make(map[uint]string)
+	r := Repository{&userDS, &cityDS, &tokenDS}
 	return &r
 }
 
@@ -51,25 +51,21 @@ func (r *Repository) SaveToken(userId uint, token string) {
 	r.UserToken = &tokenUser
 }
 
-func (r *Repository) LoginEmail(email string, password string) (userId uint, err error) {
-	var userpassword string
+func (r *Repository) LoginEmail(emailInp string, passwordInp string) (userId uint, err error) {
+	var userPassword string
 
-	for _, u := range *r.Users {
-		if u.Email == email {
-			userpassword = u.Password
-			userId = u.UserId
+	for _, user := range *r.Users {
+		if user.Email == emailInp {
+			userPassword = user.Password
+			userId = user.UserId
 			break
 		}
 	}
-
-	if password == "" {
-
+	switch userPassword {
+	case "":
 		err = fmt.Errorf("cant find user with such email")
 		return
-	}
-
-	if userpassword == password {
-
+	case passwordInp:
 		return
 	}
 
@@ -77,22 +73,21 @@ func (r *Repository) LoginEmail(email string, password string) (userId uint, err
 	return
 }
 
-func (r *Repository) LoginUsername(username string, password string) (userId uint, err error) {
-	var userpassword string
+func (r *Repository) LoginUsername(usernameInp string, passwordInp string) (userId uint, err error) {
+	var userPassword string
 	for _, u := range *r.Users {
-		if u.Username == username {
-			userpassword = u.Password
+		if u.Username == usernameInp {
+			userPassword = u.Password
 			userId = u.UserId
 		}
 	}
 
-	if password == "" {
-		err = fmt.Errorf("cant find user with such email")
+	switch userPassword {
+	case "":
+		err = fmt.Errorf("cant find user with such username")
 		return
-	}
-	if userpassword == password {
-
-		return userId, nil
+	case passwordInp:
+		return
 	}
 
 	err = fmt.Errorf("password is not correct")
@@ -102,20 +97,18 @@ func (r *Repository) LoginUsername(username string, password string) (userId uin
 func (r *Repository) DeleteToken(token string) error {
 	var userId uint
 	flagFound := false
-	for i, t := range *r.UserToken {
-		if t == token {
-			userId = i
+	for indexUser, tokenDS := range *r.UserToken {
+		if tokenDS == token {
+			userId = indexUser
 			flagFound = true
 			break
 		}
 	}
 
 	if !flagFound {
-
 		return fmt.Errorf("UnAuthorised")
 	}
 
 	delete(*r.UserToken, userId)
-
 	return nil
 }
