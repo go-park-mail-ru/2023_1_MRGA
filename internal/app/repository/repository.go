@@ -17,6 +17,7 @@ func New() *Repository {
 	var cityDS []ds.City
 	tokenDS := make(map[uint]string)
 	r := Repository{&userDS, &cityDS, &tokenDS}
+
 	return &r
 }
 
@@ -25,12 +26,10 @@ func (r *Repository) AddUser(user *ds.User) error {
 	user.UserId = uint(userId)
 
 	if err := r.CheckUsername(user.Username); err != nil {
-
 		return err
 	}
 
 	if err := r.CheckEmail(user.Email); err != nil {
-
 		return err
 	}
 
@@ -51,11 +50,11 @@ func (r *Repository) SaveToken(userId uint, token string) {
 	r.UserToken = &tokenUser
 }
 
-func (r *Repository) LoginEmail(emailInp string, passwordInp string) (userId uint, err error) {
+func (r *Repository) Login(emailInp string, usernameInp string, passwordInp string) (userId uint, err error) {
 	var userPassword string
 
 	for _, user := range *r.Users {
-		if user.Email == emailInp {
+		if user.Email == emailInp || user.Username == usernameInp {
 			userPassword = user.Password
 			userId = user.UserId
 			break
@@ -64,27 +63,6 @@ func (r *Repository) LoginEmail(emailInp string, passwordInp string) (userId uin
 	switch userPassword {
 	case "":
 		err = fmt.Errorf("cant find user with such email")
-		return
-	case passwordInp:
-		return
-	}
-
-	err = fmt.Errorf("password is not correct")
-	return
-}
-
-func (r *Repository) LoginUsername(usernameInp string, passwordInp string) (userId uint, err error) {
-	var userPassword string
-	for _, u := range *r.Users {
-		if u.Username == usernameInp {
-			userPassword = u.Password
-			userId = u.UserId
-		}
-	}
-
-	switch userPassword {
-	case "":
-		err = fmt.Errorf("cant find user with such username")
 		return
 	case passwordInp:
 		return

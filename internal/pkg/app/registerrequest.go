@@ -12,7 +12,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/logger"
-	token2 "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/utils"
 )
 
@@ -21,6 +21,8 @@ type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+const SessionTokenCookieName = "session_token"
 
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 
@@ -59,11 +61,11 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	token := token2.CreateToken()
-	a.repo.SaveToken(userJson.UserId, token)
+	userToken := token.CreateToken()
+	a.repo.SaveToken(userJson.UserId, userToken)
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    token,
+		Name:     SessionTokenCookieName,
+		Value:    userToken,
 		Expires:  time.Now().Add(120 * time.Second),
 		HttpOnly: true,
 	})
@@ -102,24 +104,23 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 
 	var userId uint
 
-	if logInp.Email != "" {
-		userId, err = a.repo.LoginEmail(logInp.Email, hashPass)
-	} else if logInp.Username != "" {
-		userId, err = a.repo.LoginUsername(logInp.Username, hashPass)
+	if logInp.Email != "" || logInp.Username != "" {
+		userId, err = a.repo.Login(logInp.Email, logInp.Username, hashPass)
 	} else {
 		logger.Log(http.StatusBadRequest, "email and username are empty", r.Method, r.URL.Path)
 		http.Error(w, "error cant login", http.StatusBadRequest)
 	}
+
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		http.Error(w, "error cant login", http.StatusBadRequest)
 	}
 
-	token := token2.CreateToken()
-	a.repo.SaveToken(userId, token)
+	userToken := token.CreateToken()
+	a.repo.SaveToken(userId, userToken)
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    token,
+		Name:     SessionTokenCookieName,
+		Value:    userToken,
 		Expires:  time.Now().Add(120 * time.Second),
 		HttpOnly: true,
 	})
@@ -136,15 +137,17 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Stoken, err := r.Cookie("session_token")
+	Stoken, err := r.Cookie(SessionTokenCookieName)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
 			http.Error(w, "error you are not authorised", http.StatusUnauthorized)
+
 			return
 		}
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		http.Error(w, "error", http.StatusInternalServerError)
+
 		return
 	}
 	Strtoken := Stoken.Value
@@ -153,11 +156,12 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
 		http.Error(w, "error you are not authorised", http.StatusUnauthorized)
+
 		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
+		Name:     SessionTokenCookieName,
 		Value:    "",
 		Expires:  time.Now().Add(-120 * time.Second),
 		HttpOnly: true,
