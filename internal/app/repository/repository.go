@@ -110,3 +110,24 @@ func (r *Repository) GetCities() ([]string, error) {
 
 	return cities, nil
 }
+
+func (r *Repository) GetUserById(userId uint) (*ds.User, error) {
+
+	for _, user := range *r.Users {
+		if user.UserId == userId {
+			return &user, nil
+		}
+	}
+
+	return nil, fmt.Errorf("user are not found")
+}
+
+func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
+	for userId, userToken := range *r.UserToken {
+		if userToken == InpToken {
+			return userId, nil
+		}
+	}
+
+	return 0, fmt.Errorf("user are not found")
+}

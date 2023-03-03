@@ -12,6 +12,8 @@ type IRepository interface {
 	Login(email string, username string, pass string) (uint, error)
 	SaveToken(id uint, token string)
 	GetCities() ([]string, error)
+	GetUserIdByToken(string) (uint, error)
+	GetUserById(uint) (*ds.User, error)
 }
 
 type Application struct {

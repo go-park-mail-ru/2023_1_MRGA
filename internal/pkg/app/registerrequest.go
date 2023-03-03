@@ -142,7 +142,7 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		http.Error(w, "error", http.StatusInternalServerError)
 
 		return
@@ -190,6 +190,55 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonData)
 }
 
+func (a *Application) GetUserByCookie(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
+		http.Error(w, "error method", http.StatusNotFound)
+
+		return
+	}
+
+	Stoken, err := r.Cookie(SessionTokenCookieName)
+	if err != nil {
+		if err == http.ErrNoCookie {
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+			http.Error(w, "error you are not authorised", http.StatusUnauthorized)
+
+			return
+		}
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "error", http.StatusInternalServerError)
+
+		return
+	}
+
+	userId, err := a.repo.GetUserIdByToken(Stoken.Value)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, "Wrong method", r.Method, r.URL.Path)
+		http.Error(w, "error method", http.StatusBadRequest)
+
+		return
+	}
+	user, err := a.repo.GetUserById(userId)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, "Wrong method", r.Method, r.URL.Path)
+		http.Error(w, "error method", http.StatusBadRequest)
+
+		return
+	}
+	jsonUser, err := json.Marshal(user)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, "Wrong method", r.Method, r.URL.Path)
+		http.Error(w, "error method", http.StatusInternalServerError)
+
+		return
+	}
+
+	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(jsonUser)
+
+}
 func CreatePass(password string) string {
 	h := sha1.New()
 	h.Write([]byte(password))

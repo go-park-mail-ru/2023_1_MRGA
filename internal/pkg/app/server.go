@@ -20,11 +20,12 @@ func (a *Application) StartServer() {
 			fmt.Fprintln(w, "Addr:", ":8080", "URL:", r.URL.String())
 		})
 
-	router.HandleFunc("/register", a.Register)
-	router.HandleFunc("/login", a.Login)
-	router.HandleFunc("/logout", a.Logout)
-	router.HandleFunc("/cities", a.GetCities)
-
+	router.HandleFunc("/meetme/register", a.Register)
+	router.HandleFunc("/meetme/login", a.Login)
+	router.HandleFunc("/meetme/logout", a.Logout)
+	router.HandleFunc("/meetme/cities", a.GetCities)
+	router.HandleFunc("/meetme/return500", a.Return500)
+	router.HandleFunc("/meetme/get-user", a.GetUserByCookie)
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Println("ListenServer failed")
