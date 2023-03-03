@@ -50,7 +50,7 @@ func TestCheckAge(t *testing.T) {
 }
 
 func TestRepository_CheckUsername(t *testing.T) {
-	repo := repository.New()
+	repo := repository.NewRepo()
 	users := []ds.User{
 		{
 			UserId:      0,
@@ -124,7 +124,7 @@ func TestRepository_CheckUsername(t *testing.T) {
 }
 
 func TestRepository_CheckEmail(t *testing.T) {
-	repo := repository.New()
+	repo := repository.NewRepo()
 	users := []ds.User{
 		{
 			UserId:      0,

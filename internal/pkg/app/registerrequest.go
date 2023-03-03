@@ -3,11 +3,8 @@ package app
 import (
 	"crypto/sha1"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
@@ -179,30 +176,18 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	fileCity, err := os.Open("./files/city.txt")
+	cities, err := a.repo.GetCities()
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		http.Error(w, "error cant read json", http.StatusInternalServerError)
+		http.Error(w, "error file cant read cities", http.StatusInternalServerError)
 
 		return
 	}
-
-	allCities, err := io.ReadAll(fileCity)
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		http.Error(w, "error cant read json", http.StatusInternalServerError)
-
-		return
-	}
-
-	allCitiesStr := string(allCities)
-	cities := strings.Split(allCitiesStr, "\n")
 	mapResp := make(map[string][]string)
 	mapResp["city"] = cities
 
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(mapResp)
+	jsonData, _ := json.Marshal(mapResp)
+	w.Write(jsonData)
 }
 
 func CreatePass(password string) string {

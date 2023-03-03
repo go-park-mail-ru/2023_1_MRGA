@@ -2,6 +2,9 @@ package repository
 
 import (
 	"fmt"
+	"io"
+	"os"
+	"strings"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
 )
@@ -12,7 +15,7 @@ type Repository struct {
 	UserToken *map[uint]string
 }
 
-func New() *Repository {
+func NewRepo() *Repository {
 	var userDS []ds.User
 	var cityDS []ds.City
 	tokenDS := make(map[uint]string)
@@ -89,4 +92,21 @@ func (r *Repository) DeleteToken(token string) error {
 
 	delete(*r.UserToken, userId)
 	return nil
+}
+
+func (r *Repository) GetCities() ([]string, error) {
+	fileCity, err := os.Open("/Users/Staurran/GolandProjects/2023_1_MRGA3/files/city.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	allCities, err := io.ReadAll(fileCity)
+	if err != nil {
+		return nil, err
+	}
+
+	allCitiesStr := string(allCities)
+	cities := strings.Split(allCitiesStr, "\n")
+
+	return cities, nil
 }
