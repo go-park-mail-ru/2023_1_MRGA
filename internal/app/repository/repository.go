@@ -112,11 +112,20 @@ func (r *Repository) GetCities() ([]string, error) {
 	return cities, nil
 }
 
-func (r *Repository) GetUserById(userId uint) (*ds.User, error) {
+func (r *Repository) GetUserById(userId uint) (*app.UserRes, error) {
 
 	for _, user := range *r.Users {
 		if user.UserId == userId {
-			return &user, nil
+			userRes := app.UserRes{
+				Username:    user.Username,
+				Avatar:      user.Avatar,
+				City:        user.City,
+				Age:         user.Age,
+				Sex:         user.Sex,
+				Email:       user.Email,
+				Description: user.Description,
+			}
+			return &userRes, nil
 		}
 	}
 

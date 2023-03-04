@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
@@ -191,6 +192,16 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonData)
 }
 
+type UserRes struct {
+	Username    string        `json:"username"`
+	Email       string        `json:"email"`
+	Age         int           `json:"age"`
+	Sex         constform.Sex `json:"sex"`
+	City        string        `json:"city"`
+	Description string        `json:"description"`
+	Avatar      string        `json:"avatar"`
+}
+
 func (a *Application) GetUserByCookie(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
@@ -240,6 +251,7 @@ func (a *Application) GetUserByCookie(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonUser)
 
 }
+
 func CreatePass(password string) string {
 	h := sha1.New()
 	h.Write([]byte(password))
