@@ -1,0 +1,7 @@
+ServiceHost = "0.0.0.0" # просто ключ значение
+ServicePort = 80
+
+[MRGANewsConfig] # вложенный объект
+SiteAddress = "api.www.bmstu.ru" # значения полей этого объекта
+Protocol = "https"
+DayLimit = 30
