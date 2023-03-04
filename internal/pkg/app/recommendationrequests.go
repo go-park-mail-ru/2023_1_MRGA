@@ -17,6 +17,13 @@ type Recommendation struct {
 	City        string        `json:"city"`
 }
 
+// GetRecommendations godoc
+// @Summary      return recommendations for user
+// @Description  now just return other 10 or fewer users
+// @Tags         Tests
+//@Param Body body []Recommendation true "list of users"
+// @Success      200
+// @Router       /meetme/recommendations [get]
 func (a *Application) GetRecommendations(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)

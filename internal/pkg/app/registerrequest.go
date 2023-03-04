@@ -21,6 +21,13 @@ type LoginInput struct {
 
 const SessionTokenCookieName = "session_token"
 
+// Register godoc
+// @Summary      Register new user
+// @Description  create new account with unique username and email
+// @Tags         Tests
+//@Param Body body ds.User true "info about user"
+// @Success      200
+// @Router       /meetme/register [post]
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -72,6 +79,13 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	utils.Respond(w, rsp)
 }
 
+// Login godoc
+// @Summary      authorise user
+// @Description  authorise existing user with username/email and password
+// @Tags         Tests
+//@Param Body body LoginInput true "nickname/email password"
+// @Success      200
+// @Router       /meetme/login [post]
 func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
@@ -129,6 +143,12 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	utils.Respond(w, rsp)
 }
 
+// Logout godoc
+// @Summary      Logout authorised user
+// @Description  auser can log out and end session
+// @Tags         Tests
+// @Success      200
+// @Router       /meetme/logout [get]
 func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
@@ -172,6 +192,12 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	utils.Respond(w, rsp)
 }
 
+// GetCities godoc
+// @Summary      get list of cities for registration
+// @Description  returned list of cities
+// @Tags         Tests
+// @Success      200  {object}  map[string][]string
+// @Router       /meetme/city [get]
 func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
@@ -210,6 +236,13 @@ type UserRes struct {
 	Avatar      string        `json:"avatar"`
 }
 
+// GetCurrentUser godoc
+// @Summary      get info about current user
+// @Description  you can get info about current user
+// @Tags         Tests
+// @Produce      json
+// @Success      200  {object}  UserRes
+// @Router       /meetme/user [get]
 func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
