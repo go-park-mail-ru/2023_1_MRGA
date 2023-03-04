@@ -210,7 +210,7 @@ type UserRes struct {
 	Avatar      string        `json:"avatar"`
 }
 
-func (a *Application) GetUserByCookie(w http.ResponseWriter, r *http.Request) {
+func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		logger.Log(http.StatusNotFound, "Wrong method", r.Method, r.URL.Path)
 		http.Error(w, "error method", http.StatusNotFound)
