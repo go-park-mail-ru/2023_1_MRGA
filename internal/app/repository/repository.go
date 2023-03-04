@@ -54,11 +54,11 @@ func (r *Repository) SaveToken(userId uint, token string) {
 	r.UserToken = &tokenUser
 }
 
-func (r *Repository) Login(emailInp string, usernameInp string, passwordInp string) (userId uint, err error) {
+func (r *Repository) Login(input string, passwordInp string) (userId uint, err error) {
 	var userPassword string
 
 	for _, user := range *r.Users {
-		if user.Email == emailInp || user.Username == usernameInp {
+		if user.Email == input || user.Username == input {
 			userPassword = user.Password
 			userId = user.UserId
 			break

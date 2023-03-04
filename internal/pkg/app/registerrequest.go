@@ -15,8 +15,7 @@ import (
 )
 
 type LoginInput struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Input    string `json:"input"`
 	Password string `json:"password"`
 }
 
@@ -102,16 +101,19 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 
 	var userId uint
 
-	if logInp.Email != "" || logInp.Username != "" {
-		userId, err = a.repo.Login(logInp.Email, logInp.Username, hashPass)
+	if logInp.Input != "" {
+		userId, err = a.repo.Login(logInp.Input, hashPass)
+		if err != nil {
+			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+			http.Error(w, "error cant login", http.StatusBadRequest)
+
+			return
+		}
 	} else {
 		logger.Log(http.StatusBadRequest, "email and username are empty", r.Method, r.URL.Path)
 		http.Error(w, "error cant login", http.StatusBadRequest)
-	}
 
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		http.Error(w, "error cant login", http.StatusBadRequest)
+		return
 	}
 
 	userToken := token.CreateToken()

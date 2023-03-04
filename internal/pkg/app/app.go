@@ -9,7 +9,7 @@ import (
 type IRepository interface {
 	DeleteToken(string) error
 	AddUser(d *ds.User) error
-	Login(email string, username string, pass string) (uint, error)
+	Login(input string, pass string) (uint, error)
 	SaveToken(id uint, token string)
 	GetCities() ([]string, error)
 	GetUserIdByToken(string) (uint, error)
