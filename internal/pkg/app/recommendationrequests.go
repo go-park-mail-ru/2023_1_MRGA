@@ -41,7 +41,7 @@ func (a *Application) GetRecommendations(w http.ResponseWriter, r *http.Request)
 
 	userId, err := a.repo.GetUserIdByToken(Stoken.Value)
 	if err != nil {
-		logger.Log(http.StatusBadRequest, "Wrong method", r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		http.Error(w, "error method", http.StatusBadRequest)
 
 		return
@@ -53,6 +53,12 @@ func (a *Application) GetRecommendations(w http.ResponseWriter, r *http.Request)
 	mapResp["recommendations"] = recomendation
 
 	w.Header().Add("Content-Type", "application/json")
-	jsonData, _ := json.Marshal(mapResp)
+	jsonData, err := json.Marshal(mapResp)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "cant create json", http.StatusInternalServerError)
+
+		return
+	}
 	w.Write(jsonData)
 }

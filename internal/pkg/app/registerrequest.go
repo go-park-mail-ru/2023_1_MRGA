@@ -188,7 +188,13 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	mapResp["city"] = cities
 
 	w.Header().Add("Content-Type", "application/json")
-	jsonData, _ := json.Marshal(mapResp)
+	jsonData, err := json.Marshal(mapResp)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		http.Error(w, "cant create json", http.StatusInternalServerError)
+
+		return
+	}
 	w.Write(jsonData)
 }
 
