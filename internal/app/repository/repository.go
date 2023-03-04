@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 )
 
 type Repository struct {
@@ -130,4 +131,32 @@ func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
 	}
 
 	return 0, fmt.Errorf("user are not found")
+}
+
+func (r *Repository) GetRecommendation(userId uint) (recommendations []*app.Recommendation, err error) {
+	count := 0
+
+	for _, user := range *r.Users {
+		if user.UserId != userId {
+			recommendPerson := app.Recommendation{
+				City:        user.City,
+				Username:    user.Username,
+				Age:         user.Age,
+				Avatar:      user.Avatar,
+				Description: user.Description,
+				Sex:         user.Sex,
+			}
+			recommendations = append(recommendations, &recommendPerson)
+			count += 1
+			if count == 10 {
+				break
+			}
+		}
+	}
+
+	if count == 0 {
+		return nil, fmt.Errorf("no users yet")
+	}
+
+	return recommendations, nil
 }

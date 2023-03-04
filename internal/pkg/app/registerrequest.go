@@ -186,6 +186,7 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	mapResp := make(map[string][]string)
 	mapResp["city"] = cities
 
+	w.Header().Add("Content-Type", "application/json")
 	jsonData, _ := json.Marshal(mapResp)
 	w.Write(jsonData)
 }

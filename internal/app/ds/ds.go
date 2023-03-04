@@ -13,6 +13,7 @@ type User struct {
 	Sex         constform.Sex `json:"sex"`
 	City        string        `json:"city"`
 	Description string        `json:"description"`
+	Avatar      string        `json:"avatar"`
 }
 
 type City struct {

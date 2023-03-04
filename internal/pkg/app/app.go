@@ -14,6 +14,7 @@ type IRepository interface {
 	GetCities() ([]string, error)
 	GetUserIdByToken(string) (uint, error)
 	GetUserById(uint) (*ds.User, error)
+	GetRecommendation(uint) ([]*Recommendation, error)
 }
 
 type Application struct {
