@@ -141,6 +141,7 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    userToken,
 		Expires:  time.Now().Add(72 * time.Hour),
 		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
@@ -180,6 +181,7 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Expires:  time.Now().Add(-120 * time.Second),
 		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
