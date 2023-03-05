@@ -47,8 +47,8 @@ func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string
 // Register godoc
 // @Summary      Register new user
 // @Description  create new account with unique username and email
-// @Tags         Registrarion
-//@Param Body body data_struct.User true "info about user"
+// @Tags         Registration
+//@Param Body body dataStruct.User true "info about user"
 // @Success      200
 // @Router       /meetme/register [post]
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
@@ -163,7 +163,7 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 
 // Logout godoc
 // @Summary      Logout authorised user
-// @Description  auser can log out and end session
+// @Description  user can log out and end session
 // @Tags         Registration
 // @Success      200
 // @Router       /meetme/logout [get]
