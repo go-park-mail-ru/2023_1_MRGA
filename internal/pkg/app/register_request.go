@@ -44,6 +44,13 @@ func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string
 	}
 }
 
+// Register godoc
+// @Summary      Register new user
+// @Description  create new account with unique username and email
+// @Tags         Registrarion
+//@Param Body body data_struct.User true "info about user"
+// @Success      200
+// @Router       /meetme/register [post]
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		err := "Only POST method is supported for this route"
@@ -92,6 +99,13 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
 }
 
+// Login godoc
+// @Summary      authorise user
+// @Description  authorise existing user with username/email and password
+// @Tags         Registration
+//@Param Body body LoginInput true "nickname/email password"
+// @Success      200
+// @Router       /meetme/login [post]
 func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		err := "Only POST method is supported for this route"
@@ -147,6 +161,12 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
 }
 
+// Logout godoc
+// @Summary      Logout authorised user
+// @Description  auser can log out and end session
+// @Tags         Registration
+// @Success      200
+// @Router       /meetme/logout [get]
 func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		err := "Only POST method is supported for this route"
@@ -187,6 +207,12 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
 }
 
+// GetCities godoc
+// @Summary      get list of cities for registration
+// @Description  returned list of cities
+// @Tags         Registration
+// @Success      200  {object}  map[string][]string
+// @Router       /meetme/city [get]
 func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		err := "Only GET method is supported for this route"
@@ -218,6 +244,13 @@ type UserRes struct {
 	Avatar      string        `json:"avatar" structs:"avatar"`
 }
 
+// GetCurrentUser godoc
+// @Summary      get info about current user
+// @Description  you can get info about current user
+// @Tags         Registration
+// @Produce      json
+// @Success      200  {object}  UserRes
+// @Router       /meetme/user [get]
 func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		err := "Only GET method is supported for this route"
