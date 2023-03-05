@@ -26,6 +26,7 @@ func (a *Application) StartServer() {
 	router.HandleFunc("/meetme/cities", a.GetCities)
 	router.HandleFunc("/meetme/user", a.GetCurrentUser)
 	router.HandleFunc("/meetme/recommendations", a.GetRecommendations)
+
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Println("ListenServer failed")

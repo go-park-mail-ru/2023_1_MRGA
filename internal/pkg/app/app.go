@@ -3,18 +3,18 @@ package app
 import (
 	"net/http"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
+	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 )
 
 type IRepository interface {
 	DeleteToken(string) error
-	AddUser(d *ds.User) error
+	AddUser(d *dataStruct.User) error
 	Login(input string, pass string) (uint, error)
 	SaveToken(id uint, token string)
 	GetCities() ([]string, error)
 	GetUserIdByToken(string) (uint, error)
-	GetUserById(uint) (*UserRes, error)
-	GetRecommendation(uint) ([]*Recommendation, error)
+	GetUserById(uint) (UserRes, error)
+	GetRecommendation(uint) ([]Recommendation, error)
 }
 
 type Application struct {
