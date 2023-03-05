@@ -139,7 +139,7 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionTokenCookieName,
 		Value:    userToken,
-		Expires:  time.Now().Add(120 * time.Second),
+		Expires:  time.Now().Add(72 * time.Hour),
 		HttpOnly: true,
 	})
 
