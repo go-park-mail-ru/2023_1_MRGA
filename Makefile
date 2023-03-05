@@ -1,4 +1,4 @@
 .PHONY: runserver
 
 runserver:
-	go run cmd/meetme/main.go
+	go run cmd/meetme/main.go localhost 8080

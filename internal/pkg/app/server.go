@@ -8,14 +8,14 @@ import (
 	"net/http"
 )
 
-const frontendHost = "http://localhost:8081"
+const frontendHost = "http://localhost:8080"
 
-func (a *Application) StartServer() {
+func (a *Application) StartServer(host, port string) {
 	log.Println("Server start up")
 	router := a.Router
-
+	h := host + ":" + port
 	server := &http.Server{
-		Addr:    "127.0.0.1:8081",
+		Addr:    h,
 		Handler: router,
 	}
 
@@ -35,7 +35,7 @@ func (a *Application) StartServer() {
 	handler.HandleFunc("/meetme/recommendations", a.GetRecommendations)
 	err := server.ListenAndServe()
 	if err != nil {
-		log.Println("ListenServer failed")
+		log.Println("ListenServer failed", err)
 	}
 
 	log.Println("Server down")
