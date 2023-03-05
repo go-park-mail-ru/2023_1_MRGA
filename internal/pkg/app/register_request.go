@@ -79,7 +79,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	userJson.Password = hashedPass
 
 	if userJson.Avatar == "" {
-		userJson.Avatar = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fcommons.wikimedia.org%2Fwiki%2FFile%3AUser_font_awesome.svg&psig=AOvVaw1K3y3WistCBJT5aPGMIC6M&ust=1678134640361000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCKCtluvQxf0CFQAAAAAdAAAAABAE"
+		userJson.Avatar = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
 	}
 
 	err = a.repo.AddUser(&userJson)
