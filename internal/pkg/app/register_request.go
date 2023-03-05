@@ -85,7 +85,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 		Name:     SessionTokenCookieName,
 		Value:    userToken,
 		Expires:  time.Now().Add(72 * time.Hour),
-		HttpOnly: false,
+		HttpOnly: true,
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
@@ -141,7 +141,6 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    userToken,
 		Expires:  time.Now().Add(72 * time.Hour),
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
