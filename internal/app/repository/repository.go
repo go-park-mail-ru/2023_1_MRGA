@@ -96,7 +96,7 @@ func (r *Repository) DeleteToken(token string) error {
 }
 
 func (r *Repository) GetCities() ([]string, error) {
-	fileCity, err := os.Open("../../files/city.txt")
+	fileCity, err := os.Open("./files/city.txt")
 	if err != nil {
 		return nil, err
 	}

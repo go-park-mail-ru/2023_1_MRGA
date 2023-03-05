@@ -193,7 +193,7 @@ func (pr *pseudoRepo) GetCities() ([]string, error) {
 	return cities, nil
 }
 
-func (r *pseudoRepo) GetUserById(userId uint) (*UserRes, error) {
+func (r *pseudoRepo) GetUserById(userId uint) (userRes UserRes, err error) {
 
 	for _, user := range *r.Users {
 		if user.UserId == userId {
@@ -206,11 +206,11 @@ func (r *pseudoRepo) GetUserById(userId uint) (*UserRes, error) {
 				Email:       user.Email,
 				Description: user.Description,
 			}
-			return &userRes, nil
+			return userRes, nil
 		}
 	}
 
-	return nil, fmt.Errorf("user are not found")
+	return userRes, fmt.Errorf("user are not found")
 }
 
 func (r *pseudoRepo) GetUserIdByToken(InpToken string) (uint, error) {
@@ -223,7 +223,7 @@ func (r *pseudoRepo) GetUserIdByToken(InpToken string) (uint, error) {
 	return 0, fmt.Errorf("user are not found")
 }
 
-func (r *pseudoRepo) GetRecommendation(userId uint) (recommendations []*Recommendation, err error) {
+func (r *pseudoRepo) GetRecommendation(userId uint) (recommendations []Recommendation, err error) {
 	count := 0
 
 	for _, user := range *r.Users {
@@ -236,7 +236,7 @@ func (r *pseudoRepo) GetRecommendation(userId uint) (recommendations []*Recommen
 				Description: user.Description,
 				Sex:         user.Sex,
 			}
-			recommendations = append(recommendations, &recommendPerson)
+			recommendations = append(recommendations, recommendPerson)
 			count += 1
 			if count == 10 {
 				break
