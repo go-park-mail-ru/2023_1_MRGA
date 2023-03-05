@@ -4,32 +4,39 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
+	"github.com/gorilla/mux"
 )
 
-func (a *Application) StartServer() {
+const frontendHost = "http://localhost:8080"
+
+func (a *Application) StartServer(host, port string) {
 	log.Println("Server start up")
 	router := a.Router
-
+	h := host + ":" + port
 	server := &http.Server{
-		Addr:    "127.0.0.1:8080",
+		Addr:    h,
 		Handler: router,
 	}
 
-	router.HandleFunc("/",
+	handler := mux.NewRouter()
+
+	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHost, handler)
+	router.Handle("/", handlerWithCorsMiddleware)
+	handler.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "Addr:", ":8080", "URL:", r.URL.String())
 		})
-
-	router.HandleFunc("/meetme/register", a.Register)
-	router.HandleFunc("/meetme/login", a.Login)
-	router.HandleFunc("/meetme/logout", a.Logout)
-	router.HandleFunc("/meetme/cities", a.GetCities)
-	router.HandleFunc("/meetme/user", a.GetCurrentUser)
-	router.HandleFunc("/meetme/recommendations", a.GetRecommendations)
-
+	handler.HandleFunc("/meetme/register", a.Register)
+	handler.HandleFunc("/meetme/login", a.Login)
+	handler.HandleFunc("/meetme/logout", a.Logout)
+	handler.HandleFunc("/meetme/cities", a.GetCities)
+	handler.HandleFunc("/meetme/user", a.GetCurrentUser)
+	handler.HandleFunc("/meetme/recommendations", a.GetRecommendations)
 	err := server.ListenAndServe()
 	if err != nil {
-		log.Println("ListenServer failed")
+		log.Println("ListenServer failed", err)
 	}
 
 	log.Println("Server down")
