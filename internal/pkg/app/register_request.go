@@ -86,6 +86,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 		Value:    userToken,
 		Expires:  time.Now().Add(72 * time.Hour),
 		HttpOnly: false,
+		SameSite: 0,
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
