@@ -148,7 +148,7 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		err := "Only POST method is supported for this route"
 		logger.Log(http.StatusNotFound, err, r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusNotFound, err}, map[string]interface{}{})
