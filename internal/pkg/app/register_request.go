@@ -44,6 +44,13 @@ func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string
 	}
 }
 
+// Register godoc
+// @Summary      Register new user
+// @Description  create new account with unique username and email
+// @Tags         Registration
+//@Param Body body dataStruct.User true "info about user"
+// @Success      200
+// @Router       /meetme/register [post]
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		err := "Only POST method is supported for this route"
@@ -71,6 +78,10 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	hashedPass := HashPassword(userJson.Password)
 	userJson.Password = hashedPass
 
+	if userJson.Avatar == "" {
+		userJson.Avatar = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+	}
+
 	err = a.repo.AddUser(&userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -92,6 +103,13 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
 }
 
+// Login godoc
+// @Summary      authorise user
+// @Description  authorise existing user with username/email and password
+// @Tags         Registration
+//@Param Body body LoginInput true "nickname/email password"
+// @Success      200
+// @Router       /meetme/login [post]
 func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		err := "Only POST method is supported for this route"
@@ -133,7 +151,7 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionTokenCookieName,
 		Value:    userToken,
-		Expires:  time.Now().Add(120 * time.Second),
+		Expires:  time.Now().Add(72 * time.Hour),
 		HttpOnly: true,
 	})
 
@@ -141,8 +159,14 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
 }
 
+// Logout godoc
+// @Summary      Logout authorised user
+// @Description  user can log out and end session
+// @Tags         Registration
+// @Success      200
+// @Router       /meetme/logout [get]
 func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		err := "Only POST method is supported for this route"
 		logger.Log(http.StatusNotFound, err, r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusNotFound, err}, map[string]interface{}{})
@@ -174,12 +198,19 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Expires:  time.Now().Add(-120 * time.Second),
 		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
 }
 
+// GetCities godoc
+// @Summary      get list of cities for registration
+// @Description  returned list of cities
+// @Tags         Registration
+// @Success      200  {object}  map[string][]string
+// @Router       /meetme/city [get]
 func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		err := "Only GET method is supported for this route"
@@ -211,6 +242,13 @@ type UserRes struct {
 	Avatar      string        `json:"avatar" structs:"avatar"`
 }
 
+// GetCurrentUser godoc
+// @Summary      get info about current user
+// @Description  you can get info about current user
+// @Tags         Registration
+// @Produce      json
+// @Success      200  {object}  UserRes
+// @Router       /meetme/user [get]
 func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		err := "Only GET method is supported for this route"
