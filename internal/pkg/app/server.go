@@ -27,6 +27,7 @@ func (a *Application) StartServer(host, port string) {
 	handler.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "Addr:", ":8080", "URL:", r.URL.String())
+			Respond(w, r, Result{status: http.StatusOK, err: ""}, map[string]interface{}{})
 		})
 	handler.HandleFunc("/meetme/register", a.Register)
 	handler.HandleFunc("/meetme/login", a.Login)

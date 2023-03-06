@@ -120,16 +120,10 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 
 	var userId uint
 
-	if logInp.Input != "" {
-		userId, err = a.repo.Login(logInp.Input, hashPass)
-		if err != nil {
-			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-			Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
-			return
-		}
-	} else {
-		logger.Log(http.StatusBadRequest, "email and username are empty", r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, "empty login"}, map[string]interface{}{})
+	userId, err = a.repo.Login(logInp.Input, hashPass)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
 		return
 	}
 
