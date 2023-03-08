@@ -60,7 +60,7 @@ func TestApplication_Register(t *testing.T) {
 		{
 			inpJson:    `{"username": "masharpik", "email": "masharpik@gmail.com", "password": "masharpik2004", "age": 19}`,
 			inpMethod:  "GET",
-			outputJson: map[string]interface{}{"err": "Only POST method is supported for this route", "status": http.StatusNotFound},
+			outputJson: map[string]interface{}{"err": "only POST method is supported for this route", "status": http.StatusNotFound},
 		},
 	}
 	r := NewRepo()
@@ -117,6 +117,11 @@ func TestApplication_Login(t *testing.T) {
 			inpJson:    `{"input": "", "password": "masharpik2004"}`,
 			inpMethod:  "POST",
 			outputJson: map[string]interface{}{"err": "empty login", "status": http.StatusBadRequest},
+		},
+		{
+			inpJson:    `{"input": "", "password": "masharpik2004"}`,
+			inpMethod:  "GET",
+			outputJson: map[string]interface{}{"err": "only POST method is supported for this route", "status": http.StatusNotFound},
 		},
 	}
 	r := NewRepo()
@@ -181,6 +186,12 @@ func TestApplication_Logout(t *testing.T) {
 			inpCookies: http.Cookie{},
 			outputJson: map[string]interface{}{"err": "http: named cookie not present", "status": http.StatusUnauthorized},
 		},
+		{
+			inpJson:    `{}`,
+			inpMethod:  "GET",
+			inpCookies: http.Cookie{},
+			outputJson: map[string]interface{}{"err": "only POST method is supported for this route", "status": http.StatusNotFound},
+		},
 	}
 	r := NewRepo()
 	a := New(r)
@@ -230,7 +241,7 @@ func TestApplication_GetCities(t *testing.T) {
 		},
 		{
 			inpMethod:  "POST",
-			outputJson: map[string]interface{}{"err": "Only GET method is supported for this route", "status": http.StatusNotFound},
+			outputJson: map[string]interface{}{"err": "only GET method is supported for this route", "status": http.StatusNotFound},
 		},
 	}
 	r := NewRepo()
@@ -287,7 +298,7 @@ func TestApplication_GetCurrentUser(t *testing.T) {
 		{
 			inpMethod:  "POST",
 			inpCookies: http.Cookie{},
-			outputJson: map[string]interface{}{"err": "Only GET method is supported for this route", "status": http.StatusNotFound},
+			outputJson: map[string]interface{}{"err": "only GET method is supported for this route", "status": http.StatusNotFound},
 		},
 		{
 			inpMethod:  "GET",
@@ -356,7 +367,7 @@ func TestApplication_GetRecommendations(t *testing.T) {
 		{
 			inpMethod:  "POST",
 			inpCookies: http.Cookie{},
-			outputJson: map[string]interface{}{"err": "Only GET method is supported for this route", "status": http.StatusNotFound},
+			outputJson: map[string]interface{}{"err": "only GET method is supported for this route", "status": http.StatusNotFound},
 		},
 	}
 	r := NewRepo()

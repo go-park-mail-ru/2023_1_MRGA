@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
@@ -25,9 +26,9 @@ type Recommendation struct {
 // @Router       /meetme/recommendations [get]
 func (a *Application) GetRecommendations(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		err := "Only GET method is supported for this route"
-		logger.Log(http.StatusNotFound, err, r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusNotFound, err}, map[string]interface{}{})
+		err := fmt.Errorf("only GET method is supported for this route")
+		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
+		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
 		return
 	}
 

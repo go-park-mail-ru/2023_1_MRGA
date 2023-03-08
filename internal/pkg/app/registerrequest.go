@@ -188,7 +188,7 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 // @Router       /meetme/logout [get]
 func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		err := fmt.Errorf("Only POST method is supported for this route")
+		err := fmt.Errorf("only POST method is supported for this route")
 		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
 		return
@@ -233,9 +233,9 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 // @Router       /meetme/city [get]
 func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		err := "Only GET method is supported for this route"
-		logger.Log(http.StatusNotFound, err, r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusNotFound, err}, map[string]interface{}{})
+		err := fmt.Errorf("only GET method is supported for this route")
+		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
+		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
 		return
 	}
 
@@ -271,7 +271,7 @@ type UserRes struct {
 // @Router       /meetme/user [get]
 func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		err := fmt.Errorf("Only GET method is supported for this route")
+		err := fmt.Errorf("only GET method is supported for this route")
 		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
 		return
