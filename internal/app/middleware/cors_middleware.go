@@ -1,14 +1,18 @@
 package middleware
 
 import (
+	"golang.org/x/exp/slices"
 	"net/http"
 )
 
-func CorsMiddleware(allowedHost string, next http.Handler) http.Handler {
+func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		origin := r.Header.Get("Origin")
+		if slices.Contains(allowedHosts, origin) {
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
 		next.ServeHTTP(w, r)
-	},
-	)
+	})
+
 }

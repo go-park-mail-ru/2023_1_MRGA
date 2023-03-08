@@ -1,39 +1,51 @@
 package app
 
 import (
+	"context"
+	"flag"
 	"log"
 	"net/http"
-
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
-	"github.com/gorilla/mux"
+	"time"
 )
 
-const frontendHost = "http://localhost:8080"
+type Server struct {
+	httpServer *http.Server
+}
 
-func (a *Application) StartServer(host, port string) {
-	log.Println("Server start up")
-	router := a.Router
-	h := host + ":" + port
-	server := &http.Server{
-		Addr:    h,
-		Handler: router,
+type ServerOptions struct {
+	Host           string
+	Port           string
+	MaxHeaderBytes int
+	ReadTimeout    time.Duration
+	WriteTimeout   time.Duration
+}
+
+func GetServerOptions() (opts ServerOptions) {
+	flag.StringVar(&opts.Host, "h", "localhost", "set the server's host")
+	flag.StringVar(&opts.Port, "p", "8080", "set the server's port")
+	flag.IntVar(&opts.MaxHeaderBytes, "m", 1, "set the server's max header bytes in MB")
+	readTimeout := flag.Int64("rt", 10, "set the server's read timeout in seconds")
+	writeTimout := flag.Int("wt", 10, "set the server's read timeout in seconds")
+	flag.Parse()
+	opts.MaxHeaderBytes = opts.MaxHeaderBytes << 20 // MB to Bytes
+	opts.ReadTimeout = time.Duration(*readTimeout) * time.Second
+	opts.WriteTimeout = time.Duration(*writeTimout) * time.Second
+
+	return opts
+}
+
+func (s *Server) Run(opts ServerOptions, handler http.Handler) error {
+	s.httpServer = &http.Server{
+		Addr:           opts.Host + ":" + opts.Port,
+		Handler:        handler,
+		MaxHeaderBytes: opts.MaxHeaderBytes,
+		ReadTimeout:    opts.ReadTimeout,
+		WriteTimeout:   opts.WriteTimeout,
 	}
+	log.Println("server starts on ", s.httpServer.Addr)
+	return s.httpServer.ListenAndServe()
+}
 
-	handler := mux.NewRouter()
-
-	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHost, handler)
-	router.Handle("/", handlerWithCorsMiddleware)
-
-	handler.HandleFunc("/meetme/register", a.Register)
-	handler.HandleFunc("/meetme/login", a.Login)
-	handler.HandleFunc("/meetme/logout", a.Logout)
-	handler.HandleFunc("/meetme/cities", a.GetCities)
-	handler.HandleFunc("/meetme/user", a.GetCurrentUser)
-	handler.HandleFunc("/meetme/recommendations", a.GetRecommendations)
-	err := server.ListenAndServe()
-	if err != nil {
-		log.Println("ListenServer failed", err)
-	}
-
-	log.Println("Server down")
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.httpServer.Shutdown(ctx)
 }

@@ -1,7 +1,9 @@
 .PHONY: runserver test cov
-host=localhost
+host=127.0.0.1
+port=8080
+
 runserver:
-	go run cmd/meetme/main.go $(host) 8080
+	go run cmd/meetme/main.go -h $(host) -p $(port)
 
 test:
 	go test ./...
