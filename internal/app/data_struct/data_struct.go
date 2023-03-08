@@ -1,4 +1,4 @@
-package data_struct
+package dataStruct
 
 import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"

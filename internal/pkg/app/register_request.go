@@ -52,7 +52,7 @@ func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string
 // @Summary      Register new user
 // @Description  create new account with unique username and email
 // @Tags         Tests
-//@Param Body body data_struct.User true "info about user"
+// @Param Body body data_struct.User true "info about user"
 // @Success      200
 // @Router       /meetme/register [post]
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +79,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userJson data_struct.User
+	var userJson dataStruct.User
 	err = json.Unmarshal(reqBody, &userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -115,7 +115,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 // @Summary      authorise user
 // @Description  authorise existing user with username/email and password
 // @Tags         Tests
-//@Param Body body LoginInput true "nickname/email password"
+// @Param Body body LoginInput true "nickname/email password"
 // @Success      200
 // @Router       /meetme/login [post]
 func (a *Application) Login(w http.ResponseWriter, r *http.Request) {

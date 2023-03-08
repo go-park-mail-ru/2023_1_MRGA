@@ -4,18 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
-
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 )
 
 type psevdoRepo struct {
-	Users     *[]data_struct.User
-	Cities    *[]data_struct.City
+	Users     *[]dataStruct.User
+	Cities    *[]dataStruct.City
 	UserToken *map[uint]string
 }
 
@@ -404,15 +403,15 @@ func TestApplication_GetRecommendations(t *testing.T) {
 ///PsevdoRepo
 
 func NewRepo() *psevdoRepo {
-	var userDS []data_struct.User
-	var cityDS []data_struct.City
+	var userDS []dataStruct.User
+	var cityDS []dataStruct.City
 	tokenDS := make(map[uint]string)
 	r := psevdoRepo{&userDS, &cityDS, &tokenDS}
 
 	return &r
 }
 
-func (pr *psevdoRepo) AddUser(_ *data_struct.User) error {
+func (pr *psevdoRepo) AddUser(_ *dataStruct.User) error {
 	return nil
 }
 
