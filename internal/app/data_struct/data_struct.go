@@ -1,4 +1,4 @@
-package ds
+package data_struct
 
 import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"

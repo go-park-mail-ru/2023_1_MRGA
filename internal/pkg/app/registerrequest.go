@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/structs"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
 )
@@ -52,7 +52,7 @@ func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string
 // @Summary      Register new user
 // @Description  create new account with unique username and email
 // @Tags         Tests
-//@Param Body body ds.User true "info about user"
+//@Param Body body data_struct.User true "info about user"
 // @Success      200
 // @Router       /meetme/register [post]
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +79,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userJson ds.User
+	var userJson data_struct.User
 	err = json.Unmarshal(reqBody, &userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)

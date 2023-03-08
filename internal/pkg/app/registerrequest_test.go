@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 )
 
 type psevdoRepo struct {
-	Users     *[]ds.User
-	Cities    *[]ds.City
+	Users     *[]data_struct.User
+	Cities    *[]data_struct.City
 	UserToken *map[uint]string
 }
 
@@ -92,9 +92,6 @@ func TestApplication_Register(t *testing.T) {
 		if err != nil {
 			t.Errorf(err.Error())
 		}
-		if err != nil {
-			t.Errorf("unexpected error: %#v", err)
-		}
 
 		if !mapEqual(result, tCase.outputJson) {
 			t.Errorf(" wrong result, expected %#v, got %#v", tCase.outputJson, result)
@@ -151,9 +148,6 @@ func TestApplication_Login(t *testing.T) {
 		err = json.Unmarshal([]byte(jsonStr), &result)
 		if err != nil {
 			t.Errorf(err.Error())
-		}
-		if err != nil {
-			t.Errorf("unexpected error: %#v", err)
 		}
 
 		if !mapEqual(result, tCase.outputJson) {
@@ -410,15 +404,15 @@ func TestApplication_GetRecommendations(t *testing.T) {
 ///PsevdoRepo
 
 func NewRepo() *psevdoRepo {
-	var userDS []ds.User
-	var cityDS []ds.City
+	var userDS []data_struct.User
+	var cityDS []data_struct.City
 	tokenDS := make(map[uint]string)
 	r := psevdoRepo{&userDS, &cityDS, &tokenDS}
 
 	return &r
 }
 
-func (pr *psevdoRepo) AddUser(_ *ds.User) error {
+func (pr *psevdoRepo) AddUser(_ *data_struct.User) error {
 	return nil
 }
 

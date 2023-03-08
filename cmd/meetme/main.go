@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
@@ -21,9 +22,17 @@ import (
 // @schemes http
 // @BasePath /meetme/
 func main() {
+	host := "localhost"
+	port := "8080"
+	if len(os.Args) == 3 {
+		host = os.Args[1]
+		port = os.Args[2]
+	} else if len(os.Args) == 2 {
+		host = os.Args[1]
+	}
 	log.Println("Application is starting")
 	r := repository.NewRepo()
 	a := app.New(r)
-	a.StartServer()
+	a.StartServer(host, port)
 	log.Println("Application terminate")
 }

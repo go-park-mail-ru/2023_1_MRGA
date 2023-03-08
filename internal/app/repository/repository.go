@@ -6,26 +6,26 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 )
 
 type Repository struct {
-	Users     *[]ds.User
-	Cities    *[]ds.City
+	Users     *[]data_struct.User
+	Cities    *[]data_struct.City
 	UserToken *map[uint]string
 }
 
 func NewRepo() *Repository {
-	var userDS []ds.User
-	var cityDS []ds.City
+	var userDS []data_struct.User
+	var cityDS []data_struct.City
 	tokenDS := make(map[uint]string)
 	r := Repository{&userDS, &cityDS, &tokenDS}
 
 	return &r
 }
 
-func (r *Repository) AddUser(user *ds.User) error {
+func (r *Repository) AddUser(user *data_struct.User) error {
 	userId := len(*r.Users)
 	user.UserId = uint(userId)
 
