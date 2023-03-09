@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
+	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/repository"
 )
 
@@ -51,7 +51,7 @@ func TestCheckAge(t *testing.T) {
 
 func TestRepository_CheckUsername(t *testing.T) {
 	repo := repository.NewRepo()
-	users := []ds.User{
+	users := []dataStruct.User{
 		{
 			UserId:      0,
 			Username:    "user1",
@@ -75,19 +75,18 @@ func TestRepository_CheckUsername(t *testing.T) {
 	}
 
 	for _, u := range users {
-		err := repo.AddUser(&u)
+		err := repo.AddUser(u)
 		if err != nil {
 
 			os.Exit(2)
 		}
 	}
-
 	testCases := []struct {
-		inp         ds.User
+		inp         dataStruct.User
 		errRequired bool
 	}{
 		{
-			inp: ds.User{
+			inp: dataStruct.User{
 				Username:    "user1",
 				Email:       "email3.com",
 				Password:    "123_user3_321",
@@ -99,7 +98,7 @@ func TestRepository_CheckUsername(t *testing.T) {
 			errRequired: true,
 		},
 		{
-			inp: ds.User{
+			inp: dataStruct.User{
 				Username:    "user3",
 				Email:       "email3.com",
 				Password:    "123_user3_321",
@@ -125,7 +124,7 @@ func TestRepository_CheckUsername(t *testing.T) {
 
 func TestRepository_CheckEmail(t *testing.T) {
 	repo := repository.NewRepo()
-	users := []ds.User{
+	users := []dataStruct.User{
 		{
 			UserId:      0,
 			Username:    "user1",
@@ -149,7 +148,7 @@ func TestRepository_CheckEmail(t *testing.T) {
 	}
 
 	for _, u := range users {
-		err := repo.AddUser(&u)
+		err := repo.AddUser(u)
 		if err != nil {
 
 			os.Exit(2)
@@ -157,11 +156,11 @@ func TestRepository_CheckEmail(t *testing.T) {
 	}
 
 	testCases := []struct {
-		inp         ds.User
+		inp         dataStruct.User
 		errRequired bool
 	}{
 		{
-			inp: ds.User{
+			inp: dataStruct.User{
 				Username:    "user3",
 				Email:       "email1.com",
 				Password:    "123_user3_321",
@@ -173,7 +172,7 @@ func TestRepository_CheckEmail(t *testing.T) {
 			errRequired: true,
 		},
 		{
-			inp: ds.User{
+			inp: dataStruct.User{
 				Username:    "user3",
 				Email:       "email3.com",
 				Password:    "123_user3_321",

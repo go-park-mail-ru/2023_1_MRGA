@@ -2,7 +2,7 @@ package token
 
 import "github.com/google/uuid"
 
-var UserToken = map[string]string{}
+var UserTokens = map[string]string{}
 
 func CreateToken() string {
 	newToken := uuid.NewString()

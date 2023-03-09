@@ -1,0 +1,10 @@
+[Unit]
+Description=metme backend
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/meetme
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

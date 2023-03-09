@@ -6,27 +6,27 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/ds"
+	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 )
 
 type Repository struct {
-	Users     *[]ds.User
-	Cities    *[]ds.City
-	UserToken *map[uint]string
+	Users      []dataStruct.User
+	Cities     []dataStruct.City
+	UserTokens map[uint]string
 }
 
 func NewRepo() *Repository {
-	var userDS []ds.User
-	var cityDS []ds.City
+	var userDS []dataStruct.User
+	var cityDS []dataStruct.City
 	tokenDS := make(map[uint]string)
-	r := Repository{&userDS, &cityDS, &tokenDS}
+	r := Repository{userDS, cityDS, tokenDS}
 
 	return &r
 }
 
-func (r *Repository) AddUser(user *ds.User) error {
-	userId := len(*r.Users)
+func (r *Repository) AddUser(user dataStruct.User) error {
+	userId := len(r.Users)
 	user.UserId = uint(userId)
 
 	if err := r.CheckUsername(user.Username); err != nil {
@@ -41,23 +41,23 @@ func (r *Repository) AddUser(user *ds.User) error {
 		return err
 	}
 
-	usersDB := *r.Users
-	usersDB = append(usersDB, *user)
-	r.Users = &usersDB
+	usersDB := r.Users
+	usersDB = append(usersDB, user)
+	r.Users = usersDB
 
 	return nil
 }
 
 func (r *Repository) SaveToken(userId uint, token string) {
-	tokenUser := *r.UserToken
+	tokenUser := r.UserTokens
 	tokenUser[userId] = token
-	r.UserToken = &tokenUser
+	r.UserTokens = tokenUser
 }
 
 func (r *Repository) Login(input string, passwordInp string) (userId uint, err error) {
 	var userPassword string
 
-	for _, user := range *r.Users {
+	for _, user := range r.Users {
 		if user.Email == input || user.Username == input {
 			userPassword = user.Password
 			userId = user.UserId
@@ -79,7 +79,7 @@ func (r *Repository) Login(input string, passwordInp string) (userId uint, err e
 func (r *Repository) DeleteToken(token string) error {
 	var userId uint
 	flagFound := false
-	for indexUser, tokenDS := range *r.UserToken {
+	for indexUser, tokenDS := range r.UserTokens {
 		if tokenDS == token {
 			userId = indexUser
 			flagFound = true
@@ -91,12 +91,12 @@ func (r *Repository) DeleteToken(token string) error {
 		return fmt.Errorf("UnAuthorised")
 	}
 
-	delete(*r.UserToken, userId)
+	delete(r.UserTokens, userId)
 	return nil
 }
 
 func (r *Repository) GetCities() ([]string, error) {
-	fileCity, err := os.Open("/Users/Staurran/GolandProjects/2023_1_MRGA3/files/city.txt")
+	fileCity, err := os.Open("./files/city.txt")
 	if err != nil {
 		return nil, err
 	}
@@ -112,11 +112,11 @@ func (r *Repository) GetCities() ([]string, error) {
 	return cities, nil
 }
 
-func (r *Repository) GetUserById(userId uint) (*app.UserRes, error) {
+func (r *Repository) GetUserById(userId uint) (userRes app.UserRes, err error) {
 
-	for _, user := range *r.Users {
+	for _, user := range r.Users {
 		if user.UserId == userId {
-			userRes := app.UserRes{
+			userRes = app.UserRes{
 				Username:    user.Username,
 				Avatar:      user.Avatar,
 				City:        user.City,
@@ -125,15 +125,15 @@ func (r *Repository) GetUserById(userId uint) (*app.UserRes, error) {
 				Email:       user.Email,
 				Description: user.Description,
 			}
-			return &userRes, nil
+			return userRes, nil
 		}
 	}
 
-	return nil, fmt.Errorf("user are not found")
+	return userRes, fmt.Errorf("user are not found")
 }
 
 func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
-	for userId, userToken := range *r.UserToken {
+	for userId, userToken := range r.UserTokens {
 		if userToken == InpToken {
 			return userId, nil
 		}
@@ -142,10 +142,10 @@ func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
 	return 0, fmt.Errorf("user are not found")
 }
 
-func (r *Repository) GetRecommendation(userId uint) (recommendations []*app.Recommendation, err error) {
+func (r *Repository) GetRecommendation(userId uint) (recommendations []app.Recommendation, err error) {
 	count := 0
 
-	for _, user := range *r.Users {
+	for _, user := range r.Users {
 		if user.UserId != userId {
 			recommendPerson := app.Recommendation{
 				City:        user.City,
@@ -155,7 +155,7 @@ func (r *Repository) GetRecommendation(userId uint) (recommendations []*app.Reco
 				Description: user.Description,
 				Sex:         user.Sex,
 			}
-			recommendations = append(recommendations, &recommendPerson)
+			recommendations = append(recommendations, recommendPerson)
 			count += 1
 			if count == 10 {
 				break
