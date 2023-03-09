@@ -22,7 +22,10 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
-const SessionTokenCookieName = "session_token"
+const (
+	SessionTokenCookieName = "session_token"
+	DefaultAvatar          = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+)
 
 type Result struct {
 	status int
@@ -92,7 +95,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	userJson.Password = hashedPass
 
 	if userJson.Avatar == "" {
-		userJson.Avatar = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+		userJson.Avatar = DefaultAvatar
 	}
 
 	userId, err := a.repo.AddUser(userJson)
@@ -311,8 +314,6 @@ func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mapUser := structs.Map(&user)
-	fmt.Print(mapUser)
-
 	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
 	Respond(w, r, Result{http.StatusOK, ""}, mapUser)
 }
