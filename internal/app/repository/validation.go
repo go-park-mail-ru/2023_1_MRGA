@@ -3,7 +3,7 @@ package repository
 import "fmt"
 
 func (r *Repository) CheckUsername(username string) error {
-	for _, user := range *r.Users {
+	for _, user := range r.Users {
 		if username == user.Username {
 
 			return fmt.Errorf("username is not unique")
@@ -14,7 +14,7 @@ func (r *Repository) CheckUsername(username string) error {
 }
 
 func (r *Repository) CheckEmail(email string) error {
-	for _, user := range *r.Users {
+	for _, user := range r.Users {
 		if email == user.Email {
 
 			return fmt.Errorf("email is not unique")

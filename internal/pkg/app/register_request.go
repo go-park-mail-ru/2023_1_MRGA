@@ -83,14 +83,14 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(reqBody, &userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+		Respond(w, r, Result{http.StatusBadRequest, "cant parse json"}, map[string]interface{}{})
 		return
 	}
 
 	hashedPass := CreatePass(userJson.Password)
 	userJson.Password = hashedPass
 
-	err = a.repo.AddUser(&userJson)
+	err = a.repo.AddUser(userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
@@ -145,7 +145,7 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(reqBody, &logInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+		Respond(w, r, Result{http.StatusBadRequest, "cant parse json"}, map[string]interface{}{})
 		return
 	}
 

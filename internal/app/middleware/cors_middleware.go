@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"golang.org/x/exp/slices"
 	"net/http"
+
+	"golang.org/x/exp/slices"
 )
 
 func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {

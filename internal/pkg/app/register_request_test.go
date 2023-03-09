@@ -4,18 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 )
 
-type psevdoRepo struct {
-	Users     *[]dataStruct.User
-	Cities    *[]dataStruct.City
-	UserToken *map[uint]string
+type dummyRepo struct {
+	Users     []dataStruct.User
+	Cities    []dataStruct.City
+	UserToken map[uint]string
 }
 
 func convertToString(val interface{}) (strVal string) {
@@ -55,6 +56,11 @@ func TestApplication_Register(t *testing.T) {
 			inpJson:    `{"username": "masharpik", "email": "masharpik@gmail.com", "password": "masharpik2004", "age": 19}`,
 			inpMethod:  "POST",
 			outputJson: map[string]interface{}{"err": "", "status": http.StatusOK},
+		},
+		{
+			inpJson:    `{"username": 6666, "email": "masharpik@gmail.com", "password": "masharpik2004", "age": 19}`,
+			inpMethod:  "POST",
+			outputJson: map[string]interface{}{"err": "cant parse json", "status": http.StatusBadRequest},
 		},
 		{
 			inpJson:    `{"username": "masharpik", "email": "masharpik@gmail.com", "password": "masharpik2004", "age": 19}`,
@@ -108,6 +114,11 @@ func TestApplication_Login(t *testing.T) {
 			inpJson:    `{"input": "masharpik", "password": "masharpik2004"}`,
 			inpMethod:  "POST",
 			outputJson: map[string]interface{}{"err": "", "status": http.StatusOK},
+		},
+		{
+			inpJson:    `{"input": 999, "password": "masharpik2004"}`,
+			inpMethod:  "POST",
+			outputJson: map[string]interface{}{"err": "cant parse json", "status": http.StatusBadRequest},
 		},
 		{
 			inpJson:    `{"input": "", "password": "masharpik2004"}`,
@@ -402,40 +413,40 @@ func TestApplication_GetRecommendations(t *testing.T) {
 
 ///PsevdoRepo
 
-func NewRepo() *psevdoRepo {
+func NewRepo() *dummyRepo {
 	var userDS []dataStruct.User
 	var cityDS []dataStruct.City
 	tokenDS := make(map[uint]string)
-	r := psevdoRepo{&userDS, &cityDS, &tokenDS}
+	r := dummyRepo{userDS, cityDS, tokenDS}
 
 	return &r
 }
 
-func (pr *psevdoRepo) AddUser(_ *dataStruct.User) error {
+func (pr *dummyRepo) AddUser(_ dataStruct.User) error {
 	return nil
 }
 
-func (pr *psevdoRepo) DeleteToken(_ string) error {
+func (pr *dummyRepo) DeleteToken(_ string) error {
 	return nil
 }
 
-func (pr *psevdoRepo) Login(_, _ string) (userId uint, err error) {
+func (pr *dummyRepo) Login(_, _ string) (userId uint, err error) {
 	return 0, nil
 }
 
-func (pr *psevdoRepo) SaveToken(_ uint, _ string) {
+func (pr *dummyRepo) SaveToken(_ uint, _ string) {
 
 }
 
-func (pr *psevdoRepo) GetCities() ([]string, error) {
+func (pr *dummyRepo) GetCities() ([]string, error) {
 	return nil, nil
 }
 
-func (pr *psevdoRepo) GetUserIdByToken(string) (uint, error) {
+func (pr *dummyRepo) GetUserIdByToken(string) (uint, error) {
 	return 0, nil
 }
 
-func (pr *psevdoRepo) GetUserById(uint) (*UserRes, error) {
+func (pr *dummyRepo) GetUserById(uint) (UserRes, error) {
 	ur := UserRes{
 		Username:    "",
 		Age:         20,
@@ -445,9 +456,9 @@ func (pr *psevdoRepo) GetUserById(uint) (*UserRes, error) {
 		Email:       "",
 		Avatar:      "",
 	}
-	return &ur, nil
+	return ur, nil
 }
 
-func (pr *psevdoRepo) GetRecommendation(uint) ([]*Recommendation, error) {
+func (pr *dummyRepo) GetRecommendation(uint) ([]Recommendation, error) {
 	return nil, nil
 }

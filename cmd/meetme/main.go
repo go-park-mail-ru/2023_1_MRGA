@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
-	"log"
 )
 
 // @title MRGA

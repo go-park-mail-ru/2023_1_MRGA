@@ -8,13 +8,13 @@ import (
 
 type IRepository interface {
 	DeleteToken(string) error
-	AddUser(d *dataStruct.User) error
+	AddUser(d dataStruct.User) error
 	Login(input string, pass string) (uint, error)
 	SaveToken(id uint, token string)
 	GetCities() ([]string, error)
 	GetUserIdByToken(string) (uint, error)
-	GetUserById(uint) (*UserRes, error)
-	GetRecommendation(uint) ([]*Recommendation, error)
+	GetUserById(uint) (UserRes, error)
+	GetRecommendation(uint) ([]Recommendation, error)
 }
 
 type Application struct {

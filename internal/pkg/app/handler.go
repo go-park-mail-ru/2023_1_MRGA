@@ -1,9 +1,11 @@
 package app
 
 import (
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 )
 
 var frontendHosts = []string{
