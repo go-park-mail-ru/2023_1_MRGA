@@ -90,6 +90,10 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	hashedPass := CreatePass(userJson.Password)
 	userJson.Password = hashedPass
 
+	if userJson.Avatar == "" {
+		userJson.Avatar = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+	}
+
 	err = a.repo.AddUser(userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
