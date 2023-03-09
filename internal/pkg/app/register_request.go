@@ -257,13 +257,13 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 }
 
 type UserRes struct {
-	Username    string        `json:"username"`
-	Email       string        `json:"email"`
-	Age         int           `json:"age"`
-	Sex         constform.Sex `json:"sex"`
-	City        string        `json:"city"`
-	Description string        `json:"description"`
-	Avatar      string        `json:"avatar"`
+	Username    string        `structs:"username"`
+	Email       string        `structs:"email"`
+	Age         int           `structs:"age"`
+	Sex         constform.Sex `structs:"sex"`
+	City        string        `structs:"city"`
+	Description string        `structs:"description"`
+	Avatar      string        `structs:"avatar"`
 }
 
 // GetCurrentUser godoc
@@ -308,6 +308,7 @@ func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mapUser := structs.Map(&user)
+	fmt.Print(mapUser)
 
 	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
 	Respond(w, r, Result{http.StatusOK, ""}, mapUser)
