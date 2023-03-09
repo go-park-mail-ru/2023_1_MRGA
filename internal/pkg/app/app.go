@@ -8,7 +8,7 @@ import (
 
 type IRepository interface {
 	DeleteToken(string) error
-	AddUser(d dataStruct.User) error
+	AddUser(d dataStruct.User) (uint, error)
 	Login(input string, pass string) (uint, error)
 	SaveToken(id uint, token string)
 	GetCities() ([]string, error)

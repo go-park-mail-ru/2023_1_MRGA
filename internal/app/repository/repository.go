@@ -25,27 +25,27 @@ func NewRepo() *Repository {
 	return &r
 }
 
-func (r *Repository) AddUser(user dataStruct.User) error {
+func (r *Repository) AddUser(user dataStruct.User) (uint, error) {
 	userId := len(r.Users)
 	user.UserId = uint(userId)
 
 	if err := r.CheckUsername(user.Username); err != nil {
-		return err
+		return 0, err
 	}
 
 	if err := r.CheckEmail(user.Email); err != nil {
-		return err
+		return 0, err
 	}
 
 	if err := CheckAge(user.Age); err != nil {
-		return err
+		return 0, err
 	}
 
 	usersDB := r.Users
 	usersDB = append(usersDB, user)
 	r.Users = usersDB
 
-	return nil
+	return user.UserId, nil
 }
 
 func (r *Repository) SaveToken(userId uint, token string) {

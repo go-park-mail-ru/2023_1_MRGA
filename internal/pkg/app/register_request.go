@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
@@ -21,7 +22,10 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
-const SessionTokenCookieName = "session_token"
+const (
+	SessionTokenCookieName = "session_token"
+	DefaultAvatar          = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+)
 
 type Result struct {
 	status int
@@ -90,7 +94,12 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	hashedPass := CreatePass(userJson.Password)
 	userJson.Password = hashedPass
 
-	err = a.repo.AddUser(userJson)
+	if userJson.Avatar == "" {
+		userJson.Avatar = DefaultAvatar
+	}
+
+	userId, err := a.repo.AddUser(userJson)
+	log.Println(userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
@@ -98,7 +107,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userToken := token.CreateToken()
-	a.repo.SaveToken(userJson.UserId, userToken)
+	a.repo.SaveToken(userId, userToken)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionTokenCookieName,
@@ -253,13 +262,13 @@ func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
 }
 
 type UserRes struct {
-	Username    string        `json:"username"`
-	Email       string        `json:"email"`
-	Age         int           `json:"age"`
-	Sex         constform.Sex `json:"sex"`
-	City        string        `json:"city"`
-	Description string        `json:"description"`
-	Avatar      string        `json:"avatar"`
+	Username    string        `structs:"username"`
+	Email       string        `structs:"email"`
+	Age         int           `structs:"age"`
+	Sex         constform.Sex `structs:"sex"`
+	City        string        `structs:"city"`
+	Description string        `structs:"description"`
+	Avatar      string        `structs:"avatar"`
 }
 
 // GetCurrentUser godoc
@@ -290,6 +299,7 @@ func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userId, err := a.repo.GetUserIdByToken(UserToken.Value)
+	log.Println(userId)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
@@ -304,7 +314,6 @@ func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mapUser := structs.Map(&user)
-
 	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
 	Respond(w, r, Result{http.StatusOK, ""}, mapUser)
 }
