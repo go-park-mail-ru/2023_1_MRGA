@@ -17,7 +17,7 @@ import (
 
 // @license.name AS IS (NO WARRANTY)
 
-// @host 127.0.0.1
+// @host 5.159.100.59
 // @schemes http
 // @BasePath /meetme/
 func main() {

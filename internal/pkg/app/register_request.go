@@ -51,9 +51,9 @@ func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string
 // Register godoc
 // @Summary      Register new user
 // @Description  create new account with unique username and email
-// @Tags         Tests
-// @Param Body body data_struct.User true "info about user"
-// @Success      200
+// @Tags         Registration
+// @Param Body body dataStruct.User true "info about user"
+// @Success      200 {object} map[string]interface{}
 // @Router       /meetme/register [post]
 func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 
@@ -114,9 +114,9 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 // Login godoc
 // @Summary      authorise user
 // @Description  authorise existing user with username/email and password
-// @Tags         Tests
+// @Tags         Registration
 // @Param Body body LoginInput true "nickname/email password"
-// @Success      200
+// @Success      200 {object} map[string]interface{}
 // @Router       /meetme/login [post]
 func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -182,10 +182,10 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 
 // Logout godoc
 // @Summary      Logout authorised user
-// @Description  auser can log out and end session
-// @Tags         Tests
-// @Success      200
-// @Router       /meetme/logout [get]
+// @Description  user can log out and end session
+// @Tags         Registration
+// @Success      200 {object} map[string]interface{}
+// @Router       /meetme/logout [post]
 func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		err := fmt.Errorf("only POST method is supported for this route")
@@ -228,7 +228,7 @@ func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
 // GetCities godoc
 // @Summary      get list of cities for registration
 // @Description  returned list of cities
-// @Tags         Tests
+// @Tags         info
 // @Success      200  {object}  map[string][]string
 // @Router       /meetme/city [get]
 func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
@@ -265,7 +265,7 @@ type UserRes struct {
 // GetCurrentUser godoc
 // @Summary      get info about current user
 // @Description  you can get info about current user
-// @Tags         Tests
+// @Tags         info
 // @Produce      json
 // @Success      200  {object}  UserRes
 // @Router       /meetme/user [get]
