@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
@@ -94,7 +95,8 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 		userJson.Avatar = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
 	}
 
-	err = a.repo.AddUser(userJson)
+	userId, err := a.repo.AddUser(userJson)
+	log.Println(userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
@@ -102,7 +104,7 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userToken := token.CreateToken()
-	a.repo.SaveToken(userJson.UserId, userToken)
+	a.repo.SaveToken(userId, userToken)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionTokenCookieName,
@@ -294,6 +296,7 @@ func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userId, err := a.repo.GetUserIdByToken(UserToken.Value)
+	log.Println(userId)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})

@@ -422,8 +422,8 @@ func NewRepo() *dummyRepo {
 	return &r
 }
 
-func (pr *dummyRepo) AddUser(_ dataStruct.User) error {
-	return nil
+func (pr *dummyRepo) AddUser(_ dataStruct.User) (uint, error) {
+	return 0, nil
 }
 
 func (pr *dummyRepo) DeleteToken(_ string) error {
