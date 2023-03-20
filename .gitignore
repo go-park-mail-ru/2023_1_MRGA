@@ -89,3 +89,6 @@ fabric.properties
 # vendor/
 
 **/.idea*
+cover
+cover.out
+.env

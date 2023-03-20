@@ -75,7 +75,7 @@ func TestRepository_CheckUsername(t *testing.T) {
 	}
 
 	for _, u := range users {
-		err := repo.AddUser(u)
+		_, err := repo.AddUser(u)
 		if err != nil {
 
 			os.Exit(2)
@@ -148,7 +148,7 @@ func TestRepository_CheckEmail(t *testing.T) {
 	}
 
 	for _, u := range users {
-		err := repo.AddUser(u)
+		_, err := repo.AddUser(u)
 		if err != nil {
 
 			os.Exit(2)
