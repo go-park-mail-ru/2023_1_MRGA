@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/logger"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 )
 
 type Recommendation struct {

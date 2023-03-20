@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/middleware"
 )
 
 var frontendHosts = []string{
