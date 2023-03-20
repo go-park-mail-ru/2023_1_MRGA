@@ -297,7 +297,7 @@ func TestApplication_GetCurrentUser(t *testing.T) {
 				Expires:  time.Now().Add(120 * time.Second),
 				HttpOnly: true,
 			},
-			outputJson: map[string]interface{}{"Age": 20, "Avatar": "", "City": "", "Description": "", "Email": "", "Sex": 0, "Username": "", "err": "", "status": http.StatusOK},
+			outputJson: map[string]interface{}{"age": 20, "avatar": "", "city": "", "description": "", "email": "", "sex": 0, "username": "", "err": "", "status": http.StatusOK},
 		},
 		{
 			inpMethod:  "POST",
