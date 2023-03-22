@@ -2,55 +2,25 @@ package app
 
 import (
 	"crypto/sha1"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/fatih/structs"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 )
 
-type LoginInput struct {
-	Input    string `json:"input"`
-	Password string `json:"password"`
-}
+//type LoginInput struct {
+//	Input    string `json:"input"`
+//	Password string `json:"password"`
+//}
 
 const (
 	SessionTokenCookieName = "session_token"
 	DefaultAvatar          = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
 )
-
-type Result struct {
-	status int
-	err    string
-}
-
-func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string]interface{}) {
-	w.Header().Add("Content-Type", "application/json")
-
-	data["status"] = res.status
-	data["err"] = res.err
-
-	encoder := json.NewEncoder(w)
-	err := encoder.Encode(data)
-
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "err": "%s"}`, http.StatusInternalServerError, err.Error())))
-		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-			return
-		}
-		return
-	}
-}
 
 // Register godoc
 // @Summary      Register new user
@@ -59,66 +29,66 @@ func Respond(w http.ResponseWriter, r *http.Request, res Result, data map[string
 // @Param Body body dataStruct.User true "info about user"
 // @Success      200 {object} map[string]interface{}
 // @Router       /meetme/register [post]
-func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != http.MethodPost {
-		err := fmt.Errorf("only POST method is supported for this route")
-		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	defer func() {
-		err := r.Body.Close()
-		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-			Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
-			return
-		}
-	}()
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	var userJson dataStruct.User
-	err = json.Unmarshal(reqBody, &userJson)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, "cant parse json"}, map[string]interface{}{})
-		return
-	}
-
-	hashedPass := CreatePass(userJson.Password)
-	userJson.Password = hashedPass
-
-	if userJson.Avatar == "" {
-		userJson.Avatar = DefaultAvatar
-	}
-
-	userId, err := a.repo.AddUser(userJson)
-	log.Println(userJson)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	userToken := token.CreateToken()
-	a.repo.SaveToken(userId, userToken)
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     SessionTokenCookieName,
-		Value:    userToken,
-		Expires:  time.Now().Add(72 * time.Hour),
-		HttpOnly: true,
-	})
-
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
-}
+//func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
+//
+//	if r.Method != http.MethodPost {
+//		err := fmt.Errorf("only POST method is supported for this route")
+//		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	defer func() {
+//		err := r.Body.Close()
+//		if err != nil {
+//			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+//			Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
+//			return
+//		}
+//	}()
+//	reqBody, err := ioutil.ReadAll(r.Body)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	var userJson dataStruct.User
+//	err = json.Unmarshal(reqBody, &userJson)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, "cant parse json"}, map[string]interface{}{})
+//		return
+//	}
+//
+//	hashedPass := CreatePass(userJson.Password)
+//	userJson.Password = hashedPass
+//
+//	if userJson.Avatar == "" {
+//		userJson.Avatar = DefaultAvatar
+//	}
+//
+//	userId, err := a.repo.AddUser(userJson)
+//	log.Println(userJson)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	userToken := token.CreateToken()
+//	a.repo.SaveToken(userId, userToken)
+//
+//	http.SetCookie(w, &http.Cookie{
+//		Name:     SessionTokenCookieName,
+//		Value:    userToken,
+//		Expires:  time.Now().Add(72 * time.Hour),
+//		HttpOnly: true,
+//	})
+//
+//	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+//	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
+//}
 
 // Login godoc
 // @Summary      authorise user
@@ -127,67 +97,67 @@ func (a *Application) Register(w http.ResponseWriter, r *http.Request) {
 // @Param Body body LoginInput true "nickname/email password"
 // @Success      200 {object} map[string]interface{}
 // @Router       /meetme/login [post]
-func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		err := fmt.Errorf("only POST method is supported for this route")
-		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	defer func() {
-		err := r.Body.Close()
-		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-			Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
-			return
-		}
-	}()
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	var logInp LoginInput
-	err = json.Unmarshal(reqBody, &logInp)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, "cant parse json"}, map[string]interface{}{})
-		return
-	}
-
-	hashPass := CreatePass(logInp.Password)
-
-	var userId uint
-
-	if logInp.Input != "" {
-		userId, err = a.repo.Login(logInp.Input, hashPass)
-		if err != nil {
-			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-			Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
-			return
-		}
-	} else {
-		logger.Log(http.StatusBadRequest, "email and username are empty", r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, "empty login"}, map[string]interface{}{})
-		return
-	}
-
-	userToken := token.CreateToken()
-	a.repo.SaveToken(userId, userToken)
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     SessionTokenCookieName,
-		Value:    userToken,
-		Expires:  time.Now().Add(120 * time.Second),
-		HttpOnly: true,
-	})
-
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
-}
+//func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
+//	if r.Method != http.MethodPost {
+//		err := fmt.Errorf("only POST method is supported for this route")
+//		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	defer func() {
+//		err := r.Body.Close()
+//		if err != nil {
+//			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+//			Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
+//			return
+//		}
+//	}()
+//	reqBody, err := ioutil.ReadAll(r.Body)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	var logInp LoginInput
+//	err = json.Unmarshal(reqBody, &logInp)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, "cant parse json"}, map[string]interface{}{})
+//		return
+//	}
+//
+//	hashPass := CreatePass(logInp.Password)
+//
+//	var userId uint
+//
+//	if logInp.Input != "" {
+//		userId, err = a.repo.Login(logInp.Input, hashPass)
+//		if err != nil {
+//			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//			Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+//			return
+//		}
+//	} else {
+//		logger.Log(http.StatusBadRequest, "email and username are empty", r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, "empty login"}, map[string]interface{}{})
+//		return
+//	}
+//
+//	userToken := token.CreateToken()
+//	a.repo.SaveToken(userId, userToken)
+//
+//	http.SetCookie(w, &http.Cookie{
+//		Name:     SessionTokenCookieName,
+//		Value:    userToken,
+//		Expires:  time.Now().Add(120 * time.Second),
+//		HttpOnly: true,
+//	})
+//
+//	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+//	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
+//}
 
 // Logout godoc
 // @Summary      Logout authorised user
@@ -195,44 +165,44 @@ func (a *Application) Login(w http.ResponseWriter, r *http.Request) {
 // @Tags         Registration
 // @Success      200 {object} map[string]interface{}
 // @Router       /meetme/logout [post]
-func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		err := fmt.Errorf("only POST method is supported for this route")
-		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	userToken, err := r.Cookie(SessionTokenCookieName)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
-			Respond(w, r, Result{http.StatusUnauthorized, err.Error()}, map[string]interface{}{})
-			return
-		}
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	strToken := userToken.Value
-	err = a.repo.DeleteToken(strToken)
-	if err != nil {
-		logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusUnauthorized, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     SessionTokenCookieName,
-		Value:    "",
-		Expires:  time.Now().Add(-120 * time.Second),
-		HttpOnly: true,
-	})
-
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
-}
+//func (a *Application) Logout(w http.ResponseWriter, r *http.Request) {
+//	if r.Method != http.MethodPost {
+//		err := fmt.Errorf("only POST method is supported for this route")
+//		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	userToken, err := r.Cookie(SessionTokenCookieName)
+//	if err != nil {
+//		if err == http.ErrNoCookie {
+//			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+//			Respond(w, r, Result{http.StatusUnauthorized, err.Error()}, map[string]interface{}{})
+//			return
+//		}
+//		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	strToken := userToken.Value
+//	err = a.repo.DeleteToken(strToken)
+//	if err != nil {
+//		logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusUnauthorized, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	http.SetCookie(w, &http.Cookie{
+//		Name:     SessionTokenCookieName,
+//		Value:    "",
+//		Expires:  time.Now().Add(-120 * time.Second),
+//		HttpOnly: true,
+//	})
+//
+//	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+//	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
+//}
 
 // GetCities godoc
 // @Summary      get list of cities for registration

@@ -6,13 +6,21 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
 )
 
+type Handler struct {
+	useCase auth.UseCase
+}
+
+func NewHandler(useCase auth.UseCase) *Handler {
+	return &Handler{
+		useCase: useCase,
+	}
+}
+
 func RegisterHTTPEndpoints(router *http.ServeMux, uc auth.UseCase) {
 	h := NewHandler(uc)
 
-	authEndpoints := router.Group("/auth")
-	{
-		authEndpoints.POST("/register", h.Register)
-		authEndpoints.POST("/login", h.Login)
-		authEndpoints.POST("/logout", h.Logout)
-	}
+	router.HandleFunc("/meetme/register", h.Register)
+	router.HandleFunc("/meetme/login", h.Login)
+	router.HandleFunc("/meetme/logout", h.Logout)
+
 }

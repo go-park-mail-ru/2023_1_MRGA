@@ -2,17 +2,16 @@ package delivery
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
+	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
-
-type Handler struct {
-	useCase auth.UseCase
-}
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
@@ -20,14 +19,15 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		err := r.Body.Close()
 		if err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-			Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
 	}()
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
@@ -35,15 +35,97 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(reqBody, &userJson)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, "cant parse json"}, map[string]interface{}{})
+		err = fmt.Errorf("cant parse json")
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
-	if err := h.useCase.Register(userJson.Username, userJson.Password); err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+	userToken, err := h.useCase.Register(&userJson)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     _default.SessionTokenCookieName,
+		Value:    userToken,
+		Expires:  time.Now().Add(72 * time.Hour),
+		HttpOnly: true,
+	})
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	Respond(w, r, Result{http.StatusOK, ""}, map[string]interface{}{})
+	writer.Respond(w, r, map[string]interface{}{})
+}
+
+type LoginInput struct {
+	Input    string `json:"input"`
+	Password string `json:"password"`
+}
+
+func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+
+	defer func() {
+		err := r.Body.Close()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+	}()
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	var logInp LoginInput
+	err = json.Unmarshal(reqBody, &logInp)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	userToken, err := h.useCase.Login(logInp)
+	http.SetCookie(w, &http.Cookie{
+		Name:     _default.SessionTokenCookieName,
+		Value:    userToken,
+		Expires:  time.Now().Add(120 * time.Second),
+		HttpOnly: true,
+	})
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, map[string]interface{}{})
+}
+
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	userToken, err := r.Cookie(_default.SessionTokenCookieName)
+	if err != nil {
+		if err == http.ErrNoCookie {
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
+			return
+		}
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	err = h.useCase.Logout(userToken.Value)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     _default.SessionTokenCookieName,
+		Value:    "",
+		Expires:  time.Now().Add(-120 * time.Second),
+		HttpOnly: true,
+	})
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, map[string]interface{}{})
 }
