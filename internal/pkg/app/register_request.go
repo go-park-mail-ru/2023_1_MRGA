@@ -1,26 +1,9 @@
 package app
 
-import (
-	"crypto/sha1"
-	"fmt"
-	"log"
-	"net/http"
-
-	"github.com/fatih/structs"
-
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
-)
-
 //type LoginInput struct {
 //	Input    string `json:"input"`
 //	Password string `json:"password"`
 //}
-
-const (
-	SessionTokenCookieName = "session_token"
-	DefaultAvatar          = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
-)
 
 // Register godoc
 // @Summary      Register new user
@@ -210,36 +193,36 @@ const (
 // @Tags         info
 // @Success      200  {object}  map[string][]string
 // @Router       /meetme/city [get]
-func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		err := fmt.Errorf("only GET method is supported for this route")
-		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	cities, err := a.repo.GetCities()
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	mapResp := make(map[string]interface{})
-	mapResp["city"] = cities
-
-	Respond(w, r, Result{http.StatusOK, ""}, mapResp)
-}
-
-type UserRes struct {
-	Username    string        `structs:"username"`
-	Email       string        `structs:"email"`
-	Age         int           `structs:"age"`
-	Sex         constform.Sex `structs:"sex"`
-	City        string        `structs:"city"`
-	Description string        `structs:"description"`
-	Avatar      string        `structs:"avatar"`
-}
+//func (a *Application) GetCities(w http.ResponseWriter, r *http.Request) {
+//	if r.Method != http.MethodGet {
+//		err := fmt.Errorf("only GET method is supported for this route")
+//		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	cities, err := a.repo.GetCities()
+//	if err != nil {
+//		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	mapResp := make(map[string]interface{})
+//	mapResp["city"] = cities
+//
+//	Respond(w, r, Result{http.StatusOK, ""}, mapResp)
+//}
+//
+//type UserRes struct {
+//	Username    string        `structs:"username"`
+//	Email       string        `structs:"email"`
+//	Age         int           `structs:"age"`
+//	Sex         constform.Sex `structs:"sex"`
+//	City        string        `structs:"city"`
+//	Description string        `structs:"description"`
+//	Avatar      string        `structs:"avatar"`
+//}
 
 // GetCurrentUser godoc
 // @Summary      get info about current user
@@ -248,50 +231,50 @@ type UserRes struct {
 // @Produce      json
 // @Success      200  {object}  UserRes
 // @Router       /meetme/user [get]
-func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		err := fmt.Errorf("only GET method is supported for this route")
-		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
-		return
-	}
+//func (a *Application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+//	if r.Method != http.MethodGet {
+//		err := fmt.Errorf("only GET method is supported for this route")
+//		logger.Log(http.StatusNotFound, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusNotFound, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	UserToken, err := r.Cookie(SessionTokenCookieName)
+//	if err != nil {
+//		if err == http.ErrNoCookie {
+//			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+//			Respond(w, r, Result{http.StatusUnauthorized, err.Error()}, map[string]interface{}{})
+//			return
+//		}
+//		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	userId, err := a.repo.GetUserIdByToken(UserToken.Value)
+//	log.Println(userId)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	user, err := a.repo.GetUserById(userId)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
+//		return
+//	}
+//
+//	mapUser := structs.Map(&user)
+//	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
+//	Respond(w, r, Result{http.StatusOK, ""}, mapUser)
+//}
 
-	UserToken, err := r.Cookie(SessionTokenCookieName)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
-			Respond(w, r, Result{http.StatusUnauthorized, err.Error()}, map[string]interface{}{})
-			return
-		}
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusInternalServerError, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	userId, err := a.repo.GetUserIdByToken(UserToken.Value)
-	log.Println(userId)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	user, err := a.repo.GetUserById(userId)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		Respond(w, r, Result{http.StatusBadRequest, err.Error()}, map[string]interface{}{})
-		return
-	}
-
-	mapUser := structs.Map(&user)
-	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
-	Respond(w, r, Result{http.StatusOK, ""}, mapUser)
-}
-
-func CreatePass(password string) string {
-	h := sha1.New()
-	h.Write([]byte(password))
-	bs := h.Sum([]byte("123456789"))
-
-	return string(bs)
-}
+//func CreatePass(password string) string {
+//	h := sha1.New()
+//	h.Write([]byte(password))
+//	bs := h.Sum([]byte("123456789"))
+//
+//	return string(bs)
+//}

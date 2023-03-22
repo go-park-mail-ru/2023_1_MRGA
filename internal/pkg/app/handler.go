@@ -5,6 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/middleware"
 )
 
@@ -24,13 +26,14 @@ func (a *Application) InitRoutes() *http.ServeMux {
 
 	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
 	router.Handle("/", handlerWithCorsMiddleware)
-
-	handler.HandleFunc("/meetme/register", a.Register)
-	handler.HandleFunc("/meetme/login", a.Login)
-	handler.HandleFunc("/meetme/logout", a.Logout)
-	handler.HandleFunc("/meetme/cities", a.GetCities)
-	handler.HandleFunc("/meetme/user", a.GetCurrentUser)
-	handler.HandleFunc("/meetme/recommendations", a.GetRecommendations)
+	uc := usecase.NewAuthUseCase(a.repo, "0123", []byte("0123"), 1233)
+	delivery.RegisterHTTPEndpoints(a.Router, uc)
+	//handler.HandleFunc("/meetme/register", a.Register)
+	//handler.HandleFunc("/meetme/login", a.Login)
+	//handler.HandleFunc("/meetme/logout", a.Logout)
+	//handler.HandleFunc("/meetme/cities", a.GetCities)
+	//handler.HandleFunc("/meetme/user", a.GetCurrentUser)
+	//handler.HandleFunc("/meetme/recommendations", a.GetRecommendations)
 
 	return router
 }

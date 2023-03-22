@@ -8,6 +8,7 @@ import (
 	"time"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
 	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -58,11 +59,6 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
-type LoginInput struct {
-	Input    string `json:"input"`
-	Password string `json:"password"`
-}
-
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
@@ -80,7 +76,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var logInp LoginInput
+	var logInp auth.LoginInput
 	err = json.Unmarshal(reqBody, &logInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)

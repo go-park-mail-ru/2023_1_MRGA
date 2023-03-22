@@ -13,8 +13,8 @@ type IRepository interface {
 	SaveToken(id uint, token string)
 	GetCities() ([]string, error)
 	GetUserIdByToken(string) (uint, error)
-	GetUserById(uint) (UserRes, error)
-	GetRecommendation(uint) ([]Recommendation, error)
+	//GetUserById(uint) (UserRes, error)
+	//GetRecommendation(uint) ([]Recommendation, error)
 }
 
 type Application struct {

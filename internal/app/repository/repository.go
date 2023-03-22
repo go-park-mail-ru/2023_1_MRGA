@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 )
 
 type Repository struct {
@@ -112,25 +111,25 @@ func (r *Repository) GetCities() ([]string, error) {
 	return cities, nil
 }
 
-func (r *Repository) GetUserById(userId uint) (userRes app.UserRes, err error) {
-
-	for _, user := range r.Users {
-		if user.UserId == userId {
-			userRes = app.UserRes{
-				Username:    user.Username,
-				Avatar:      user.Avatar,
-				City:        user.City,
-				Age:         user.Age,
-				Sex:         user.Sex,
-				Email:       user.Email,
-				Description: user.Description,
-			}
-			return userRes, nil
-		}
-	}
-
-	return userRes, fmt.Errorf("user are not found")
-}
+//func (r *Repository) GetUserById(userId uint) (userRes app.UserRes, err error) {
+//
+//	for _, user := range r.Users {
+//		if user.UserId == userId {
+//			userRes = app.UserRes{
+//				Username:    user.Username,
+//				Avatar:      user.Avatar,
+//				City:        user.City,
+//				Age:         user.Age,
+//				Sex:         user.Sex,
+//				Email:       user.Email,
+//				Description: user.Description,
+//			}
+//			return userRes, nil
+//		}
+//	}
+//
+//	return userRes, fmt.Errorf("user are not found")
+//}
 
 func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
 	for userId, userToken := range r.UserTokens {
@@ -142,30 +141,30 @@ func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
 	return 0, fmt.Errorf("user are not found")
 }
 
-func (r *Repository) GetRecommendation(userId uint) (recommendations []app.Recommendation, err error) {
-	count := 0
-
-	for _, user := range r.Users {
-		if user.UserId != userId {
-			recommendPerson := app.Recommendation{
-				City:        user.City,
-				Username:    user.Username,
-				Age:         user.Age,
-				Avatar:      user.Avatar,
-				Description: user.Description,
-				Sex:         user.Sex,
-			}
-			recommendations = append(recommendations, recommendPerson)
-			count += 1
-			if count == 10 {
-				break
-			}
-		}
-	}
-
-	if count == 0 {
-		return nil, fmt.Errorf("no users yet")
-	}
-
-	return recommendations, nil
-}
+//func (r *Repository) GetRecommendation(userId uint) (recommendations []app.Recommendation, err error) {
+//	count := 0
+//
+//	for _, user := range r.Users {
+//		if user.UserId != userId {
+//			recommendPerson := app.Recommendation{
+//				City:        user.City,
+//				Username:    user.Username,
+//				Age:         user.Age,
+//				Avatar:      user.Avatar,
+//				Description: user.Description,
+//				Sex:         user.Sex,
+//			}
+//			recommendations = append(recommendations, recommendPerson)
+//			count += 1
+//			if count == 10 {
+//				break
+//			}
+//		}
+//	}
+//
+//	if count == 0 {
+//		return nil, fmt.Errorf("no users yet")
+//	}
+//
+//	return recommendations, nil
+//}

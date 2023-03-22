@@ -9,7 +9,6 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
 	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 )
 
 type AuthUseCase struct {
@@ -51,7 +50,7 @@ func (a *AuthUseCase) Register(user *dataStruct.User) (string, error) {
 	return userToken, nil
 }
 
-func (a *AuthUseCase) Login(logInp delivery.LoginInput) (string, error) {
+func (a *AuthUseCase) Login(logInp auth.LoginInput) (string, error) {
 	hashPass := CreatePass(logInp.Password)
 
 	if logInp.Input == "" {
