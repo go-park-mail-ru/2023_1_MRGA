@@ -5,11 +5,11 @@ import (
 )
 
 type RecUseCase struct {
-	userRepo recommendation.IRepositoryAuth
+	userRepo recommendation.IRepositoryRec
 }
 
 func NewRecUseCase(
-	userRepo recommendation.IRepositoryAuth) *RecUseCase {
+	userRepo recommendation.IRepositoryRec) *RecUseCase {
 	return &RecUseCase{
 		userRepo: userRepo,
 	}

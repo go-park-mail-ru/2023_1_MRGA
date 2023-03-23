@@ -5,6 +5,7 @@ import (
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user"
 )
 
 type IRepository interface {
@@ -14,7 +15,7 @@ type IRepository interface {
 	SaveToken(id uint, token string)
 	GetCities() ([]string, error)
 	GetUserIdByToken(string) (uint, error)
-	//GetUserById(uint) (dataStruct.User, error)
+	GetUserById(uint) (user.UserRes, error)
 	GetRecommendation(uint) ([]recommendation.Recommendation, error)
 }
 

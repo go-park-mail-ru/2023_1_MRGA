@@ -1,5 +1,5 @@
 package user
 
 type UseCase interface {
-	GetCurrentUser() (UserRes, error)
+	GetUserByToken(string) (UserRes, error)
 }

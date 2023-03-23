@@ -9,6 +9,8 @@ import (
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
+	userDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/delivery"
+	userUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/usecase"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/middleware"
 )
 
@@ -28,16 +30,15 @@ func (a *Application) InitRoutes() *http.ServeMux {
 
 	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
 	router.Handle("/", handlerWithCorsMiddleware)
+
 	ucAuth := authUC.NewAuthUseCase(a.repo, "0123", []byte("0123"), 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
+
 	ucRec := recUC.NewRecUseCase(a.repo)
 	recDel.RegisterHTTPEndpoints(a.Router, ucRec)
-	//handler.HandleFunc("/meetme/register", a.Register)
-	//handler.HandleFunc("/meetme/login", a.Login)
-	//handler.HandleFunc("/meetme/logout", a.Logout)
-	//handler.HandleFunc("/meetme/cities", a.GetCities)
-	//handler.HandleFunc("/meetme/user", a.GetCurrentUser)
-	//handler.HandleFunc("/meetme/recommendations", a.GetRecommendations)
+
+	ucUser := userUC.NewUserUseCase(a.repo)
+	userDel.RegisterHTTPEndpoints(a.Router, ucUser)
 
 	return router
 }

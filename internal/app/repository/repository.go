@@ -8,6 +8,7 @@ import (
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user"
 )
 
 type Repository struct {
@@ -57,10 +58,10 @@ func (r *Repository) SaveToken(userId uint, token string) {
 func (r *Repository) Login(input string, passwordInp string) (userId uint, err error) {
 	var userPassword string
 
-	for _, user := range r.Users {
-		if user.Email == input || user.Username == input {
-			userPassword = user.Password
-			userId = user.UserId
+	for _, userdb := range r.Users {
+		if userdb.Email == input || userdb.Username == input {
+			userPassword = userdb.Password
+			userId = userdb.UserId
 			break
 		}
 	}
@@ -112,25 +113,25 @@ func (r *Repository) GetCities() ([]string, error) {
 	return cities, nil
 }
 
-//func (r *Repository) GetUserById(userId uint) (userRes app.UserRes, err error) {
-//
-//	for _, user := range r.Users {
-//		if user.UserId == userId {
-//			userRes = app.UserRes{
-//				Username:    user.Username,
-//				Avatar:      user.Avatar,
-//				City:        user.City,
-//				Age:         user.Age,
-//				Sex:         user.Sex,
-//				Email:       user.Email,
-//				Description: user.Description,
-//			}
-//			return userRes, nil
-//		}
-//	}
-//
-//	return userRes, fmt.Errorf("user are not found")
-//}
+func (r *Repository) GetUserById(userId uint) (userRes user.UserRes, err error) {
+
+	for _, userdb := range r.Users {
+		if userdb.UserId == userId {
+			userRes = user.UserRes{
+				Username:    userdb.Username,
+				Avatar:      userdb.Avatar,
+				City:        userdb.City,
+				Age:         userdb.Age,
+				Sex:         userdb.Sex,
+				Email:       userdb.Email,
+				Description: userdb.Description,
+			}
+			return userRes, nil
+		}
+	}
+
+	return userRes, fmt.Errorf("user are not found")
+}
 
 func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
 	for userId, userToken := range r.UserTokens {
@@ -145,15 +146,15 @@ func (r *Repository) GetUserIdByToken(InpToken string) (uint, error) {
 func (r *Repository) GetRecommendation(userId uint) (recommendations []recommendation.Recommendation, err error) {
 	count := 0
 
-	for _, user := range r.Users {
-		if user.UserId != userId {
+	for _, userdb := range r.Users {
+		if userdb.UserId != userId {
 			recommendPerson := recommendation.Recommendation{
-				City:        user.City,
-				Username:    user.Username,
-				Age:         user.Age,
-				Avatar:      user.Avatar,
-				Description: user.Description,
-				Sex:         user.Sex,
+				City:        userdb.City,
+				Username:    userdb.Username,
+				Age:         userdb.Age,
+				Avatar:      userdb.Avatar,
+				Description: userdb.Description,
+				Sex:         userdb.Sex,
 			}
 			recommendations = append(recommendations, recommendPerson)
 			count += 1

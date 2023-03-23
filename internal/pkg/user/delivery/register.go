@@ -1,6 +1,10 @@
 package delivery
 
-import "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user"
+import (
+	"net/http"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user"
+)
 
 type Handler struct {
 	useCase user.UseCase
