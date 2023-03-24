@@ -17,7 +17,7 @@ func NewUserUseCase(
 	}
 }
 
-func (u *UserUseCase) GetUserByToken(token string) (user user.UserRes, errr error) {
+func (u *UserUseCase) GetUserByToken(token string) (user user.UserRes, err error) {
 	userId, err := u.userRepo.GetUserIdByToken(token)
 	log.Println(userId)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/fatih/structs"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
 	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -12,7 +13,7 @@ import (
 
 func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 
-	userToken, err := r.Cookie(_default.SessionTokenCookieName)
+	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
@@ -24,7 +25,7 @@ func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := c.useCase.GetUserByToken(userToken.Value)
+	user, err := c.useCase.GetUserByToken(userToken)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)

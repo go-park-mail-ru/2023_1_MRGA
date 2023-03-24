@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
 	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
@@ -48,12 +49,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     _default.SessionTokenCookieName,
-		Value:    userToken,
-		Expires:  time.Now().Add(72 * time.Hour),
-		HttpOnly: true,
-	})
+	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Second))
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
@@ -84,19 +80,18 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userToken, err := h.useCase.Login(logInp)
-	http.SetCookie(w, &http.Cookie{
-		Name:     _default.SessionTokenCookieName,
-		Value:    userToken,
-		Expires:  time.Now().Add(120 * time.Second),
-		HttpOnly: true,
-	})
-
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Second))
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
-	userToken, err := r.Cookie(_default.SessionTokenCookieName)
+	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
@@ -108,19 +103,14 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.useCase.Logout(userToken.Value)
+	err = h.useCase.Logout(userToken)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     _default.SessionTokenCookieName,
-		Value:    "",
-		Expires:  time.Now().Add(-120 * time.Second),
-		HttpOnly: true,
-	})
+	cookie.SetCookie(w, _default.SessionTokenCookieName, "", -120*time.Second)
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})

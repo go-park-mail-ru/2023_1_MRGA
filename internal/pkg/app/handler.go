@@ -6,10 +6,13 @@ import (
 	"github.com/gorilla/mux"
 
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
+	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
+	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
 	userDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/delivery"
+	userRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/repository"
 	userUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/usecase"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/middleware"
 )
@@ -31,13 +34,16 @@ func (a *Application) InitRoutes() *http.ServeMux {
 	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
 	router.Handle("/", handlerWithCorsMiddleware)
 
-	ucAuth := authUC.NewAuthUseCase(a.repo, "0123", []byte("0123"), 1233)
+	authRepo := AuthRepository.NewRepo()
+	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
 
-	ucRec := recUC.NewRecUseCase(a.repo)
+	recRepo := RecRepository.NewRepo()
+	ucRec := recUC.NewRecUseCase(recRepo)
 	recDel.RegisterHTTPEndpoints(a.Router, ucRec)
 
-	ucUser := userUC.NewUserUseCase(a.repo)
+	userRepo := userRepository.NewRepo()
+	ucUser := userUC.NewUserUseCase(userRepo)
 	userDel.RegisterHTTPEndpoints(a.Router, ucUser)
 
 	return router

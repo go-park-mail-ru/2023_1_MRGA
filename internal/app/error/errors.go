@@ -1,5 +1,15 @@
 package error
 
-var ERROR = map[string]string{
-	"Token not Found": "Token is not uniq", //All errors of our app [name in app (for us)] = name for front
+import "net/http"
+
+var UserNotFound = "cant find user in db"
+
+var ERROR = map[string]struct {
+	description string
+	status      int
+}{
+	UserNotFound: {
+		description: "you dont register yet",
+		status:      http.StatusBadGateway,
+	},
 }

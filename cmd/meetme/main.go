@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
 )
@@ -23,8 +22,8 @@ import (
 // @BasePath /meetme/
 func main() {
 	log.Println("Application is starting")
-	r := repository.NewRepo()
-	a := app.New(r)
+
+	a := app.New()
 
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
