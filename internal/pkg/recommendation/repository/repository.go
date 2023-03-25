@@ -1,21 +1,18 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
 
-	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation"
 )
 
 type RecRepository struct {
-	Users      []dataStruct.User
-	UserTokens map[uint]string
+	db *sql.DB
 }
 
-func NewRepo() *RecRepository {
-	var userDS []dataStruct.User
-	tokenDS := make(map[uint]string)
-	r := RecRepository{userDS, tokenDS}
+func NewRepo(db *sql.DB) *RecRepository {
+	r := RecRepository{db}
 
 	return &r
 }

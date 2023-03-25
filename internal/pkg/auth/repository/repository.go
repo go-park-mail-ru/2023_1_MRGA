@@ -1,20 +1,19 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 )
 
 type AuthRepository struct {
-	Users      []dataStruct.User
-	UserTokens map[uint]string
+	db *sql.DB
 }
 
-func NewRepo() *AuthRepository {
-	var userDS []dataStruct.User
-	tokenDS := make(map[uint]string)
-	r := AuthRepository{userDS, tokenDS}
+func NewRepo(db *sql.DB) *AuthRepository {
+
+	r := AuthRepository{db}
 
 	return &r
 }
