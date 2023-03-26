@@ -3,19 +3,17 @@ package repository
 import (
 	"fmt"
 
-	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
+	"gorm.io/gorm"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation"
 )
 
 type RecRepository struct {
-	Users      []dataStruct.User
-	UserTokens map[uint]string
+	db *gorm.DB
 }
 
-func NewRepo() *RecRepository {
-	var userDS []dataStruct.User
-	tokenDS := make(map[uint]string)
-	r := RecRepository{userDS, tokenDS}
+func NewRepo(db *gorm.DB) *RecRepository {
+	r := RecRepository{db}
 
 	return &r
 }

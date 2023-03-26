@@ -3,6 +3,10 @@ package main
 import (
 	"log"
 
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
 )
@@ -24,10 +28,11 @@ func main() {
 	log.Println("Application is starting")
 
 	a := app.New()
-
+	connStr := dsn.FromEnv()
+	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
-	err := serv.Run(opts, a.InitRoutes())
+	err = serv.Run(opts, a.InitRoutes(db))
 	if err != nil {
 		log.Fatalf("error occured while server starting: %v", err)
 	}

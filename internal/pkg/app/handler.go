@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
@@ -26,7 +27,7 @@ var frontendHosts = []string{
 	"http://192.168.0.2:8080",
 }
 
-func (a *Application) InitRoutes() *http.ServeMux {
+func (a *Application) InitRoutes(db *gorm.DB) *http.ServeMux {
 	router := a.Router
 
 	handler := mux.NewRouter()
@@ -34,15 +35,15 @@ func (a *Application) InitRoutes() *http.ServeMux {
 	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
 	router.Handle("/", handlerWithCorsMiddleware)
 
-	authRepo := AuthRepository.NewRepo()
+	authRepo := AuthRepository.NewRepo(db)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
 
-	recRepo := RecRepository.NewRepo()
+	recRepo := RecRepository.NewRepo(db)
 	ucRec := recUC.NewRecUseCase(recRepo)
 	recDel.RegisterHTTPEndpoints(a.Router, ucRec)
 
-	userRepo := userRepository.NewRepo()
+	userRepo := userRepository.NewRepo(db)
 	ucUser := userUC.NewUserUseCase(userRepo)
 	userDel.RegisterHTTPEndpoints(a.Router, ucUser)
 

@@ -3,18 +3,18 @@ package repository
 import (
 	"fmt"
 
+	"gorm.io/gorm"
+
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 )
 
 type AuthRepository struct {
-	Users      []dataStruct.User
-	UserTokens map[uint]string
+	db *gorm.DB
 }
 
-func NewRepo() *AuthRepository {
-	var userDS []dataStruct.User
-	tokenDS := make(map[uint]string)
-	r := AuthRepository{userDS, tokenDS}
+func NewRepo(db *gorm.DB) *AuthRepository {
+
+	r := AuthRepository{db}
 
 	return &r
 }
@@ -43,7 +43,7 @@ func (r *AuthRepository) Login(input string, passwordInp string) (userId uint, e
 
 func (r *AuthRepository) AddUser(user dataStruct.User) (uint, error) {
 	userId := len(r.Users)
-	user.UserId = uint(userId)
+	user.Id = uint(userId)
 
 	if err := r.CheckUsername(user.Username); err != nil {
 		return 0, err
@@ -61,7 +61,7 @@ func (r *AuthRepository) AddUser(user dataStruct.User) (uint, error) {
 	usersDB = append(usersDB, user)
 	r.Users = usersDB
 
-	return user.UserId, nil
+	return user.Id, nil
 }
 
 func (r *AuthRepository) DeleteToken(token string) error {

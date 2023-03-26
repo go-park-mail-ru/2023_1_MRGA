@@ -53,7 +53,7 @@ func TestRepository_CheckUsername(t *testing.T) {
 	repo := repository.NewRepo()
 	users := []dataStruct.User{
 		{
-			UserId:      0,
+			Id:          0,
 			Username:    "user1",
 			Email:       "email1.com",
 			Password:    "123_user1_321",
@@ -63,7 +63,7 @@ func TestRepository_CheckUsername(t *testing.T) {
 			Description: "Im cool",
 		},
 		{
-			UserId:      0,
+			Id:          0,
 			Username:    "user2",
 			Email:       "email2.com",
 			Password:    "123_user2_321",
@@ -126,7 +126,7 @@ func TestRepository_CheckEmail(t *testing.T) {
 	repo := repository.NewRepo()
 	users := []dataStruct.User{
 		{
-			UserId:      0,
+			Id:          0,
 			Username:    "user1",
 			Email:       "email1.com",
 			Password:    "123_user1_321",
@@ -136,7 +136,7 @@ func TestRepository_CheckEmail(t *testing.T) {
 			Description: "Im cool",
 		},
 		{
-			UserId:      0,
+			Id:          0,
 			Username:    "user2",
 			Email:       "email2.com",
 			Password:    "123_user2_321",
