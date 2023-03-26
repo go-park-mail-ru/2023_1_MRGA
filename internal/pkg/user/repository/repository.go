@@ -33,7 +33,7 @@ func (r *UserRepository) GetUserIdByToken(InpToken string) (uint, error) {
 func (r *UserRepository) GetUserById(userId uint) (userRes user.UserRes, err error) {
 
 	for _, userdb := range r.Users {
-		if userdb.UserId == userId {
+		if userdb.Id == userId {
 			userRes = user.UserRes{
 				Username:    userdb.Username,
 				Avatar:      userdb.Avatar,

@@ -42,7 +42,7 @@ func (r *AuthRepository) Login(input string, passwordInp string) (userId uint, e
 
 func (r *AuthRepository) AddUser(user dataStruct.User) (uint, error) {
 	userId := len(r.Users)
-	user.UserId = uint(userId)
+	user.Id = uint(userId)
 
 	if err := r.CheckUsername(user.Username); err != nil {
 		return 0, err
@@ -60,7 +60,7 @@ func (r *AuthRepository) AddUser(user dataStruct.User) (uint, error) {
 	usersDB = append(usersDB, user)
 	r.Users = usersDB
 
-	return user.UserId, nil
+	return user.Id, nil
 }
 
 func (r *AuthRepository) DeleteToken(token string) error {
