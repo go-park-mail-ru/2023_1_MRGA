@@ -1,17 +1,18 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
+
+	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 )
 
 type AuthRepository struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewRepo(db *sql.DB) *AuthRepository {
+func NewRepo(db *gorm.DB) *AuthRepository {
 
 	r := AuthRepository{db}
 

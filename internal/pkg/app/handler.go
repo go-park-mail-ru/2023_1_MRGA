@@ -1,10 +1,10 @@
 package app
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
@@ -27,7 +27,7 @@ var frontendHosts = []string{
 	"http://192.168.0.2:8080",
 }
 
-func (a *Application) InitRoutes(db *sql.DB) *http.ServeMux {
+func (a *Application) InitRoutes(db *gorm.DB) *http.ServeMux {
 	router := a.Router
 
 	handler := mux.NewRouter()

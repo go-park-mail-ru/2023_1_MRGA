@@ -1,17 +1,18 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
+
+	"gorm.io/gorm"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation"
 )
 
 type RecRepository struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewRepo(db *sql.DB) *RecRepository {
+func NewRepo(db *gorm.DB) *RecRepository {
 	r := RecRepository{db}
 
 	return &r
