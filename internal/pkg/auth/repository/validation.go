@@ -2,7 +2,7 @@ package repository
 
 import "fmt"
 
-func (r *Repository) CheckUsername(username string) error {
+func (r *AuthRepository) CheckUsername(username string) error {
 	for _, user := range r.Users {
 		if username == user.Username {
 
@@ -13,7 +13,7 @@ func (r *Repository) CheckUsername(username string) error {
 	return nil
 }
 
-func (r *Repository) CheckEmail(email string) error {
+func (r *AuthRepository) CheckEmail(email string) error {
 	for _, user := range r.Users {
 		if email == user.Email {
 

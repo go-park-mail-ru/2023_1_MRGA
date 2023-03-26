@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
 )
 
 // @title MRGA
@@ -22,12 +22,12 @@ import (
 // @BasePath /meetme/
 func main() {
 	log.Println("Application is starting")
-	r := repository.NewRepo()
-	a := app.New(r)
 
-	server := new(app.Server)
-	opts := app.GetServerOptions()
-	err := server.Run(opts, a.InitRoutes())
+	a := app.New()
+
+	serv := new(server.Server)
+	opts := server.GetServerOptions()
+	err := serv.Run(opts, a.InitRoutes())
 	if err != nil {
 		log.Fatalf("error occured while server starting: %v", err)
 	}
