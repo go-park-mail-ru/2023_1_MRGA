@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -28,8 +29,12 @@ func main() {
 	log.Println("Application is starting")
 
 	a := app.New()
-	connStr := dsn.FromEnv()
-	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
+
+	_ = godotenv.Load()
+	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
 	err = serv.Run(opts, a.InitRoutes(db))

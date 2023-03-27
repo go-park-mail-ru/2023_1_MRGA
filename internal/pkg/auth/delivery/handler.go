@@ -90,28 +90,28 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
-func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
-	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
-			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
-			return
-		}
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
-
-	err = h.useCase.Logout(userToken)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
-
-	cookie.SetCookie(w, _default.SessionTokenCookieName, "", -120*time.Second)
-
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, map[string]interface{}{})
-}
+//func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+//	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
+//	if err != nil {
+//		if err == http.ErrNoCookie {
+//			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+//			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
+//			return
+//		}
+//		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+//		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+//		return
+//	}
+//
+//	err = h.useCase.Logout(userToken)
+//	if err != nil {
+//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+//		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+//		return
+//	}
+//
+//	cookie.SetCookie(w, _default.SessionTokenCookieName, "", -120*time.Second)
+//
+//	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+//	writer.Respond(w, r, map[string]interface{}{})
+//}

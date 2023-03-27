@@ -7,5 +7,5 @@ import (
 type UseCase interface {
 	Register(user *dataStruct.User) (string, error)
 	Login(logInp LoginInput) (string, error)
-	Logout(string) error
+	//Logout(string) error
 }
