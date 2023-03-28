@@ -36,13 +36,13 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	//client := redis.NewClient(&redis.Options{
-	//	Addr:     "localhost:6379",
-	//	Password: "",
-	//	DB:       0,
-	//})
-	//_, err = client.Ping().Result()
-	client := &redis.Client{}
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "password",
+		DB:       0,
+	})
+	_, err = client.Ping().Result()
+	//client := &redis.Client{}
 	if err != nil {
 		panic("failed to connect redis" + err.Error())
 	}
