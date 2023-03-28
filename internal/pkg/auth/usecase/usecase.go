@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -9,7 +10,6 @@ import (
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/token"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
-	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
 )
 
 type AuthUseCase struct {
@@ -36,10 +36,6 @@ func (a *AuthUseCase) Register(user *dataStruct.User) (string, error) {
 	}
 	user.Password = hashedPass
 
-	if user.Avatar == "" {
-		user.Avatar = _default.DefaultAvatar
-	}
-
 	_, err = a.userRepo.AddUser(user)
 	if err != nil {
 		return "", err
@@ -51,14 +47,17 @@ func (a *AuthUseCase) Register(user *dataStruct.User) (string, error) {
 	return userToken, nil
 }
 
+//if user.Avatar == "" {
+//user.Avatar = _default.DefaultAvatar
+//}
 func (a *AuthUseCase) Login(logInp auth.LoginInput) (string, error) {
 
-	if logInp.Input == "" {
-		err := fmt.Errorf("email and username are empty")
+	if logInp.Email == "" {
+		err := fmt.Errorf("email is empty")
 		return "", err
 	}
 
-	_, err := a.userRepo.Login(logInp.Input, logInp.Password)
+	_, err := a.userRepo.Login(logInp.Email, logInp.Password)
 	if err != nil {
 		return "", err
 	}
@@ -67,6 +66,21 @@ func (a *AuthUseCase) Login(logInp auth.LoginInput) (string, error) {
 	//a.userRepo.SaveToken(userId, userToken)
 
 	return userToken, nil
+}
+
+func (u *AuthUseCase) GetUserByToken(token string) (user auth.UserRes, err error) {
+	userId, err := u.userRepo.GetUserIdByToken(token)
+	log.Println(userId)
+	if err != nil {
+		return
+	}
+
+	user, err = u.userRepo.GetUserById(userId)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 //func (a *AuthUseCase) Logout(token string) error {

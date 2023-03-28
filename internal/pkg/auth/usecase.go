@@ -7,5 +7,6 @@ import (
 type UseCase interface {
 	Register(user *dataStruct.User) (string, error)
 	Login(logInp LoginInput) (string, error)
+	GetUserByToken(string) (UserRes, error)
 	//Logout(string) error
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/go-redis/redis"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -35,9 +36,19 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	//client := redis.NewClient(&redis.Options{
+	//	Addr:     "localhost:6379",
+	//	Password: "",
+	//	DB:       0,
+	//})
+	//_, err = client.Ping().Result()
+	client := &redis.Client{}
+	if err != nil {
+		panic("failed to connect redis" + err.Error())
+	}
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
-	err = serv.Run(opts, a.InitRoutes(db))
+	err = serv.Run(opts, a.InitRoutes(db, client))
 	if err != nil {
 		log.Fatalf("error occured while server starting: %v", err)
 	}

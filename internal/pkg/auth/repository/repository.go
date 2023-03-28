@@ -1,25 +1,28 @@
 package repository
 
 import (
+	"github.com/go-redis/redis"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
 )
 
 type AuthRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	client *redis.Client
 }
 
-func NewRepo(db *gorm.DB) *AuthRepository {
+func NewRepo(db *gorm.DB, client *redis.Client) *AuthRepository {
 
-	r := AuthRepository{db}
+	r := AuthRepository{db, client}
 	return &r
 }
 
-func (r *AuthRepository) Login(input string, passwordInp string) (uint, error) {
+func (r *AuthRepository) Login(email string, passwordInp string) (uint, error) {
 	var userDB *dataStruct.User
-	err := r.db.Model(&dataStruct.User{}).Where("username = ? or email = ?", input, input).Take(&userDB).Error
+	err := r.db.Model(&dataStruct.User{}).Where("email = ?", email).Take(&userDB).Error
 	if err != nil {
 		return 0, err
 	}
@@ -35,21 +38,38 @@ func (r *AuthRepository) Login(input string, passwordInp string) (uint, error) {
 }
 
 func (r *AuthRepository) AddUser(user *dataStruct.User) (uint, error) {
-
-	if err := r.CheckUsername(user.Username); err != nil {
-		return 0, err
-	}
-
-	if err := r.CheckEmail(user.Email); err != nil {
-		return 0, err
-	}
-
-	if err := CheckAge(user.Age); err != nil {
+	if err := r.CheckBirthDay(user.BirthDay); err != nil {
 		return 0, err
 	}
 
 	err := r.db.Create(user).Error
 	return user.Id, err
+}
+
+func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRes, err error) {
+
+	user := auth.UserRes{}
+	err = r.db.Table("users").Select("users.id, email").
+		Joins("JOIN user_photos on users.id=user_photos.id").
+		Joins("Join user_infos on users.id = user_infos.id").
+		Find(&user).Error
+	if err != nil {
+		return
+	}
+
+	return user, nil
+
+	//return userRes, fmt.Errorf("user are not found")
+}
+
+func (r *AuthRepository) GetUserIdByToken(InpToken string) (uint, error) {
+	//for userId, userToken := range r.UserTokens {
+	//	if userToken == InpToken {
+	//		return userId, nil
+	//	}
+	//}
+	return 1, nil
+	//return 1, fmt.Errorf("user are not found")
 }
 
 //

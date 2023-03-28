@@ -3,6 +3,7 @@ package app
 import (
 	"net/http"
 
+	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
@@ -27,7 +28,7 @@ var frontendHosts = []string{
 	"http://192.168.0.2:8080",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB) *http.ServeMux {
+func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) *http.ServeMux {
 	router := a.Router
 
 	handler := mux.NewRouter()
@@ -35,7 +36,7 @@ func (a *Application) InitRoutes(db *gorm.DB) *http.ServeMux {
 	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
 	router.Handle("/", handlerWithCorsMiddleware)
 
-	authRepo := AuthRepository.NewRepo(db)
+	authRepo := AuthRepository.NewRepo(db, client)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
 

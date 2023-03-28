@@ -1,19 +1,32 @@
 package repository
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-func (r *AuthRepository) CheckUsername(username string) error {
-	return nil
-}
+func (r *AuthRepository) CheckBirthDay(birthDay string) error {
+	birth, err := time.Parse("02.01.2006", birthDay)
+	if err != nil {
+		return err
+	}
+	now := time.Now()
+	age := now.Year() - birth.Year()
+	if now.Month() > birth.Month() {
+		age -= 1
+	}
+	if now.Month() == birth.Month() && now.Day() < birth.Day() {
+		age -= 1
+	}
 
-func (r *AuthRepository) CheckEmail(email string) error {
-	return nil
-}
-
-func CheckAge(age int) error {
 	if age > 150 || age < 18 {
 
 		return fmt.Errorf("age is not correct")
 	}
+
+	return nil
+}
+
+func (r *AuthRepository) CheckEmail(email string) error {
 	return nil
 }
