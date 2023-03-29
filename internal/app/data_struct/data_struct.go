@@ -33,8 +33,8 @@ type UserPhoto struct {
 }
 
 type City struct {
-	CityId uint   `sql:"unique;type:uuid;primary_key;default:" json:"cityId" gorm:"primaryKey;unique"`
-	Name   string `json:"city"`
+	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"cityId" gorm:"primaryKey;unique"`
+	Name string `json:"city"`
 }
 
 type Zodiac struct {

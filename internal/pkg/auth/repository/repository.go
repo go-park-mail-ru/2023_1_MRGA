@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/go-redis/redis"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -49,7 +52,7 @@ func (r *AuthRepository) AddUser(user *dataStruct.User) (uint, error) {
 func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRes, err error) {
 
 	user := auth.UserRes{}
-	err = r.db.Table("users").Select("users.id, email").
+	err = r.db.Table("users").Select("users.id, email", "users.id = ?", userId).
 		Joins("JOIN user_photos on users.id=user_photos.id").
 		Joins("Join user_infos on users.id = user_infos.id").
 		Find(&user).Error
@@ -62,38 +65,25 @@ func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRes, err err
 	//return userRes, fmt.Errorf("user are not found")
 }
 
-func (r *AuthRepository) GetUserIdByToken(InpToken string) (uint, error) {
-	//for userId, userToken := range r.UserTokens {
-	//	if userToken == InpToken {
-	//		return userId, nil
-	//	}
-	//}
-	return 1, nil
-	//return 1, fmt.Errorf("user are not found")
+func (r *AuthRepository) GetUserIdByToken(token string) (uint, error) {
+	user, err := r.client.Get(token).Result()
+	if err != nil {
+		return 0, err
+	}
+	userId, err := strconv.Atoi(user)
+	if err != nil {
+		return 0, err
+	}
+	return uint(userId), nil
 }
 
-//
-//func (r *AuthRepository) DeleteToken(token string) error {
-//	var userId uint
-//	flagFound := false
-//	for indexUser, tokenDS := range r.UserTokens {
-//		if tokenDS == token {
-//			userId = indexUser
-//			flagFound = true
-//			break
-//		}
-//	}
-//
-//	if !flagFound {
-//		return fmt.Errorf("UnAuthorised")
-//	}
-//
-//	delete(r.UserTokens, userId)
-//	return nil
-//}
-//
-//func (r *AuthRepository) SaveToken(userId uint, token string) {
-//	tokenUser := r.UserTokens
-//	tokenUser[userId] = token
-//	r.UserTokens = tokenUser
-//}
+func (r *AuthRepository) DeleteToken(token string) error {
+	err := r.client.Del(token).Err()
+	return err
+}
+
+func (r *AuthRepository) SaveToken(userId uint, token string) (err error) {
+	userIdStr := strconv.Itoa(int(userId))
+	err = r.client.Set(token, userIdStr, 200*time.Second).Err()
+	return
+}

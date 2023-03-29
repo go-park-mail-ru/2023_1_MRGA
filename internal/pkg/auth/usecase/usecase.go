@@ -36,13 +36,16 @@ func (a *AuthUseCase) Register(user *dataStruct.User) (string, error) {
 	}
 	user.Password = hashedPass
 
-	_, err = a.userRepo.AddUser(user)
+	userId, err := a.userRepo.AddUser(user)
 	if err != nil {
 		return "", err
 	}
 
 	userToken := token.CreateToken()
-	//a.userRepo.SaveToken(userId, userToken)
+	err = a.userRepo.SaveToken(userId, userToken)
+	if err != nil {
+		return "", err
+	}
 
 	return userToken, nil
 }
@@ -57,13 +60,16 @@ func (a *AuthUseCase) Login(logInp auth.LoginInput) (string, error) {
 		return "", err
 	}
 
-	_, err := a.userRepo.Login(logInp.Email, logInp.Password)
+	userId, err := a.userRepo.Login(logInp.Email, logInp.Password)
 	if err != nil {
 		return "", err
 	}
 
 	userToken := token.CreateToken()
-	//a.userRepo.SaveToken(userId, userToken)
+	err = a.userRepo.SaveToken(userId, userToken)
+	if err != nil {
+		return "", err
+	}
 
 	return userToken, nil
 }
@@ -83,10 +89,11 @@ func (u *AuthUseCase) GetUserByToken(token string) (user auth.UserRes, err error
 	return
 }
 
-//func (a *AuthUseCase) Logout(token string) error {
-//	err := a.userRepo.DeleteToken(token)
-//	return err
-//}
+func (a *AuthUseCase) Logout(token string) error {
+
+	err := a.userRepo.DeleteToken(token)
+	return err
+}
 
 func CreatePass(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
