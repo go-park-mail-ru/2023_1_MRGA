@@ -1,0 +1,29 @@
+version: "3.8" # версия вашего docker-compose
+services: # имеджи, которые запустятся по вашему желанию
+  db: # название моего имеджа
+    image: postgres:12 # скачает image postgres 12 версии
+    volumes: # часть настроек для хранения данных, пока для нас это не важно
+      - type: volume
+        source: postgresdb-data
+        target: /var/lib/postgresql/data
+    ports: # порты
+      - "5432:5432"
+    environment: # переменные окружения, меняйте их если хотите поменять пароль, логин или название стартовой базы данных
+      POSTGRES_USER: mrga_user
+      POSTGRES_DB: mrga
+      POSTGRES_PASSWORD: marga_password
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass password
+    volumes:
+      - redis-data:/data
+
+volumes: # часть настроек для хранения данных
+  postgresdb-data:
+    driver: local
+  redis-data:
+    driver: local
+
