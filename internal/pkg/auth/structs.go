@@ -1,6 +1,12 @@
 package auth
 
 type LoginInput struct {
-	Input    string `json:"input"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type UserRes struct {
+	Email  string `json:"email"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
 }

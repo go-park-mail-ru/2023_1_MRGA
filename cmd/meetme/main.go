@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/go-redis/redis"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -28,11 +30,27 @@ func main() {
 	log.Println("Application is starting")
 
 	a := app.New()
-	connStr := dsn.FromEnv()
-	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("failed to connect env" + err.Error())
+	}
+	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("failed to connect db" + err.Error())
+	}
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "password",
+		DB:       0,
+	})
+	_, err = client.Ping().Result()
+	if err != nil {
+		log.Fatalf("failed to connect redis" + err.Error())
+	}
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
-	err = serv.Run(opts, a.InitRoutes(db))
+	err = serv.Run(opts, a.InitRoutes(db, client))
 	if err != nil {
 		log.Fatalf("error occured while server starting: %v", err)
 	}
