@@ -31,10 +31,13 @@ func main() {
 
 	a := app.New()
 
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("failed to connect env" + err.Error())
+	}
 	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		log.Fatalf("failed to connect db" + err.Error())
 	}
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -42,9 +45,8 @@ func main() {
 		DB:       0,
 	})
 	_, err = client.Ping().Result()
-	//client := &redis.Client{}
 	if err != nil {
-		panic("failed to connect redis" + err.Error())
+		log.Fatalf("failed to connect redis" + err.Error())
 	}
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
