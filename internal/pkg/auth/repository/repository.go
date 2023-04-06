@@ -17,7 +17,7 @@ type AuthRepository struct {
 	client *redis.Client
 }
 
-func NewRepo(db *gorm.DB, client *redis.Client) *AuthRepository {
+func NewAuthRepo(db *gorm.DB, client *redis.Client) *AuthRepository {
 
 	r := AuthRepository{db, client}
 	return &r

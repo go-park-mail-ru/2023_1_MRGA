@@ -10,9 +10,10 @@ import (
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
-	//recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
-	//RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
-	//recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
+	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
+	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
+	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
+
 	//userDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/delivery"
 	//userRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/repository"
 	//userUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/usecase"
@@ -36,15 +37,15 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) *http.ServeM
 	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
 	router.Handle("/", handlerWithCorsMiddleware)
 
-	authRepo := AuthRepository.NewRepo(db, client)
+	authRepo := AuthRepository.NewAuthRepo(db, client)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
 
-	//recRepo := RecRepository.NewRepo(db)
-	//ucRec := recUC.NewRecUseCase(recRepo)
-	//recDel.RegisterHTTPEndpoints(a.Router, ucRec)
+	recRepo := RecRepository.NewRecRepo(db, client)
+	ucRec := recUC.NewRecUseCase(recRepo)
+	recDel.RegisterHTTPEndpoints(a.Router, ucRec)
 
-	//userRepo := userRepository.NewRepo(db)
+	//userRepo := userRepository.NewInfoRepo(db)
 	//ucUser := userUC.NewUserUseCase(userRepo)
 	//userDel.RegisterHTTPEndpoints(a.Router, ucUser)
 
