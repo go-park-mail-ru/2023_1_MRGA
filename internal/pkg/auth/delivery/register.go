@@ -22,7 +22,7 @@ func RegisterHTTPEndpoints(router *http.ServeMux, uc auth.UseCase) {
 	router.HandleFunc("/meetme/register", h.Register)
 	router.HandleFunc("/meetme/login", h.Login)
 	router.HandleFunc("/meetme/user", h.GetCurrentUser)
-	router.HandleFunc("/meetme/user", h.GetCurrentUser)
+	//router.HandleFunc("/meetme/user", h.GetCurrentUser)
 	router.HandleFunc("/meetme/logout", h.Logout)
 
 }

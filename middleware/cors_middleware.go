@@ -27,7 +27,7 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 
 var ContextUserKey = "userId"
 
-func AuthMiddleware(client redis.Client, next http.Handler) http.Handler {
+func AuthMiddleware(client *redis.Client, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		token := r.Header.Get("session_token")

@@ -16,5 +16,8 @@ func SetCookie(w http.ResponseWriter, nameCookie string, value string, expTime t
 
 func GetValueCookie(r *http.Request, nameCookie string) (string, error) {
 	valueCookie, err := r.Cookie(nameCookie)
+	if err != nil {
+		return "", err
+	}
 	return valueCookie.Value, err
 }

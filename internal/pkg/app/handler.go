@@ -34,7 +34,9 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) *http.ServeM
 	handler := mux.NewRouter()
 
 	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
+	authCheckMiddleware := middleware.AuthMiddleware(client, handler)
 	router.Handle("/", handlerWithCorsMiddleware)
+	router.Handle("/meetme", authCheckMiddleware)
 
 	authRepo := AuthRepository.NewRepo(db, client)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
