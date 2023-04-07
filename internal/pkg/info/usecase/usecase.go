@@ -9,9 +9,7 @@ type InfoUseCase struct {
 	userRepo info.IRepositoryInfo
 }
 
-func NewInfoUseCase(
-	userRepo info.IRepositoryInfo,
-) *InfoUseCase {
+func NewInfoUseCase(userRepo info.IRepositoryInfo) *InfoUseCase {
 	return &InfoUseCase{
 		userRepo: userRepo,
 	}
@@ -72,6 +70,25 @@ func (iu *InfoUseCase) AddInfo(userId uint, info info.InfoStruct) error {
 	return nil
 }
 
+func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info.InfoStruct, err error) {
+	userInfo, err = iu.userRepo.GetUserInfo(userId)
+	if err != nil {
+		return
+	}
+
+	avatar, err := iu.userRepo.GetAvatar(userId)
+	if err != nil {
+		return
+	}
+	userInfo.Avatar = avatar
+
+	photos, err := iu.userRepo.GetPhotos(userId)
+	for _, photo := range photos {
+		userInfo.Photo = append(userInfo.Photo, photo.Photo)
+	}
+	return
+}
+
 func (iu *InfoUseCase) GetCities() ([]string, error) {
 	cities, err := iu.userRepo.GetCities()
 	if err != nil {
@@ -80,7 +97,7 @@ func (iu *InfoUseCase) GetCities() ([]string, error) {
 
 	var citiesResult []string
 	for _, city := range cities {
-		citiesResult = append(citiesResult, city.Name)
+		citiesResult = append(citiesResult, city.City)
 	}
 
 	return citiesResult, nil
@@ -94,7 +111,7 @@ func (iu *InfoUseCase) GetJobs() ([]string, error) {
 
 	var jobsResult []string
 	for _, job := range jobs {
-		jobsResult = append(jobsResult, job.Name)
+		jobsResult = append(jobsResult, job.Job)
 	}
 
 	return jobsResult, nil
@@ -108,7 +125,7 @@ func (iu *InfoUseCase) GetEducation() ([]string, error) {
 
 	var educationResult []string
 	for _, ed := range education {
-		educationResult = append(educationResult, ed.Name)
+		educationResult = append(educationResult, ed.Education)
 	}
 
 	return educationResult, nil
@@ -122,7 +139,7 @@ func (iu *InfoUseCase) GetZodiacs() ([]string, error) {
 
 	var zodiacResult []string
 	for _, z := range zodiac {
-		zodiacResult = append(zodiacResult, z.Name)
+		zodiacResult = append(zodiacResult, z.Zodiac)
 	}
 
 	return zodiacResult, nil

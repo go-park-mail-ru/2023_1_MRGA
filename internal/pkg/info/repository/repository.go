@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
 )
 
 type InfoRepository struct {
@@ -25,6 +26,33 @@ func (r *InfoRepository) AddUserPhoto(userPhoto *dataStruct.UserPhoto) error {
 	err := r.db.Create(userPhoto).Error
 	return err
 }
+
+func (r *InfoRepository) GetUserInfo(userId uint) (info.InfoStruct, error) {
+	var infoStruct info.InfoStruct
+	err := r.db.Table("user_infos").Select("*").
+		Where("user_infos.user_id =?", userId).
+		Joins("JOIN jobs on jobs.id = user_infos.job").
+		Joins("Join educations on educations.id = user_infos.education").
+		Joins("Join zodiacs on zodiacs.id = user_infos.zodiac").
+		Joins("Join cities on cities.id = user_infos.city_id").
+		Find(&infoStruct).Error
+
+	return infoStruct, err
+}
+
+func (r *InfoRepository) GetAvatar(userId uint) (string, error) {
+	var avatar dataStruct.UserPhoto
+	err := r.db.Table("user_photos").Where("user_id = ? AND avatar=?", userId, true).Find(&avatar).Error
+	return avatar.Photo, err
+}
+
+func (r *InfoRepository) GetPhotos(userId uint) ([]dataStruct.UserPhoto, error) {
+	var photos []dataStruct.UserPhoto
+	err := r.db.Table("user_photos").Where("user_id = ? AND avatar=?", userId, false).Find(&photos).Error
+	return photos, err
+}
+
+///getId
 
 func (r *InfoRepository) GetCityId(nameCity string) (uint, error) {
 	city := &dataStruct.City{}
@@ -49,6 +77,8 @@ func (r *InfoRepository) GetEducationId(nameEducation string) (uint, error) {
 	err := r.db.First(education, "name = ?", nameEducation).Error
 	return education.Id, err
 }
+
+////getters
 
 func (r *InfoRepository) GetCities() ([]dataStruct.City, error) {
 	var cities []dataStruct.City

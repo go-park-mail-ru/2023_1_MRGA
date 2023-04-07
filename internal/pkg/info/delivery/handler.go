@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/fatih/structs"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -56,6 +58,28 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (h *Handler) GetInfo(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(int)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	infoBD, err := h.useCase.GetInfo(uint(userId))
+	if err != nil {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	mapInfo := structs.Map(&infoBD)
+	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
+	writer.Respond(w, r, mapInfo)
+}
+
+/////getters
 func (h *Handler) GetCities(w http.ResponseWriter, r *http.Request) {
 	cities, err := h.useCase.GetCities()
 	if err != nil {

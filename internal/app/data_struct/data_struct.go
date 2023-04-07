@@ -34,22 +34,22 @@ type UserPhoto struct {
 
 type City struct {
 	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"cityId" gorm:"primaryKey;unique"`
-	Name string `json:"city"`
+	City string `json:"city"`
 }
 
 type Zodiac struct {
-	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"zodiacId" gorm:"primaryKey;unique"`
-	Name string `json:"zodiac"`
+	Id     uint   `sql:"unique;type:uuid;primary_key;default:" json:"zodiacId" gorm:"primaryKey;unique"`
+	Zodiac string `json:"zodiac"`
 }
 
 type Job struct {
-	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"jobId" gorm:"primaryKey;unique"`
-	Name string `json:"job"`
+	Id  uint   `sql:"unique;type:uuid;primary_key;default:" json:"jobId" gorm:"primaryKey;unique"`
+	Job string `json:"job"`
 }
 
 type Education struct {
-	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"educationId" gorm:"primaryKey;unique"`
-	Name string `json:"education"`
+	Id        uint   `sql:"unique;type:uuid;primary_key;default:" json:"educationId" gorm:"primaryKey;unique"`
+	Education string `json:"education"`
 }
 
 ///Filter
