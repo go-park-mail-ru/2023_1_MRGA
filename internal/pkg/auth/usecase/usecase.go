@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -74,12 +73,7 @@ func (a *AuthUseCase) Login(logInp auth.LoginInput) (string, error) {
 	return userToken, nil
 }
 
-func (u *AuthUseCase) GetUserByToken(token string) (user auth.UserRes, err error) {
-	userId, err := u.userRepo.GetUserIdByToken(token)
-	log.Println(userId)
-	if err != nil {
-		return
-	}
+func (u *AuthUseCase) GetUserById(userId uint) (user auth.UserRes, err error) {
 
 	user, err = u.userRepo.GetUserById(userId)
 	if err != nil {
@@ -87,6 +81,21 @@ func (u *AuthUseCase) GetUserByToken(token string) (user auth.UserRes, err error
 	}
 
 	return
+}
+
+func (u *AuthUseCase) ChangeUser(user dataStruct.User) error {
+	if user.Password != "" {
+		hashedPass, err := CreatePass(user.Password)
+		if err != nil {
+			return err
+		}
+		user.Password = hashedPass
+	}
+	err := u.userRepo.ChangeUser(user)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AuthUseCase) Logout(token string) error {

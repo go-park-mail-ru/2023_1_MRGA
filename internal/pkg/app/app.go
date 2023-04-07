@@ -1,15 +1,15 @@
 package app
 
 import (
-	"net/http"
+	"github.com/gorilla/mux"
 )
 
 type Application struct {
-	Router *http.ServeMux
+	Router *mux.Router
 }
 
 func New() *Application {
-	router := http.NewServeMux()
+	router := mux.NewRouter()
 
 	a := &Application{Router: router}
 

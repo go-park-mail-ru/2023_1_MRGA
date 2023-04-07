@@ -6,7 +6,7 @@ import (
 )
 
 func (r *AuthRepository) CheckBirthDay(birthDay string) error {
-	birth, err := time.Parse("02.01.2006", birthDay)
+	birth, err := time.Parse("2006-01-02", birthDay)
 	if err != nil {
 		return err
 	}

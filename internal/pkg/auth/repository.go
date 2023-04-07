@@ -8,5 +8,6 @@ type IRepositoryAuth interface {
 	Login(input string, pass string) (uint, error)
 	GetUserIdByToken(string) (uint, error)
 	GetUserById(uint) (UserRes, error)
+	ChangeUser(user dataStruct.User) error
 	SaveToken(id uint, token string) error
 }
