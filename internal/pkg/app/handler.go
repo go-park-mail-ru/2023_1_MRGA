@@ -28,10 +28,6 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 		return middleware.CorsMiddleware(frontendHosts, h)
 	})
 
-	//a.Router.Use(middleware.LogMW)
-	//a.Router.Use(func(next http.Handler) http.Handler {
-	//	return middleware.LogMW(next)
-	//})
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.AuthMiddleware(client, h)
 	})

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
@@ -89,8 +88,6 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Second))
-	token, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
-	log.Println(token)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }

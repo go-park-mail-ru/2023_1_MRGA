@@ -51,7 +51,7 @@ func (r *AuthRepository) AddUser(user *dataStruct.User) (uint, error) {
 
 func (r *AuthRepository) ChangeUser(user dataStruct.User) error {
 	userDb := &dataStruct.User{}
-	err := r.db.First(userDb, "id= ?", user.Id).Error // find user with code D42
+	err := r.db.First(userDb, "id= ?", user.Id).Error
 	if err != nil {
 		return err
 	}
