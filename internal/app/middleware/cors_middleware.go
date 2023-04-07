@@ -10,6 +10,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -35,7 +36,7 @@ func AuthMiddleware(client *redis.Client, next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		token, err := cookie.GetValueCookie(r, "session_token")
+		token, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
 		if err != nil {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
 			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)

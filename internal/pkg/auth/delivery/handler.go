@@ -12,8 +12,8 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
-	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )

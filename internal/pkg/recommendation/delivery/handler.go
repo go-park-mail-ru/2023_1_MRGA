@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
-	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/default"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )

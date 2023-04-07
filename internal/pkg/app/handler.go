@@ -6,10 +6,10 @@ import (
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/middleware"
 )
 
 var frontendHosts = []string{
