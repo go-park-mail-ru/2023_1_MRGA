@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"net/http"
+	"github.com/gorilla/mux"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
 )
@@ -16,11 +16,11 @@ func NewHandler(useCase auth.UseCase) *Handler {
 	}
 }
 
-func RegisterHTTPEndpoints(router *http.ServeMux, uc auth.UseCase) {
+func RegisterHTTPEndpoints(router *mux.Router, uc auth.UseCase) {
 	h := NewHandler(uc)
 
-	router.HandleFunc("/meetme/register", h.Register)
-	router.HandleFunc("/meetme/login", h.Login)
+	router.HandleFunc("/api/register", h.Register)
+	router.HandleFunc("/api/login", h.Login)
 	router.HandleFunc("/meetme/user", h.GetCurrentUser)
 	//router.HandleFunc("/meetme/user", h.GetCurrentUser)
 	router.HandleFunc("/meetme/logout", h.Logout)

@@ -52,7 +52,7 @@ func (r *AuthRepository) AddUser(user *dataStruct.User) (uint, error) {
 func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRes, err error) {
 
 	user := auth.UserRes{}
-	err = r.db.Table("users").Select("users.id, email", "users.id = ?", userId).
+	err = r.db.Table("users").Select("users.id, email", "users.id =?", userId).
 		Joins("JOIN user_photos on users.id=user_photos.id").
 		Joins("Join user_infos on users.id = user_infos.id").
 		Find(&user).Error

@@ -7,10 +7,10 @@ import (
 
 func SetCookie(w http.ResponseWriter, nameCookie string, value string, expTime time.Duration) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     nameCookie,
-		Value:    value,
-		Expires:  time.Now().Add(expTime),
-		HttpOnly: true,
+		Name:    nameCookie,
+		Value:   value,
+		Expires: time.Now().Add(expTime),
+		Path:    "/",
 	})
 }
 

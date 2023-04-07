@@ -50,7 +50,8 @@ func main() {
 	}
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
-	err = serv.Run(opts, a.InitRoutes(db, client))
+	a.InitRoutes(db, client)
+	err = serv.Run(opts, a.Router)
 	if err != nil {
 		log.Fatalf("error occured while server starting: %v", err)
 	}

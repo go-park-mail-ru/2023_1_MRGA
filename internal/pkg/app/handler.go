@@ -4,18 +4,11 @@ import (
 	"net/http"
 
 	"github.com/go-redis/redis"
-	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
-	//recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
-	//RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
-	//recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
-	//userDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/delivery"
-	//userRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/repository"
-	//userUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/user/usecase"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/middleware"
 )
 
@@ -26,18 +19,22 @@ var frontendHosts = []string{
 	"http://5.159.100.59:8080",
 	"http://192.168.0.2:3000",
 	"http://192.168.0.2:8080",
+	"",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) *http.ServeMux {
-	router := a.Router
+func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 
-	handler := mux.NewRouter()
+	a.Router.Use(func(h http.Handler) http.Handler {
+		return middleware.CorsMiddleware(frontendHosts, h)
+	})
 
-	handlerWithCorsMiddleware := middleware.CorsMiddleware(frontendHosts, handler)
-	authCheckMiddleware := middleware.AuthMiddleware(client, handler)
-	router.Handle("/", handlerWithCorsMiddleware)
-	router.Handle("/meetme", authCheckMiddleware)
-
+	//a.Router.Use(middleware.LogMW)
+	//a.Router.Use(func(next http.Handler) http.Handler {
+	//	return middleware.LogMW(next)
+	//})
+	a.Router.Use(func(h http.Handler) http.Handler {
+		return middleware.AuthMiddleware(client, h)
+	})
 	authRepo := AuthRepository.NewRepo(db, client)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
@@ -50,5 +47,4 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) *http.ServeM
 	//ucUser := userUC.NewUserUseCase(userRepo)
 	//userDel.RegisterHTTPEndpoints(a.Router, ucUser)
 
-	return router
 }
