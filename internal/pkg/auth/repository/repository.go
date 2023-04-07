@@ -49,6 +49,26 @@ func (r *AuthRepository) AddUser(user *dataStruct.User) (uint, error) {
 	return user.Id, err
 }
 
+func (r *AuthRepository) ChangeUser(user dataStruct.User) error {
+	userDb := &dataStruct.User{}
+	err := r.db.First(userDb, "id= ?", user.Id).Error // find user with code D42
+	if err != nil {
+		return err
+	}
+	if user.Email != "" {
+		userDb.Email = user.Email
+	}
+	if user.BirthDay != "" {
+		userDb.BirthDay = user.BirthDay
+	}
+	if user.Password != "" {
+		userDb.Password = user.Password
+	}
+
+	err = r.db.Save(&userDb).Error
+	return err
+}
+
 func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRes, err error) {
 
 	user := auth.UserRes{}

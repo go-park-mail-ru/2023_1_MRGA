@@ -95,8 +95,49 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
-func (h *Handler) AddInfoUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		err := r.Body.Close()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+	}()
 
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	var userJson dataStruct.User
+	err = json.Unmarshal(reqBody, &userJson)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		err = fmt.Errorf("cant parse json")
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(int)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+	userJson.Id = uint(userId)
+	err = h.useCase.ChangeUser(userJson)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, map[string]interface{}{})
 }
 
 func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {

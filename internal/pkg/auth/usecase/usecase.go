@@ -83,6 +83,21 @@ func (u *AuthUseCase) GetUserById(userId uint) (user auth.UserRes, err error) {
 	return
 }
 
+func (u *AuthUseCase) ChangeUser(user dataStruct.User) error {
+	if user.Password != "" {
+		hashedPass, err := CreatePass(user.Password)
+		if err != nil {
+			return err
+		}
+		user.Password = hashedPass
+	}
+	err := u.userRepo.ChangeUser(user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AuthUseCase) Logout(token string) error {
 
 	err := a.userRepo.DeleteToken(token)

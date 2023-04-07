@@ -9,4 +9,5 @@ type UseCase interface {
 	Login(logInp LoginInput) (string, error)
 	Logout(string) error
 	GetUserById(uint) (UserRes, error)
+	ChangeUser(user dataStruct.User) error
 }
