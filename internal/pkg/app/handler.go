@@ -10,6 +10,9 @@ import (
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
+	infoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/delivery"
+	InfoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/repository"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/usecase"
 )
 
 var frontendHosts = []string{
@@ -34,6 +37,10 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	authRepo := AuthRepository.NewRepo(db, client)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
+
+	infoRepo := InfoRepository.NewInfoRepo(db)
+	ucInfo := usecase.NewInfoUseCase(infoRepo)
+	infoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
 
 	//recRepo := RecRepository.NewRepo(db)
 	//ucRec := recUC.NewRecUseCase(recRepo)
