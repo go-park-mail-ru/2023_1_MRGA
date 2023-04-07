@@ -89,6 +89,52 @@ func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info.InfoStruct, err error
 	return
 }
 
+func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info.InfoChange) (info.InfoStruct, error) {
+	var userInfo dataStruct.UserInfo
+
+	if infoInp.City != "" {
+		cityId, err := iu.userRepo.GetCityId(infoInp.City)
+		if err != nil {
+			return info.InfoStruct{}, err
+		}
+		userInfo.CityId = cityId
+	}
+	if infoInp.Zodiac != "" {
+		zodiacId, err := iu.userRepo.GetZodiacId(infoInp.Zodiac)
+		if err != nil {
+			return info.InfoStruct{}, err
+		}
+		userInfo.Zodiac = zodiacId
+	}
+	if infoInp.Education != "" {
+		educationId, err := iu.userRepo.GetEducationId(infoInp.Education)
+		if err != nil {
+			return info.InfoStruct{}, err
+		}
+		userInfo.Education = educationId
+	}
+	if infoInp.Job != "" {
+		jobId, err := iu.userRepo.GetJobId(infoInp.Job)
+		if err != nil {
+			return info.InfoStruct{}, err
+		}
+		userInfo.Job = jobId
+	}
+	userInfo.Sex = infoInp.Sex
+	userInfo.Description = infoInp.Description
+	userInfo.Name = infoInp.Name
+	userInfo.UserId = userId
+	err := iu.userRepo.ChangeInfo(&userInfo)
+	if err != nil {
+		return info.InfoStruct{}, err
+	}
+	result, err := iu.GetInfo(userId)
+	if err != nil {
+		return info.InfoStruct{}, err
+	}
+	return result, nil
+}
+
 func (iu *InfoUseCase) GetCities() ([]string, error) {
 	cities, err := iu.userRepo.GetCities()
 	if err != nil {

@@ -52,29 +52,65 @@ func (r *InfoRepository) GetPhotos(userId uint) ([]dataStruct.UserPhoto, error) 
 	return photos, err
 }
 
+func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {
+	infoDB := &dataStruct.UserInfo{}
+	err := r.db.First(infoDB, "user_id = ?", userInfo.UserId).Error
+	if err != nil {
+		return err
+	}
+	if userInfo.CityId != infoDB.CityId {
+		infoDB.CityId = userInfo.CityId
+	}
+	if userInfo.Zodiac != infoDB.Zodiac {
+		infoDB.Zodiac = userInfo.Zodiac
+	}
+	if userInfo.Job != infoDB.Job {
+		infoDB.Job = userInfo.Job
+	}
+	if userInfo.Education != infoDB.Education {
+		infoDB.Education = userInfo.Education
+	}
+
+	if userInfo.Description != "" {
+		infoDB.Description = userInfo.Description
+	}
+
+	if userInfo.Name != "" {
+		infoDB.Name = userInfo.Name
+	}
+
+	if userInfo.Sex != userInfo.Sex {
+		infoDB.Sex = userInfo.Sex
+	}
+
+	err = r.db.Save(&infoDB).Error
+	return err
+
+}
+
 ///getId
 
 func (r *InfoRepository) GetCityId(nameCity string) (uint, error) {
 	city := &dataStruct.City{}
-	err := r.db.First(city, "name = ?", nameCity).Error
+	err := r.db.First(city, "city = ?", nameCity).Error
 	return city.Id, err
 }
 
 func (r *InfoRepository) GetZodiacId(nameZodiac string) (uint, error) {
 	zodiac := &dataStruct.Zodiac{}
-	err := r.db.First(zodiac, "name = ?", nameZodiac).Error
+	err := r.db.First(zodiac, "zodiac = ?", nameZodiac).Error
 	return zodiac.Id, err
 }
 
 func (r *InfoRepository) GetJobId(nameJob string) (uint, error) {
 	job := &dataStruct.Job{}
-	err := r.db.First(job, "name = ?", nameJob).Error
+	err := r.db.First(job, "job = ?", nameJob).Error
 	return job.Id, err
 }
 
 func (r *InfoRepository) GetEducationId(nameEducation string) (uint, error) {
 	education := &dataStruct.Education{}
-	err := r.db.First(education, "name = ?", nameEducation).Error
+	err := r.db.First(education, "education = ?", nameEducation).Error
 	return education.Id, err
 }
 

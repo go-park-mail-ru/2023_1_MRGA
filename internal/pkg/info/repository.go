@@ -8,6 +8,7 @@ type IRepositoryInfo interface {
 	GetUserInfo(userId uint) (InfoStruct, error)
 	GetAvatar(userId uint) (string, error)
 	GetPhotos(userId uint) ([]dataStruct.UserPhoto, error)
+	ChangeInfo(userInfo *dataStruct.UserInfo) error
 
 	GetEducationId(nameEducation string) (uint, error)
 	GetJobId(nameJob string) (uint, error)
