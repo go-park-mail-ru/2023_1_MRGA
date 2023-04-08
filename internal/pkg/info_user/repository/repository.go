@@ -112,8 +112,6 @@ func (r *InfoRepository) GetEducationId(nameEducation string) (uint, error) {
 	return education.Id, err
 }
 
-////getters
-
 func (r *InfoRepository) GetCities() ([]dataStruct.City, error) {
 	var cities []dataStruct.City
 	err := r.db.Find(&cities).Error
