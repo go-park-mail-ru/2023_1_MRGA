@@ -69,8 +69,8 @@ type UserReason struct {
 }
 
 type Reason struct {
-	Id   uint `sql:"unique;type:uuid;primary_key;default:" json:"reasonId" gorm:"primaryKey;unique"`
-	Name uint `json:"reason"`
+	Id     uint   `sql:"unique;type:uuid;primary_key;default:" json:"reasonId" gorm:"primaryKey;unique"`
+	Reason string `json:"reason"`
 }
 
 type UserHashtag struct {

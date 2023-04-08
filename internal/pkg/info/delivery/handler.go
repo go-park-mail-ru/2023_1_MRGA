@@ -125,7 +125,6 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, mapInfo)
 }
 
-/////getters
 func (h *Handler) GetCities(w http.ResponseWriter, r *http.Request) {
 	cities, err := h.useCase.GetCities()
 	if err != nil {

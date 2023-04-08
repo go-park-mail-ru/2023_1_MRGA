@@ -88,8 +88,6 @@ func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {
 
 }
 
-///getId
-
 func (r *InfoRepository) GetCityId(nameCity string) (uint, error) {
 	city := &dataStruct.City{}
 	err := r.db.First(city, "city = ?", nameCity).Error
