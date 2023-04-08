@@ -123,10 +123,10 @@ func (r *RecRepository) GetReasonById(reasonId uint) (string, error) {
 }
 
 func (r *RecRepository) DeleteUserReason(userId, reactionId uint) error {
-	err := r.db.First(&dataStruct.UserReason{}, "user_id = ? AND reason_is=?", userId, reactionId).Error
+	err := r.db.First(&dataStruct.UserReason{}, "user_id = ? AND reason_id=?", userId, reactionId).Error
 	if err != nil {
 		return err
 	}
-	err = r.db.Delete(&dataStruct.UserReason{}, "user_id = ? AND reason_is=?", userId, reactionId).Error
+	err = r.db.Delete(&dataStruct.UserReason{}, "user_id = ? AND reason_id=?", userId, reactionId).Error
 	return err
 }
