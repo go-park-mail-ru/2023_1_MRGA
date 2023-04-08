@@ -126,6 +126,9 @@ func (r *RecUseCase) ChangeFilters(userId uint, filterInp recommendation.FilterI
 			reasonAdd.UserId = userId
 			reasonAdd.ReasonId = reasonId
 			err = r.userRepo.AddUserReason(&reasonAdd)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
