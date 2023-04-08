@@ -10,3 +10,10 @@ type Recommendation struct {
 	Description string        `json:"description"`
 	City        string        `json:"city"`
 }
+
+type FilterInput struct {
+	MinAge    int      `json:"minAge"`
+	MaxAge    int      `json:"maxAge"`
+	SearchSex uint     `json:"sex"`
+	Reason    []string `json:"reason"`
+}
