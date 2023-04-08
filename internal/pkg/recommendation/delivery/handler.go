@@ -74,8 +74,8 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 
 	err = h.useCase.AddFilters(uint(userId), filterInp)
 	if err != nil {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
@@ -153,15 +153,15 @@ func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
 
 	err = h.useCase.ChangeFilters(uint(userId), filterInp)
 	if err != nil {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
 	filters, err := h.useCase.GetFilters(uint(userId))
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, "", r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 	result := make(map[string]interface{})

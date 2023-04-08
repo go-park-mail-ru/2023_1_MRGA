@@ -80,8 +80,8 @@ type UserHashtag struct {
 }
 
 type Hashtag struct {
-	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"hashtagId" gorm:"primaryKey;unique"`
-	Name string `json:"hashtag"`
+	Id      uint   `sql:"unique;type:uuid;primary_key;default:" json:"hashtagId" gorm:"primaryKey;unique"`
+	Hashtag string `json:"hashtag"`
 }
 
 ///Match

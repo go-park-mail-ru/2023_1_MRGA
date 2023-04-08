@@ -10,11 +10,18 @@ type IRepositoryInfo interface {
 	GetPhotos(userId uint) ([]dataStruct.UserPhoto, error)
 	ChangeInfo(userInfo *dataStruct.UserInfo) error
 
+	GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error)
+	AddUserHashtag(hashtag dataStruct.UserHashtag) error
+	GetHashtagById(hashtagId uint) (string, error)
+	DeleteUserHashtag(userId, hashtagId uint) error
+
+	GetHashtagId(nameHashtag string) (uint, error)
 	GetEducationId(nameEducation string) (uint, error)
 	GetJobId(nameJob string) (uint, error)
 	GetZodiacId(nameZodiac string) (uint, error)
 	GetCityId(nameCity string) (uint, error)
 
+	GetHashtags() ([]dataStruct.Hashtag, error)
 	GetCities() ([]dataStruct.City, error)
 	GetJobs() ([]dataStruct.Job, error)
 	GetEducation() ([]dataStruct.Education, error)

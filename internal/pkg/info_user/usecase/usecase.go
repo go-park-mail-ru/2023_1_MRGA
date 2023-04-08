@@ -135,6 +135,99 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (in
 	return result, nil
 }
 
+func (iu *InfoUseCase) AddHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
+	for _, hashtag := range hashtagInp.Hashtag {
+		hashtagId, err := iu.userRepo.GetHashtagId(hashtag)
+		if err != nil {
+			return err
+		}
+		var userHashtag dataStruct.UserHashtag
+		userHashtag.HashtagId = hashtagId
+		userHashtag.UserId = userId
+		err = iu.userRepo.AddUserHashtag(userHashtag)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (iu *InfoUseCase) GetUserHashtags(userId uint) (info_user.HashtagInp, error) {
+	hashtags, err := iu.userRepo.GetUserHashtags(userId)
+	if err != nil {
+		return info_user.HashtagInp{}, err
+	}
+
+	var result info_user.HashtagInp
+	for _, hashtagId := range hashtags {
+		hashtag, err := iu.userRepo.GetHashtagById(hashtagId.HashtagId)
+		if err != nil {
+			return info_user.HashtagInp{}, err
+		}
+
+		result.Hashtag = append(result.Hashtag, hashtag)
+	}
+	return result, nil
+}
+
+func (iu *InfoUseCase) ChangeUserHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
+	hashtagsBD, err := iu.userRepo.GetUserHashtags(userId)
+	if err != nil {
+		return err
+	}
+	var hashtagSlice []string
+	for _, hashtagId := range hashtagsBD {
+		reason, err := iu.userRepo.GetHashtagById(hashtagId.HashtagId)
+		if err != nil {
+			return err
+		}
+		hashtagSlice = append(hashtagSlice, reason)
+	}
+
+	for _, hashtag := range hashtagInp.Hashtag {
+		if !Contains(hashtagSlice, hashtag) {
+			var hashtagAdd dataStruct.UserHashtag
+			hashtagId, err := iu.userRepo.GetHashtagId(hashtag)
+			if err != nil {
+				return err
+			}
+			hashtagAdd.UserId = userId
+			hashtagAdd.HashtagId = hashtagId
+			err = iu.userRepo.AddUserHashtag(hashtagAdd)
+		}
+	}
+
+	for _, hashtag := range hashtagSlice {
+		if !Contains(hashtagInp.Hashtag, hashtag) {
+			hashtagId, err := iu.userRepo.GetHashtagId(hashtag)
+			if err != nil {
+				return err
+			}
+			err = iu.userRepo.DeleteUserHashtag(userId, hashtagId)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (iu *InfoUseCase) GetHashtags() ([]string, error) {
+	hashtags, err := iu.userRepo.GetHashtags()
+	if err != nil {
+		return nil, err
+	}
+
+	var hashtagsResult []string
+	for _, hashtag := range hashtags {
+		hashtagsResult = append(hashtagsResult, hashtag.Hashtag)
+	}
+
+	return hashtagsResult, nil
+}
+
 func (iu *InfoUseCase) GetCities() ([]string, error) {
 	cities, err := iu.userRepo.GetCities()
 	if err != nil {
@@ -189,4 +282,13 @@ func (iu *InfoUseCase) GetZodiacs() ([]string, error) {
 	}
 
 	return zodiacResult, nil
+}
+
+func Contains(s []string, elem string) bool {
+	for _, elemS := range s {
+		if elem == elemS {
+			return true
+		}
+	}
+	return false
 }

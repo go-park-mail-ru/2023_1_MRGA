@@ -88,6 +88,47 @@ func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {
 
 }
 
+func (r *InfoRepository) GetHashtags() ([]dataStruct.Hashtag, error) {
+	var hashtags []dataStruct.Hashtag
+	err := r.db.Find(&hashtags).Error
+	if err != nil {
+		return nil, err
+	}
+	return hashtags, nil
+}
+
+func (r *InfoRepository) GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error) {
+	var hashtags []dataStruct.UserHashtag
+	err := r.db.Table("user_hashtags").Where("user_id = ? ", userId).Find(&hashtags).Error
+	return hashtags, err
+}
+
+func (r *InfoRepository) AddUserHashtag(hashtag dataStruct.UserHashtag) error {
+	err := r.db.Create(&hashtag).Error
+	return err
+}
+
+func (r *InfoRepository) DeleteUserHashtag(userId, hashtagId uint) error {
+	err := r.db.First(&dataStruct.UserHashtag{}, "user_id = ? AND hashtag_id=?", userId, hashtagId).Error
+	if err != nil {
+		return err
+	}
+	err = r.db.Delete(&dataStruct.UserHashtag{}, "user_id = ? AND hashtag_id=?", userId, hashtagId).Error
+	return err
+}
+
+func (r *InfoRepository) GetHashtagId(nameHashtag string) (uint, error) {
+	hashtag := &dataStruct.Hashtag{}
+	err := r.db.First(hashtag, "hashtag = ?", nameHashtag).Error
+	return hashtag.Id, err
+}
+
+func (r *InfoRepository) GetHashtagById(hashtagId uint) (string, error) {
+	hashtagDB := dataStruct.Hashtag{}
+	err := r.db.First(&hashtagDB, "id = ?", hashtagId).Error
+	return hashtagDB.Hashtag, err
+}
+
 func (r *InfoRepository) GetCityId(nameCity string) (uint, error) {
 	city := &dataStruct.City{}
 	err := r.db.First(city, "city = ?", nameCity).Error
