@@ -5,6 +5,11 @@ type UseCase interface {
 	ChangeInfo(userId uint, info InfoChange) (InfoStruct, error)
 	GetInfo(userId uint) (InfoStruct, error)
 
+	AddHashtags(userId uint, inp HashtagInp) error
+	GetUserHashtags(userId uint) (HashtagInp, error)
+	ChangeUserHashtags(userId uint, inp HashtagInp) error
+
+	GetHashtags() ([]string, error)
 	GetZodiacs() ([]string, error)
 	GetCities() ([]string, error)
 	GetJobs() ([]string, error)
