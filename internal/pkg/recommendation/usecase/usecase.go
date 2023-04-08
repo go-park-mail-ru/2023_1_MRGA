@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation"
 )
 
@@ -15,17 +16,149 @@ func NewRecUseCase(
 	}
 }
 
-func (r *RecUseCase) GetRecommendation(token string) ([]recommendation.Recommendation, error) {
+//
+//func (r *RecUseCase) GetRecommendation(token string) ([]recommendation.Recommendation, error) {
+//
+//	userId, err := r.userRepo.GetUserIdByToken(token)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	recs, err := r.userRepo.GetRecommendation(userId)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return recs, err
+//}
 
-	userId, err := r.userRepo.GetUserIdByToken(token)
+func (r *RecUseCase) AddFilters(userId uint, filterInp recommendation.FilterInput) error {
+	for _, reason := range filterInp.Reason {
+		reasonId, err := r.userRepo.GetReasonId(reason)
+		if err != nil {
+			return err
+		}
+
+		var userReason dataStruct.UserReason
+		userReason.UserId = userId
+		userReason.ReasonId = reasonId
+		err = r.userRepo.AddUserReason(&userReason)
+		if err != nil {
+			return err
+		}
+	}
+
+	var filter dataStruct.UserFilter
+	filter.UserId = userId
+	filter.SearchSex = filterInp.SearchSex
+	filter.MinAge = filterInp.MinAge
+	filter.MaxAge = filterInp.MaxAge
+
+	err := r.userRepo.AddFilter(&filter)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RecUseCase) GetReasons() ([]string, error) {
+	reasons, err := r.userRepo.GetReasons()
 	if err != nil {
 		return nil, err
 	}
 
-	recs, err := r.userRepo.GetRecommendation(userId)
-	if err != nil {
-		return nil, err
+	var reasonsResult []string
+	for _, reason := range reasons {
+		reasonsResult = append(reasonsResult, reason.Reason)
 	}
 
-	return recs, err
+	return reasonsResult, nil
+}
+
+func (r *RecUseCase) GetFilters(userId uint) (recommendation.FilterInput, error) {
+	var filterRes recommendation.FilterInput
+	filter, err := r.userRepo.GetFilter(userId)
+	if err != nil {
+		return recommendation.FilterInput{}, err
+	}
+
+	filterRes.MinAge = filter.MinAge
+	filterRes.MaxAge = filter.MaxAge
+	filterRes.SearchSex = filter.SearchSex
+
+	reasons, err := r.userRepo.GetUserReasons(userId)
+	if err != nil {
+		return recommendation.FilterInput{}, err
+	}
+
+	for _, reasonId := range reasons {
+		reason, err := r.userRepo.GetReasonById(reasonId.ReasonId)
+		if err != nil {
+			return recommendation.FilterInput{}, err
+		}
+		filterRes.Reason = append(filterRes.Reason, reason)
+	}
+
+	return filterRes, nil
+}
+
+func (r *RecUseCase) ChangeFilters(userId uint, filterInp recommendation.FilterInput) error {
+	reasonsBD, err := r.userRepo.GetUserReasons(userId)
+	if err != nil {
+		return err
+	}
+	var reasonsSlice []string
+	for _, reasonId := range reasonsBD {
+		reason, err := r.userRepo.GetReasonById(reasonId.ReasonId)
+		if err != nil {
+			return err
+		}
+		reasonsSlice = append(reasonsSlice, reason)
+	}
+
+	for _, reason := range filterInp.Reason {
+		if !Contains(reasonsSlice, reason) {
+			var reasonAdd dataStruct.UserReason
+			reasonId, err := r.userRepo.GetReasonId(reason)
+			if err != nil {
+				return err
+			}
+			reasonAdd.UserId = userId
+			reasonAdd.ReasonId = reasonId
+			err = r.userRepo.AddUserReason(&reasonAdd)
+		}
+	}
+
+	for _, reason := range reasonsSlice {
+		if !Contains(filterInp.Reason, reason) {
+			reasonId, err := r.userRepo.GetReasonId(reason)
+			if err != nil {
+				return err
+			}
+			err = r.userRepo.DeleteUserReason(userId, reasonId)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	var newFilter dataStruct.UserFilter
+	newFilter.UserId = userId
+	newFilter.MaxAge = filterInp.MaxAge
+	newFilter.SearchSex = filterInp.SearchSex
+
+	err = r.userRepo.ChangeFilter(newFilter)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func Contains(s []string, elem string) bool {
+	for _, elemS := range s {
+		if elem == elemS {
+			return true
+		}
+	}
+	return false
 }
