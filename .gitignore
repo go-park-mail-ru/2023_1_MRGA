@@ -92,3 +92,7 @@ fabric.properties
 cover
 cover.out
 .env
+
+services/files_storage/saved_files/
+
+**/.DS_Store
