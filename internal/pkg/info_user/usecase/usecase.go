@@ -2,20 +2,20 @@ package usecase
 
 import (
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
 )
 
 type InfoUseCase struct {
-	userRepo info.IRepositoryInfo
+	userRepo info_user.IRepositoryInfo
 }
 
-func NewInfoUseCase(userRepo info.IRepositoryInfo) *InfoUseCase {
+func NewInfoUseCase(userRepo info_user.IRepositoryInfo) *InfoUseCase {
 	return &InfoUseCase{
 		userRepo: userRepo,
 	}
 }
 
-func (iu *InfoUseCase) AddInfo(userId uint, info info.InfoStruct) error {
+func (iu *InfoUseCase) AddInfo(userId uint, info info_user.InfoStruct) error {
 	var userInfo dataStruct.UserInfo
 	var avatar dataStruct.UserPhoto
 	avatar.Avatar = true
@@ -70,7 +70,7 @@ func (iu *InfoUseCase) AddInfo(userId uint, info info.InfoStruct) error {
 	return nil
 }
 
-func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info.InfoStruct, err error) {
+func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStruct, err error) {
 	userInfo, err = iu.userRepo.GetUserInfo(userId)
 	if err != nil {
 		return
@@ -89,34 +89,34 @@ func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info.InfoStruct, err error
 	return
 }
 
-func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info.InfoChange) (info.InfoStruct, error) {
+func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (info_user.InfoStruct, error) {
 	var userInfo dataStruct.UserInfo
 
 	if infoInp.City != "" {
 		cityId, err := iu.userRepo.GetCityId(infoInp.City)
 		if err != nil {
-			return info.InfoStruct{}, err
+			return info_user.InfoStruct{}, err
 		}
 		userInfo.CityId = cityId
 	}
 	if infoInp.Zodiac != "" {
 		zodiacId, err := iu.userRepo.GetZodiacId(infoInp.Zodiac)
 		if err != nil {
-			return info.InfoStruct{}, err
+			return info_user.InfoStruct{}, err
 		}
 		userInfo.Zodiac = zodiacId
 	}
 	if infoInp.Education != "" {
 		educationId, err := iu.userRepo.GetEducationId(infoInp.Education)
 		if err != nil {
-			return info.InfoStruct{}, err
+			return info_user.InfoStruct{}, err
 		}
 		userInfo.Education = educationId
 	}
 	if infoInp.Job != "" {
 		jobId, err := iu.userRepo.GetJobId(infoInp.Job)
 		if err != nil {
-			return info.InfoStruct{}, err
+			return info_user.InfoStruct{}, err
 		}
 		userInfo.Job = jobId
 	}
@@ -126,11 +126,11 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info.InfoChange) (info.In
 	userInfo.UserId = userId
 	err := iu.userRepo.ChangeInfo(&userInfo)
 	if err != nil {
-		return info.InfoStruct{}, err
+		return info_user.InfoStruct{}, err
 	}
 	result, err := iu.GetInfo(userId)
 	if err != nil {
-		return info.InfoStruct{}, err
+		return info_user.InfoStruct{}, err
 	}
 	return result, nil
 }

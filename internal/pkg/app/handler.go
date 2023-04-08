@@ -10,9 +10,9 @@ import (
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
-	infoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/delivery"
-	InfoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/repository"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/usecase"
+	infoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/delivery"
+	InfoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/repository"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/usecase"
 )
 
 var frontendHosts = []string{

@@ -1,4 +1,4 @@
-package info
+package info_user
 
 type InfoStruct struct {
 	Name        string   `json:"name"`

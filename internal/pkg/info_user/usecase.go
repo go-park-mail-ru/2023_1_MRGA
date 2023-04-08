@@ -1,4 +1,4 @@
-package info
+package info_user
 
 type UseCase interface {
 	AddInfo(userId uint, info InfoStruct) error

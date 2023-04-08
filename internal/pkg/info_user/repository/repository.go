@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
 )
 
 type InfoRepository struct {
@@ -27,8 +27,8 @@ func (r *InfoRepository) AddUserPhoto(userPhoto *dataStruct.UserPhoto) error {
 	return err
 }
 
-func (r *InfoRepository) GetUserInfo(userId uint) (info.InfoStruct, error) {
-	var infoStruct info.InfoStruct
+func (r *InfoRepository) GetUserInfo(userId uint) (info_user.InfoStruct, error) {
+	var infoStruct info_user.InfoStruct
 	err := r.db.Table("user_infos").Select("*").
 		Where("user_infos.user_id =?", userId).
 		Joins("JOIN jobs on jobs.id = user_infos.job").

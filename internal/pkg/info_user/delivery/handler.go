@@ -8,7 +8,7 @@ import (
 
 	"github.com/fatih/structs"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -30,7 +30,7 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var infoInp info.InfoStruct
+	var infoInp info_user.InfoStruct
 	err = json.Unmarshal(reqBody, &infoInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -96,7 +96,7 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var infoInp info.InfoChange
+	var infoInp info_user.InfoChange
 	err = json.Unmarshal(reqBody, &infoInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
