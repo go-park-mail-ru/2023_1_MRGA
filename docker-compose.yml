@@ -20,10 +20,19 @@ services: # имеджи, которые запустятся по вашему 
     command: redis-server --save 20 1 --loglevel warning --requirepass password
     volumes:
       - redis-data:/data
+  db-storage:
+    image: postgres:latest
+    volumes:
+      - ./sql_scripts/:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: "mrga_storage"
+      POSTGRES_USER: "mrga_user"
+      POSTGRES_PASSWORD: "mrga_password"
+    ports:
+      - "5433:5432"
 
 volumes: # часть настроек для хранения данных
   postgresdb-data:
     driver: local
   redis-data:
     driver: local
-
