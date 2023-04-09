@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -8,16 +9,16 @@ import (
 	"strconv"
 	"time"
 
-	cors "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/app/cors_middleware"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/repository"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/service"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/repository"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/service"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 	"github.com/gorilla/mux"
 )
 
 func getRouter() *mux.Router {
 	router := mux.NewRouter()
 
-	router.Use(cors.SetCorsMiddleware)
+	// router.Use(SetCorsMiddleware)
 
 	router.HandleFunc("/api/files/upload", uploadFile).Methods("POST")
 	router.HandleFunc("/api/files/{id}", getFile).Methods("GET")
@@ -27,38 +28,38 @@ func getRouter() *mux.Router {
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("file")
 	if err != nil {
-		http.Error(w, "Не передан id пользователя", http.StatusBadRequest)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
 
 	userID := r.FormValue("userID")
 	if userID == "" {
-		http.Error(w, "Не передан id пользователя", http.StatusBadRequest)
+		writer.ErrorRespond(w, r, errors.New("Не передан id пользователя"), http.StatusBadRequest)
 		return
 	}
 
 	userIDUInt64, err := strconv.ParseUint(userID, 10, 32)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
 	filePath, err := service.UploadFile(file, handler, uint(userIDUInt64))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
 	fileID, err := repository.UploadFile(filePath, uint(userIDUInt64))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%d", fileID)
+	writer.Respond(w, r, map[string]interface{}{
+		"photoID": fileID,
+	})
 }
 
 func getFile(w http.ResponseWriter, r *http.Request) {

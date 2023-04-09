@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/repository"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/server"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/repository"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/server"
 )
 
 func main() {
