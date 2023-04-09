@@ -82,7 +82,6 @@ func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRes, err err
 
 	return user, nil
 
-	//return userRes, fmt.Errorf("user are not found")
 }
 
 func (r *AuthRepository) GetUserIdByToken(token string) (uint, error) {
@@ -104,6 +103,6 @@ func (r *AuthRepository) DeleteToken(token string) error {
 
 func (r *AuthRepository) SaveToken(userId uint, token string) (err error) {
 	userIdStr := strconv.Itoa(int(userId))
-	err = r.client.Set(token, userIdStr, 200*time.Second).Err()
+	err = r.client.Set(token, userIdStr, 1000*time.Second).Err()
 	return
 }

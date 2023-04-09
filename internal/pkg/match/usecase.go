@@ -2,5 +2,5 @@ package match
 
 type UseCase interface {
 	GetMatches(userId uint) ([]UserRes, error)
-	PostReaction(userId, userTo uint, reaction string) error
+	PostReaction(userId uint, reaction ReactionInp) error
 }

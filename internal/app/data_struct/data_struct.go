@@ -22,8 +22,8 @@ type UserInfo struct {
 }
 
 type Sex struct {
-	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"sexId" gorm:"primaryKey;unique"`
-	Name string `json:"sex"`
+	Id  uint   `sql:"unique;type:uuid;primary_key;default:" json:"sexId" gorm:"primaryKey;unique"`
+	Sex string `json:"sex"`
 }
 type UserPhoto struct {
 	Id     uint   `sql:"unique;type:uuid;primary_key;default:" json:"userPhotoId" gorm:"primaryKey;unique"`
@@ -94,19 +94,20 @@ type UserReaction struct {
 }
 
 type Reaction struct {
-	Id   uint   `sql:"unique;type:uuid;primary_key;default:" json:"reactionId" gorm:"primaryKey;unique"`
-	Name string `json:"reaction"`
+	Id       uint   `sql:"unique;type:uuid;primary_key;default:" json:"reactionId" gorm:"primaryKey;unique"`
+	Reaction string `json:"reaction"`
 }
 
 type UserHistory struct {
 	Id            uint   `sql:"unique;type:uuid;primary_key;default:" json:"userHistoryId" gorm:"primaryKey;unique"`
 	UserId        uint   `json:"userId" gorm:"foreignKey"`
 	UserProfileId uint   `json:"userProfileId" gorm:"foreignKey"`
-	Date          string `json:"date"`
+	ShowDate      string `json:"birthDay" sql:"type:date" gorm:"type:date"`
 }
 
 type Match struct {
 	Id           uint `sql:"unique;type:uuid;primary_key;default:" json:"MarchId" gorm:"primaryKey;unique"`
 	UserFirstId  uint `json:"userFirstId" gorm:"foreignKey"`
 	UserSecondId uint `json:"userSecondId" gorm:"foreignKey"`
+	Shown        bool `json:"shown"`
 }

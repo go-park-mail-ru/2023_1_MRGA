@@ -44,7 +44,7 @@ func (r *RecRepository) GetRecommendation(userId uint, history []uint, hashtags 
 }
 
 func (r *RecRepository) GetRecommendedUser(userId uint) (user recommendation.Recommendation, err error) {
-	err = r.db.Table("users u").Select("ui.name, ui.description,  ui.sex, p.photo, ed.education, z.zodiac, j.job, c.city").
+	err = r.db.Table("users u").Select("ui.name, u.email, ui.description,  ui.sex, p.photo, ed.education, z.zodiac, j.job, c.city").
 		Where("u.id = ?", userId).
 		Joins("Join user_infos ui on u.id = ui.user_id").
 		Joins("Join user_photos p on p.user_id=u.id").

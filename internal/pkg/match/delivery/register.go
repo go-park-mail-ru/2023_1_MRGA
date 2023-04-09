@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"net/http"
+	"github.com/gorilla/mux"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match"
 )
@@ -16,9 +16,9 @@ func NewHandler(useCase match.UseCase) *Handler {
 	}
 }
 
-func RegisterHTTPEndpoints(router *http.ServeMux, uc match.UseCase) {
+func RegisterHTTPEndpoints(router *mux.Router, uc match.UseCase) {
 	h := NewHandler(uc)
 
-	router.HandleFunc("/meetme/match", h.GetMatches)
-
+	router.HandleFunc("/meetme/match", h.GetMatches).Methods("GET")
+	router.HandleFunc("/meetme/reaction", h.AddReaction).Methods("POST")
 }

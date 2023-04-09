@@ -3,7 +3,8 @@ package recommendation
 import "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
 
 type Recommendation struct {
-	Name        string        `json:"username" structs:"name"`
+	Email       string        `json:"email"`
+	Name        string        `json:"name" structs:"name"`
 	Photo       string        `json:"avatar" structs:"name"`
 	Age         int           `json:"age" structs:"name"`
 	Sex         constform.Sex `json:"sex" structs:"name"`
