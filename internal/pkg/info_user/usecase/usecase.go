@@ -89,6 +89,16 @@ func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStruct, err 
 	return
 }
 
+func (iu *InfoUseCase) GetInfoByEmail(email string) (userInfo info_user.InfoStruct, err error) {
+	userId, err := iu.userRepo.GetUserIdByEmail(email)
+	if err != nil {
+		return
+	}
+
+	userInfo, err = iu.GetInfo(userId)
+	return
+}
+
 func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (info_user.InfoStruct, error) {
 	var userInfo dataStruct.UserInfo
 

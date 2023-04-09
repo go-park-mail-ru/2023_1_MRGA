@@ -11,3 +11,9 @@ type ReactionInp struct {
 	Email    string `json:"email"`
 	Reaction string `json:"reaction"`
 }
+
+type ChatAnswer struct {
+	Email  string `json:"email" structs:"email"`
+	Name   string `json:"name" structs:"name"`
+	Avatar string `json:"avatar" structs:"avatar"`
+}

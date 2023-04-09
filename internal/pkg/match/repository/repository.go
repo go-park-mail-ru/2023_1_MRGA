@@ -72,3 +72,23 @@ func (r *MatchRepository) AddMatchRow(row dataStruct.Match) error {
 	err := r.db.Create(&row).Error
 	return err
 }
+
+func (r *MatchRepository) ChangeStatusMatch(userId, profileId uint) error {
+	var matchDB dataStruct.Match
+	err := r.db.First(&matchDB, "user_first_id = ? AND user_second_id = ?", userId, profileId).Error
+	if err != nil {
+		return err
+	}
+	matchDB.Shown = true
+	err = r.db.Save(&matchDB).Error
+	return err
+}
+
+func (r *MatchRepository) GetChat(userId uint) (match.ChatAnswer, error) {
+	var user match.ChatAnswer
+	err := r.db.Table("users u").Select(" u.email, ui.name").
+		Where("u.id =?", userId).
+		Joins("Join user_infos ui on u.id = ui.user_id").
+		Find(&user).Error
+	return user, err
+}

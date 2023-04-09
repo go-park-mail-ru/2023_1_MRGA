@@ -12,4 +12,6 @@ type IRepositoryMatch interface {
 	AddUserReaction(row dataStruct.UserReaction) error
 	DeleteUserReaction(rowId uint) error
 	AddMatchRow(row dataStruct.Match) error
+	ChangeStatusMatch(userId, profileId uint) error
+	GetChat(userId uint) (ChatAnswer, error)
 }

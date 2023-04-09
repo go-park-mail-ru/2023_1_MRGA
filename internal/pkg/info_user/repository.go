@@ -10,6 +10,8 @@ type IRepositoryInfo interface {
 	GetPhotos(userId uint) ([]dataStruct.UserPhoto, error)
 	ChangeInfo(userInfo *dataStruct.UserInfo) error
 
+	GetUserIdByEmail(email string) (uint, error)
+
 	GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error)
 	AddUserHashtag(hashtag dataStruct.UserHashtag) error
 	GetHashtagById(hashtagId uint) (string, error)

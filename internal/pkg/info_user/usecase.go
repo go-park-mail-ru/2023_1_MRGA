@@ -4,6 +4,7 @@ type UseCase interface {
 	AddInfo(userId uint, info InfoStruct) error
 	ChangeInfo(userId uint, info InfoChange) (InfoStruct, error)
 	GetInfo(userId uint) (InfoStruct, error)
+	GetInfoByEmail(email string) (userInfo InfoStruct, err error)
 
 	AddHashtags(userId uint, inp HashtagInp) error
 	GetUserHashtags(userId uint) (HashtagInp, error)
