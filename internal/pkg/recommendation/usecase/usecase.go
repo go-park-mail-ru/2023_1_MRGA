@@ -16,21 +16,44 @@ func NewRecUseCase(
 	}
 }
 
-//
-//func (r *RecUseCase) GetRecommendation(token string) ([]recommendation.Recommendation, error) {
-//
-//	userId, err := r.userRepo.GetUserIdByToken(token)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	recs, err := r.userRepo.GetRecommendation(userId)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return recs, err
-//}
+func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommendation, error) {
+	hashtags, err := r.userRepo.GetUserHashtags(userId)
+	if err != nil {
+		return nil, err
+	}
+	filters, err := r.userRepo.GetFilter(userId)
+	if err != nil {
+		return nil, err
+	}
+	hashtagsSlice := make([]uint, 0)
+	for _, hashtagId := range hashtags {
+		hashtagsSlice = append(hashtagsSlice, hashtagId.HashtagId)
+	}
+
+	history, err := r.userRepo.GetUserHistory(userId)
+	historySlice := []uint{0}
+	for _, historyId := range history {
+		historySlice = append(historySlice, historyId.UserProfileId)
+	}
+
+	recs, err := r.userRepo.GetRecommendation(userId, historySlice, hashtagsSlice, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []recommendation.Recommendation
+	for _, rec := range recs {
+		user, err := r.userRepo.GetRecommendedUser(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
+		age, err := r.userRepo.GetUserAge(rec.UserId)
+		user.Age = age
+		result = append(result, user)
+	}
+
+	return result, err
+}
 
 func (r *RecUseCase) AddFilters(userId uint, filterInp recommendation.FilterInput) error {
 	for _, reason := range filterInp.Reason {

@@ -19,9 +19,9 @@ func NewHandler(useCase info_user.UseCase) *Handler {
 func RegisterHTTPEndpoints(router *mux.Router, ic info_user.UseCase) {
 	h := NewHandler(ic)
 
-	router.HandleFunc("/meetme/info_user", h.GetInfo).Methods("GET")
-	router.HandleFunc("/meetme/info_user", h.ChangeInfo).Methods("PUT")
-	router.HandleFunc("/meetme/info_user", h.CreateInfo).Methods("POST")
+	router.HandleFunc("/meetme/info-user", h.GetInfo).Methods("GET")
+	router.HandleFunc("/meetme/info-user", h.ChangeInfo).Methods("PUT")
+	router.HandleFunc("/meetme/info-user", h.CreateInfo).Methods("POST")
 
 	router.HandleFunc("/meetme/hashtags-user", h.AddUserHashtags).Methods("POST")
 	router.HandleFunc("/meetme/hashtags-user", h.GetUserHashtags).Methods("GET")

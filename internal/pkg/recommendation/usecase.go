@@ -1,7 +1,7 @@
 package recommendation
 
 type UseCase interface {
-	//GetRecommendation(string) ([]Recommendation, error)
+	GetRecommendations(userId uint) ([]Recommendation, error)
 	AddFilters(userId uint, FilterInp FilterInput) error
 	GetReasons() ([]string, error)
 	GetFilters(userId uint) (FilterInput, error)
