@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/fatih/structs"
+	"github.com/gorilla/mux"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
@@ -180,6 +181,21 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	mapInfo := structs.Map(&result)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, mapInfo)
+}
+
+func (h *Handler) GetInfoByEmail(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	email := params["email"]
+	infoBD, err := h.useCase.GetInfoByEmail(email)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	mapInfo := structs.Map(&infoBD)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, mapInfo)
 }

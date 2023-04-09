@@ -188,3 +188,12 @@ func (r *InfoRepository) GetEducation() ([]dataStruct.Education, error) {
 	}
 	return education, nil
 }
+
+func (r *InfoRepository) GetUserIdByEmail(email string) (uint, error) {
+	var user dataStruct.User
+	err := r.db.First(&user, "email = ?", email).Error
+	if err != nil {
+		return 0, err
+	}
+	return user.Id, err
+}

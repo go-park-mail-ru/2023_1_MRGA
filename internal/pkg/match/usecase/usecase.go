@@ -94,3 +94,17 @@ func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) err
 	}
 	return nil
 }
+
+func (m *MatchUseCase) GetChatByEmail(userId uint, email string) (result match.ChatAnswer, err error) {
+	profileId, err := m.userRepo.GetIdByEmail(email)
+	if err != nil {
+		return
+	}
+
+	err = m.userRepo.ChangeStatusMatch(userId, profileId)
+	if err != nil {
+		return
+	}
+	result, err = m.userRepo.GetChat(profileId)
+	return
+}

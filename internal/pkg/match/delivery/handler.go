@@ -6,6 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/fatih/structs"
+	"github.com/gorilla/mux"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -77,4 +80,25 @@ func (h *Handler) AddReaction(w http.ResponseWriter, r *http.Request) {
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 	return
+}
+
+func (h *Handler) GetChatByEmail(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(int)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+	params := mux.Vars(r)
+	email := params["email"]
+	chat, err := h.useCase.GetChatByEmail(uint(userId), email)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	result := structs.Map(&chat)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, result)
 }
