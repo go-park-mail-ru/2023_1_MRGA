@@ -86,9 +86,11 @@ func (r *MatchRepository) ChangeStatusMatch(userId, profileId uint) error {
 
 func (r *MatchRepository) GetChat(userId uint) (match.ChatAnswer, error) {
 	var user match.ChatAnswer
-	err := r.db.Table("users u").Select(" u.email, ui.name").
+	err := r.db.Table("users u").Select(" u.email, ui.name, p.photo").
 		Where("u.id =?", userId).
 		Joins("Join user_infos ui on u.id = ui.user_id").
+		Joins("Join user_photos p on p.user_id=u.id").
+		Where("p.avatar = ?", true).
 		Find(&user).Error
 	return user, err
 }

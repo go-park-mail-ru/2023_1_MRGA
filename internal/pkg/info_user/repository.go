@@ -6,8 +6,7 @@ type IRepositoryInfo interface {
 	AddInfoUser(userInfo *dataStruct.UserInfo) error
 	AddUserPhoto(userPhoto *dataStruct.UserPhoto) error
 	GetUserInfo(userId uint) (InfoStruct, error)
-	GetAvatar(userId uint) (string, error)
-	GetPhotos(userId uint) ([]dataStruct.UserPhoto, error)
+	GetUserPhoto(userId uint) (photos []dataStruct.UserPhoto, err error)
 	ChangeInfo(userInfo *dataStruct.UserInfo) error
 
 	GetUserIdByEmail(email string) (uint, error)

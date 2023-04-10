@@ -46,7 +46,20 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	reader := bytes.NewReader(reqBody)
 	body := &bytes.Buffer{}
 	writer2 := multipart.NewWriter(body)
-	fileField, err := writer2.CreateFormFile("file", "")
+	userIdField, err := writer2.CreateFormField("userID")
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	_, err = io.WriteString(userIdField, "0")
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	fileField, err := writer2.CreateFormFile("file", "filename")
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -144,7 +157,6 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+photoId, nil)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		err = fmt.Errorf("cant parse json")
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}

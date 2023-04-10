@@ -17,25 +17,6 @@ func NewInfoUseCase(userRepo info_user.IRepositoryInfo) *InfoUseCase {
 
 func (iu *InfoUseCase) AddInfo(userId uint, info info_user.InfoStruct) error {
 	var userInfo dataStruct.UserInfo
-	var avatar dataStruct.UserPhoto
-	avatar.Avatar = true
-	avatar.UserId = userId
-	avatar.Photo = info.Avatar
-	err := iu.userRepo.AddUserPhoto(&avatar)
-	if err != nil {
-		return err
-	}
-	for _, photo := range info.Photo {
-		var photoDB dataStruct.UserPhoto
-		photoDB.Avatar = false
-		photoDB.UserId = userId
-		photoDB.Photo = photo
-		err = iu.userRepo.AddUserPhoto(&photoDB)
-		if err != nil {
-			return err
-		}
-	}
-
 	userInfo.UserId = userId
 	userInfo.Name = info.Name
 	userInfo.Description = info.Description
@@ -70,26 +51,28 @@ func (iu *InfoUseCase) AddInfo(userId uint, info info_user.InfoStruct) error {
 	return nil
 }
 
-func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStruct, err error) {
-	userInfo, err = iu.userRepo.GetUserInfo(userId)
+func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStructAnswer, err error) {
+	userInfoTemp, err := iu.userRepo.GetUserInfo(userId)
+	userInfo.Name = userInfoTemp.Name
+	userInfo.Sex = userInfoTemp.Sex
+	userInfo.Job = userInfoTemp.Job
+	userInfo.Education = userInfoTemp.Education
+	userInfo.Zodiac = userInfoTemp.Zodiac
+	userInfo.City = userInfoTemp.City
+	userInfo.Description = userInfoTemp.Description
 	if err != nil {
 		return
 	}
 
-	avatar, err := iu.userRepo.GetAvatar(userId)
-	if err != nil {
-		return
-	}
-	userInfo.Avatar = avatar
-
-	photos, err := iu.userRepo.GetPhotos(userId)
-	for _, photo := range photos {
-		userInfo.Photo = append(userInfo.Photo, photo.Photo)
+	photos, err := iu.userRepo.GetUserPhoto(userId)
+	for _, p := range photos {
+		photo := info_user.Photo{PhotoId: p.Photo, Avatar: p.Avatar}
+		userInfo.Photos = append(userInfo.Photos, photo)
 	}
 	return
 }
 
-func (iu *InfoUseCase) GetInfoByEmail(email string) (userInfo info_user.InfoStruct, err error) {
+func (iu *InfoUseCase) GetInfoByEmail(email string) (userInfo info_user.InfoStructAnswer, err error) {
 	userId, err := iu.userRepo.GetUserIdByEmail(email)
 	if err != nil {
 		return
@@ -99,34 +82,34 @@ func (iu *InfoUseCase) GetInfoByEmail(email string) (userInfo info_user.InfoStru
 	return
 }
 
-func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (info_user.InfoStruct, error) {
+func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (info_user.InfoStructAnswer, error) {
 	var userInfo dataStruct.UserInfo
 
 	if infoInp.City != "" {
 		cityId, err := iu.userRepo.GetCityId(infoInp.City)
 		if err != nil {
-			return info_user.InfoStruct{}, err
+			return info_user.InfoStructAnswer{}, err
 		}
 		userInfo.CityId = cityId
 	}
 	if infoInp.Zodiac != "" {
 		zodiacId, err := iu.userRepo.GetZodiacId(infoInp.Zodiac)
 		if err != nil {
-			return info_user.InfoStruct{}, err
+			return info_user.InfoStructAnswer{}, err
 		}
 		userInfo.Zodiac = zodiacId
 	}
 	if infoInp.Education != "" {
 		educationId, err := iu.userRepo.GetEducationId(infoInp.Education)
 		if err != nil {
-			return info_user.InfoStruct{}, err
+			return info_user.InfoStructAnswer{}, err
 		}
 		userInfo.Education = educationId
 	}
 	if infoInp.Job != "" {
 		jobId, err := iu.userRepo.GetJobId(infoInp.Job)
 		if err != nil {
-			return info_user.InfoStruct{}, err
+			return info_user.InfoStructAnswer{}, err
 		}
 		userInfo.Job = jobId
 	}
@@ -136,11 +119,11 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (in
 	userInfo.UserId = userId
 	err := iu.userRepo.ChangeInfo(&userInfo)
 	if err != nil {
-		return info_user.InfoStruct{}, err
+		return info_user.InfoStructAnswer{}, err
 	}
 	result, err := iu.GetInfo(userId)
 	if err != nil {
-		return info_user.InfoStruct{}, err
+		return info_user.InfoStructAnswer{}, err
 	}
 	return result, nil
 }
