@@ -40,16 +40,9 @@ func (r *InfoRepository) GetUserInfo(userId uint) (info_user.InfoStruct, error) 
 	return infoStruct, err
 }
 
-func (r *InfoRepository) GetAvatar(userId uint) (string, error) {
-	var avatar dataStruct.UserPhoto
-	err := r.db.Table("user_photos").Where("user_id = ? AND avatar=?", userId, true).Find(&avatar).Error
-	return avatar.Photo, err
-}
-
-func (r *InfoRepository) GetPhotos(userId uint) ([]dataStruct.UserPhoto, error) {
-	var photos []dataStruct.UserPhoto
-	err := r.db.Table("user_photos").Where("user_id = ? AND avatar=?", userId, false).Find(&photos).Error
-	return photos, err
+func (r *InfoRepository) GetUserPhoto(userId uint) (photos []dataStruct.UserPhoto, err error) {
+	err = r.db.Find(&photos, "user_id = ?", userId).Error
+	return
 }
 
 func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {

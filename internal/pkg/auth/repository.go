@@ -7,7 +7,8 @@ type IRepositoryAuth interface {
 	AddUser(d *dataStruct.User) (uint, error)
 	Login(input string, pass string) (uint, error)
 	GetUserIdByToken(string) (uint, error)
-	GetUserById(uint) (UserRes, error)
+	GetUserPhoto(userId uint) (photos []dataStruct.UserPhoto, err error)
+	GetUserById(uint) (UserRestTemp, error)
 	ChangeUser(user dataStruct.User) error
 	SaveToken(id uint, token string) error
 }

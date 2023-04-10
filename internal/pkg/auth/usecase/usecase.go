@@ -75,11 +75,20 @@ func (a *AuthUseCase) Login(logInp auth.LoginInput) (string, error) {
 
 func (u *AuthUseCase) GetUserById(userId uint) (user auth.UserRes, err error) {
 
-	user, err = u.userRepo.GetUserById(userId)
+	userTemp, err := u.userRepo.GetUserById(userId)
 	if err != nil {
 		return
 	}
-
+	user.Name = userTemp.Name
+	user.Email = userTemp.Email
+	photos, err := u.userRepo.GetUserPhoto(userId)
+	if err != nil {
+		return
+	}
+	for _, p := range photos {
+		photo := auth.Photo{PhotoId: p.Photo, Avatar: p.Avatar}
+		user.Photos = append(user.Photos, photo)
+	}
 	return
 }
 

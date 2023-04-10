@@ -1,15 +1,24 @@
 package info_user
 
 type InfoStruct struct {
-	Name        string   `json:"name" structs:"name"`
-	City        string   `json:"city" structs:"city"`
-	Sex         uint     `json:"sex" structs:"sex"`
-	Description string   `json:"description" structs:"description"`
-	Zodiac      string   `json:"zodiac" structs:"zodiac"`
-	Job         string   `json:"job" structs:"job"`
-	Education   string   `json:"education" structs:"education"`
-	Avatar      string   `json:"avatar" structs:"avatar"`
-	Photo       []string `json:"photo" structs:"photo"`
+	Name        string `json:"name" structs:"name"`
+	City        string `json:"city" structs:"city"`
+	Sex         uint   `json:"sex" structs:"sex"`
+	Description string `json:"description" structs:"description"`
+	Zodiac      string `json:"zodiac" structs:"zodiac"`
+	Job         string `json:"job" structs:"job"`
+	Education   string `json:"education" structs:"education"`
+}
+
+type InfoStructAnswer struct {
+	Name        string  `json:"name" structs:"name"`
+	City        string  `json:"city" structs:"city"`
+	Sex         uint    `json:"sex" structs:"sex"`
+	Description string  `json:"description" structs:"description"`
+	Zodiac      string  `json:"zodiac" structs:"zodiac"`
+	Job         string  `json:"job" structs:"job" structs:"job"`
+	Education   string  `json:"education" structs:"education" structs:"education"`
+	Photos      []Photo `json:"photos" structs:"photos"`
 }
 
 type InfoChange struct {
@@ -24,4 +33,9 @@ type InfoChange struct {
 
 type HashtagInp struct {
 	Hashtag []string `json:"hashtag" structs:"hashtag"`
+}
+
+type Photo struct {
+	PhotoId uint `json:"photoId" structs:"photoId"`
+	Avatar  bool `json:"avatar" structs:"avatar"`
 }
