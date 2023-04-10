@@ -78,29 +78,7 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
-	// Создаем HTTP-запрос на другой микросервис
-	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+photoId, nil)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
-	// Отправляем запрос и проверяем статус ответа
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		err = fmt.Errorf("cant parse json")
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	if resp.StatusCode != http.StatusOK {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := SendRequest(photoId)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -213,4 +191,33 @@ func SendPhoto(reader *bytes.Reader) (uint, error) {
 	}
 
 	return answer.Body.PhotoID, nil
+}
+
+func SendRequest(photoId string) ([]byte, error) {
+	// Создаем HTTP-запрос на другой микросервис
+	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+photoId, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Отправляем запрос и проверяем статус ответа
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, err
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			return
+		}
+	}()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return bodyBytes, err
 }
