@@ -16,6 +16,9 @@ import (
 	matchDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/delivery"
 	MatchRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/repository"
 	matchUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/usecase"
+	photoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo/delivery"
+	PhotoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo/repository"
+	photoUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo/usecase"
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
@@ -55,6 +58,10 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	matchRepo := MatchRepository.NewMatchRepo(db)
 	ucMatch := matchUC.NewMatchUseCase(matchRepo)
 	matchDel.RegisterHTTPEndpoints(a.Router, ucMatch)
+
+	photoRepo := PhotoRepository.NewPhotoRepo(db)
+	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
+	photoDel.RegisterHTTPEndpoints(a.Router, ucPhoto)
 	//userRepo := userRepository.NewRepo(db)
 	//ucUser := userUC.NewUserUseCase(userRepo)
 	//userDel.RegisterHTTPEndpoints(a.Router, ucUser)

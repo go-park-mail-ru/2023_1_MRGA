@@ -26,10 +26,10 @@ type Sex struct {
 	Sex string `json:"sex"`
 }
 type UserPhoto struct {
-	Id     uint   `sql:"unique;type:uuid;primary_key;default:" json:"userPhotoId" gorm:"primaryKey;unique"`
-	UserId uint   `json:"userId" gorm:"foreignKey"`
-	Photo  string `json:"photo"`
-	Avatar bool   `json:"avatar"`
+	Id     uint `sql:"unique;type:uuid;primary_key;default:" json:"userPhotoId" gorm:"primaryKey;unique"`
+	UserId uint `json:"userId" gorm:"foreignKey"`
+	Photo  uint `json:"photo"`
+	Avatar bool `json:"avatar"`
 }
 
 type City struct {
