@@ -1,7 +1,6 @@
 package repository
 
 type File struct {
-	ID     uint   `gorm:"primary_key"`
-	Path   string `gorm:"not null"`
-	UserID uint   `gorm:"not null"`
+	ID   uint   `gorm:"primary_key"`
+	Path string `gorm:"not null"`
 }

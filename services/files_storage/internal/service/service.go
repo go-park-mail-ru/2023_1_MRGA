@@ -5,12 +5,20 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 )
 
-func UploadFile(file multipart.File, handler *multipart.FileHeader, userID uint) (string, error) {
-	dir := filepath.Join("services", "files_storage", "saved_files", fmt.Sprintf("%d", userID))
+type Service struct {
+}
+
+func InitService() Service {
+	return Service{}
+}
+
+func (service Service) UploadFile(file multipart.File, handler *multipart.FileHeader) (string, error) {
+	dir := filepath.Join("services", "files_storage", "saved_files")
 
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
@@ -40,6 +48,13 @@ func UploadFile(file multipart.File, handler *multipart.FileHeader, userID uint)
 	return filePath, nil
 }
 
-func GetFile(filePath string) {
+func (service Service) GetFile(filePath string) (*os.File, string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, "", err
+	}
 
+	filename := path.Base(file.Name())
+
+	return file, filename, nil
 }
