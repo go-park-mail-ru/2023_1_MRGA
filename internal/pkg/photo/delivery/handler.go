@@ -18,15 +18,6 @@ import (
 )
 
 func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	avatar, err := strconv.ParseBool(params["avatar"])
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		err = fmt.Errorf("cant parse json")
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -44,81 +35,15 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	reader := bytes.NewReader(reqBody)
-	body := &bytes.Buffer{}
-	writer2 := multipart.NewWriter(body)
-	userIdField, err := writer2.CreateFormField("userID")
+	photoId, err := SendPhoto(reader)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		err = fmt.Errorf("cant parse json")
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	_, err = io.WriteString(userIdField, "0")
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
-	fileField, err := writer2.CreateFormFile("file", "filename")
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	_, err = io.Copy(fileField, reader)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
-	err = writer2.Close()
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
-	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", body)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	req.Header.Set("Content-Type", writer2.FormDataContentType())
-
-	// Отправляем запрос и проверяем статус ответа
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	if resp.StatusCode != http.StatusOK {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-			return
-		}
-	}()
-
-	answerBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
-	var answer photo.AnswerPhoto
-	err = json.Unmarshal(answerBody, &answer)
+	params := mux.Vars(r)
+	avatar, err := strconv.ParseBool(params["avatar"])
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		err = fmt.Errorf("cant parse json")
@@ -134,7 +59,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.useCase.SavePhoto(uint(userId), answer.Body.PhotoID, avatar)
+	err = h.useCase.SavePhoto(uint(userId), photoId, avatar)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -223,4 +148,69 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 	return
+}
+
+func SendPhoto(reader *bytes.Reader) (uint, error) {
+
+	body := &bytes.Buffer{}
+	writerFile := multipart.NewWriter(body)
+	userIdField, err := writerFile.CreateFormField("userID")
+	if err != nil {
+		return 0, err
+	}
+	_, err = io.WriteString(userIdField, "0")
+	if err != nil {
+		return 0, err
+	}
+
+	fileField, err := writerFile.CreateFormFile("file", "filename")
+	if err != nil {
+		return 0, err
+	}
+	_, err = io.Copy(fileField, reader)
+	if err != nil {
+		return 0, err
+	}
+
+	err = writerFile.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", body)
+	if err != nil {
+		return 0, err
+	}
+	req.Header.Set("Content-Type", writerFile.FormDataContentType())
+
+	// Отправляем запрос и проверяем статус ответа
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		err = fmt.Errorf("status %v", resp.StatusCode)
+		return 0, err
+	}
+
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			return
+		}
+	}()
+
+	answerBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+
+	var answer photo.AnswerPhoto
+	err = json.Unmarshal(answerBody, &answer)
+	if err != nil {
+		return 0, err
+	}
+
+	return answer.Body.PhotoID, nil
 }
