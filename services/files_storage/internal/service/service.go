@@ -17,7 +17,7 @@ func InitService() Service {
 	return Service{}
 }
 
-func (service Service) UploadFile(file multipart.File, handler *multipart.FileHeader) (string, error) {
+func (service Service) UploadFile(file multipart.File, filename string) (string, error) {
 	dir := filepath.Join("services", "files_storage", "saved_files")
 
 	err := os.MkdirAll(dir, os.ModePerm)
@@ -25,8 +25,8 @@ func (service Service) UploadFile(file multipart.File, handler *multipart.FileHe
 		return "", err
 	}
 
-	ext := filepath.Ext(handler.Filename)
-	baseName := handler.Filename[0 : len(handler.Filename)-len(ext)]
+	ext := filepath.Ext(filename)
+	baseName := filename[0 : len(filename)-len(ext)]
 	newFileName := fmt.Sprintf("%s_%d%s", baseName, time.Now().UnixNano(), ext)
 
 	filePath := filepath.Join(dir, newFileName)

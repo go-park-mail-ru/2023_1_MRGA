@@ -14,13 +14,13 @@ func (server *Server) getRouter() *mux.Router {
 	router := mux.NewRouter()
 
 	// router.Use(SetCorsMiddleware)
-	router.HandleFunc("/api/files/upload", server.uploadFile).Methods("POST")
-	router.HandleFunc("/api/files/{id}", server.getFile).Methods("GET")
+	router.HandleFunc("/api/files/upload", server.UploadFile).Methods("POST")
+	router.HandleFunc("/api/files/{id}", server.GetFile).Methods("GET")
 
 	return router
 }
 
-func (server Server) uploadFile(w http.ResponseWriter, r *http.Request) {
+func (server Server) UploadFile(w http.ResponseWriter, r *http.Request) {
 	file, fileHandler, err := r.FormFile("file")
 	if err != nil {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -28,7 +28,7 @@ func (server Server) uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	filePath, err := server.service.UploadFile(file, fileHandler)
+	filePath, err := server.service.UploadFile(file, fileHandler.Filename)
 	if err != nil {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
@@ -45,7 +45,7 @@ func (server Server) uploadFile(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (server Server) getFile(w http.ResponseWriter, r *http.Request) {
+func (server Server) GetFile(w http.ResponseWriter, r *http.Request) {
 	// Получаем ID файла из параметра запроса
 	vars := mux.Vars(r)
 	id := vars["id"]

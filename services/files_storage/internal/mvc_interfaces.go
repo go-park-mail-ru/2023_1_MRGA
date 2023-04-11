@@ -11,12 +11,12 @@ type IRepository interface {
 	GetFile(uint) (string, error)
 }
 
-type IHandler interface {
-	uploadFile(http.ResponseWriter, *http.Request)
-	getFile(http.ResponseWriter, *http.Request)
+type IServer interface {
+	UploadFile(http.ResponseWriter, *http.Request)
+	GetFile(http.ResponseWriter, *http.Request)
 }
 
 type IService interface {
-	UploadFile(multipart.File, *multipart.FileHeader) (string, error)
+	UploadFile(multipart.File, string) (string, error)
 	GetFile(string) (*os.File, string, error)
 }
