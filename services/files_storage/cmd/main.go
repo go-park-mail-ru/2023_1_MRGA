@@ -1,18 +1,41 @@
 package main
 
 import (
+	"flag"
 	"log"
+	"time"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/repository"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/server"
+	repositoryPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/repository"
+	serverPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/server"
+	servicePackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/service"
 )
 
+func getServerOptions() (opts serverPackage.ServerOptions) {
+	flag.StringVar(&opts.Host, "h", "localhost", "set the server's host")
+	flag.StringVar(&opts.Port, "p", "8081", "set the server's port")
+	flag.IntVar(&opts.MaxHeaderBytes, "m", 1, "set the server's max header bytes in MB")
+
+	readTimeout := flag.Int64("rt", 10, "set the server's read timeout in seconds")
+	writeTimout := flag.Int("wt", 10, "set the server's read timeout in seconds")
+
+	flag.Parse()
+
+	opts.MaxHeaderBytes = opts.MaxHeaderBytes << 20 // MB to Bytes
+	opts.ReadTimeout = time.Duration(*readTimeout) * time.Second
+	opts.WriteTimeout = time.Duration(*writeTimout) * time.Second
+
+	return opts
+}
+
 func main() {
-	err := repository.InitRepository()
+	repo, err := repositoryPackage.InitRepository()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
+	service := servicePackage.InitService()
+
+	server := serverPackage.InitServer(getServerOptions(), repo, service)
 	err = server.RunServer()
 	if err != nil {
 		log.Fatal("Не удалось запустить сервер: " + err.Error())
