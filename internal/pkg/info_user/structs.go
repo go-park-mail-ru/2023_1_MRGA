@@ -17,7 +17,8 @@ type InfoStructAnswer struct {
 	Description string  `json:"description" structs:"description"`
 	Zodiac      string  `json:"zodiac" structs:"zodiac"`
 	Job         string  `json:"job" structs:"job" structs:"job"`
-	Education   string  `json:"education" structs:"education" structs:"education"`
+	Education   string  `json:"education" structs:"education"`
+	Age         int     `json:"age" structs:"age"`
 	Photos      []Photo `json:"photos" structs:"photos"`
 }
 
