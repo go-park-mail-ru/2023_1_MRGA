@@ -20,7 +20,7 @@ func NewRepo(db *gorm.DB) *RecRepository {
 	return &r
 }
 
-func (r *RecRepository) GetRecommendation(userId uint, history []uint, hashtags []uint, filters dataStruct.UserFilter) (users []recommendation.UserRecommend, err error) {
+func (r *RecRepository) GetRecommendation(userId uint, history []uint, reasons []uint, hashtags []uint, filters dataStruct.UserFilter) (users []recommendation.UserRecommend, err error) {
 	var sexSlice []uint
 	switch filters.SearchSex {
 	case 0:
@@ -33,8 +33,10 @@ func (r *RecRepository) GetRecommendation(userId uint, history []uint, hashtags 
 	err = r.db.Table("users u").Select("ui.user_id").
 		Joins("JOIN user_infos ui on u.id = ui.user_id").
 		Joins("join user_hashtags uh on u.id = uh.user_id").
+		Joins("join user_reasons ur on u.id = ur.user_id").
 		Where("ui.user_id NOT IN ?", history).
 		Where("hashtag_id IN ?", hashtags).
+		Where("reason_id IN ?", reasons).
 		Where("ui.user_id!=?", userId).
 		Where("u.birth_day BETWEEN ? AND ?", calculateBirthYear(filters.MaxAge), calculateBirthYear(filters.MinAge)).
 		Group("ui.user_id").

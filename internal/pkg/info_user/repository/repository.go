@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
@@ -155,6 +157,19 @@ func (r *InfoRepository) GetCities() ([]dataStruct.City, error) {
 	return cities, nil
 }
 
+func (r *InfoRepository) GetAge(userId uint) (int, error) {
+	var user dataStruct.User
+	err := r.db.First(&user, "id=?", userId).Error
+	if err != nil {
+		return 0, err
+	}
+	age, err := CalculateAge(user.BirthDay)
+	if err != nil {
+		return 0, err
+	}
+	return age, nil
+}
+
 func (r *InfoRepository) GetZodiac() ([]dataStruct.Zodiac, error) {
 	var zodiac []dataStruct.Zodiac
 	err := r.db.Find(&zodiac).Error
@@ -189,4 +204,20 @@ func (r *InfoRepository) GetUserIdByEmail(email string) (uint, error) {
 		return 0, err
 	}
 	return user.Id, err
+}
+
+func CalculateAge(birthDay string) (int, error) {
+	birth, err := time.Parse("2006-01-02", birthDay)
+	if err != nil {
+		return 0, err
+	}
+	now := time.Now()
+	age := now.Year() - birth.Year()
+	if now.Month() > birth.Month() {
+		age -= 1
+	}
+	if now.Month() == birth.Month() && now.Day() < birth.Day() {
+		age -= 1
+	}
+	return age, nil
 }

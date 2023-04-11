@@ -21,6 +21,10 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 	if err != nil {
 		return nil, err
 	}
+	reasons, err := r.userRepo.GetUserReasons(userId)
+	if err != nil {
+		return nil, err
+	}
 	filters, err := r.userRepo.GetFilter(userId)
 	if err != nil {
 		return nil, err
@@ -29,6 +33,10 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 	for _, hashtagId := range hashtags {
 		hashtagsSlice = append(hashtagsSlice, hashtagId.HashtagId)
 	}
+	reasonsSlice := make([]uint, 0)
+	for _, reasonId := range reasons {
+		reasonsSlice = append(reasonsSlice, reasonId.ReasonId)
+	}
 
 	history, err := r.userRepo.GetUserHistory(userId)
 	historySlice := []uint{0}
@@ -36,7 +44,7 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 		historySlice = append(historySlice, historyId.UserProfileId)
 	}
 
-	recs, err := r.userRepo.GetRecommendation(userId, historySlice, hashtagsSlice, filters)
+	recs, err := r.userRepo.GetRecommendation(userId, historySlice, reasonsSlice, hashtagsSlice, filters)
 	if err != nil {
 		return nil, err
 	}

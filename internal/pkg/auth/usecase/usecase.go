@@ -81,6 +81,11 @@ func (u *AuthUseCase) GetUserById(userId uint) (user auth.UserRes, err error) {
 	}
 	user.Name = userTemp.Name
 	user.Email = userTemp.Email
+	age, err := u.userRepo.GetAge(userId)
+	if err != nil {
+		return
+	}
+	user.Age = age
 	photos, err := u.userRepo.GetUserPhoto(userId)
 	if err != nil {
 		return

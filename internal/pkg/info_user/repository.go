@@ -10,6 +10,7 @@ type IRepositoryInfo interface {
 	ChangeInfo(userInfo *dataStruct.UserInfo) error
 
 	GetUserIdByEmail(email string) (uint, error)
+	GetAge(userId uint) (int, error)
 
 	GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error)
 	AddUserHashtag(hashtag dataStruct.UserHashtag) error

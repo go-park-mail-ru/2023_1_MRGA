@@ -53,7 +53,7 @@ func ErrorRespond(w http.ResponseWriter, r *http.Request, servarErr error, statu
 
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "err": "%s"}`, http.StatusInternalServerError, err.Error())))
+		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())))
 		if err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 			return

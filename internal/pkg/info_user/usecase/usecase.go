@@ -63,7 +63,11 @@ func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStructAnswer
 	if err != nil {
 		return
 	}
-
+	age, err := iu.userRepo.GetAge(userId)
+	if err != nil {
+		return
+	}
+	userInfo.Age = age
 	photos, err := iu.userRepo.GetUserPhoto(userId)
 	for _, p := range photos {
 		photo := info_user.Photo{PhotoId: p.Photo, Avatar: p.Avatar}
