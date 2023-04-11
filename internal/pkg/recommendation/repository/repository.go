@@ -20,7 +20,7 @@ func NewRepo(db *gorm.DB) *RecRepository {
 	return &r
 }
 
-func (r *RecRepository) GetRecommendation(userId uint, history []uint, hashtags []uint, filters dataStruct.UserFilter) (users []recommendation.UserRecommend, err error) {
+func (r *RecRepository) GetRecommendation(userId uint, history []uint, reasons []uint, hashtags []uint, filters dataStruct.UserFilter) (users []recommendation.UserRecommend, err error) {
 	var sexSlice []uint
 	switch filters.SearchSex {
 	case 0:
