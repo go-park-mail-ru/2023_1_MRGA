@@ -11,4 +11,5 @@ type IRepositoryAuth interface {
 	GetUserById(uint) (UserRestTemp, error)
 	ChangeUser(user dataStruct.User) error
 	SaveToken(id uint, token string) error
+	GetAge(userId uint) (int, error)
 }

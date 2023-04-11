@@ -13,6 +13,7 @@ type UserRestTemp struct {
 type UserRes struct {
 	Email  string  `json:"email" structs:"email"`
 	Name   string  `json:"name" structs:"name"`
+	Age    int     `json:"age"`
 	Photos []Photo `json:"photos" structs:"photos"`
 }
 

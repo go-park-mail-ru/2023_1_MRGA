@@ -111,3 +111,16 @@ func (r *AuthRepository) SaveToken(userId uint, token string) (err error) {
 	err = r.client.Set(token, userIdStr, 1000*time.Second).Err()
 	return
 }
+
+func (r *AuthRepository) GetAge(userId uint) (int, error) {
+	var user dataStruct.User
+	err := r.db.First(&user, "id=?", userId).Error
+	if err != nil {
+		return 0, err
+	}
+	age, err := CalculateAge(user.BirthDay)
+	if err != nil {
+		return 0, err
+	}
+	return age, nil
+}
