@@ -26,10 +26,15 @@ func (r *PhotoRepository) SavePhoto(row dataStruct.UserPhoto) error {
 }
 
 func (r *PhotoRepository) DeletePhoto(row dataStruct.UserPhoto) error {
-	err := r.db.First(&dataStruct.UserPhoto{}, "user_id =? AND photo =?", row.UserId, row.Photo).Error
+
+	err := r.db.First(&row, "user_id =? AND photo =?", row.UserId, row.Photo).Error
 	if err != nil {
 		return err
 	}
-	err = r.db.Delete(&dataStruct.UserReaction{}, "user_id =? AND photo =?", row.UserId, row.Photo).Error
+	err = r.CheckDeletedPhoto(row)
+	if err != nil {
+		return err
+	}
+	err = r.db.Delete(&dataStruct.UserPhoto{}, "user_id =? AND photo =?", row.UserId, row.Photo).Error
 	return err
 }
