@@ -51,7 +51,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Second))
+	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Hour))
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
@@ -87,7 +87,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (1000 * time.Second))
+	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Hour))
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }
