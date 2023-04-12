@@ -29,10 +29,10 @@ func CalculateAge(birthDay string) (int, error) {
 	}
 	now := time.Now()
 	age := now.Year() - birth.Year()
-	if now.Month() > birth.Month() {
+	if now.Month() < birth.Month() {
 		age -= 1
 	}
-	if now.Month() == birth.Month() && now.Day() < birth.Day() {
+	if now.Month() == birth.Month() && now.Day() <= birth.Day() {
 		age -= 1
 	}
 	return age, nil

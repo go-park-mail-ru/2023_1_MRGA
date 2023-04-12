@@ -36,8 +36,8 @@ func Respond(w http.ResponseWriter, r *http.Request, data map[string]interface{}
 }
 
 type ErrorResult struct {
-	Status int
-	Error  string
+	Status int    `json:"status"`
+	Error  string `json:"error"`
 }
 
 func ErrorRespond(w http.ResponseWriter, r *http.Request, servarErr error, status int) {
