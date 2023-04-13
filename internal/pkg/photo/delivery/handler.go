@@ -26,7 +26,6 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}()
-	fmt.Println("HI")
 
 	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
 	if err != nil {
@@ -34,11 +33,17 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("HI")
 
 	// Получаем файл из формы
 	files := r.MultipartForm.File["files[]"]
-	fmt.Println("HI")
+
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(int)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
 
 	for idx, fileHeader := range files {
 		file, err := fileHeader.Open()
@@ -47,7 +52,6 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("HI")
 
 		defer func() {
 			err := file.Close()
@@ -58,28 +62,19 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		photoId, err := SendPhoto(file, fileHeader.Filename)
+		photoId, err := SendPhoto(file, fileHeader.Filename, userId)
 		if err != nil {
 			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 			err = fmt.Errorf("cant parse json")
 			writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 			return
 		}
-		fmt.Println("HI")
 
 		var avatar bool
 		if idx == 0 {
 			avatar = true
 		} else {
 			avatar = false
-		}
-
-		userIdDB := r.Context().Value("userId")
-		userId, ok := userIdDB.(int)
-		if !ok {
-			logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-			writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
-			return
 		}
 
 		err = h.useCase.SavePhoto(uint(userId), photoId, avatar)
@@ -152,15 +147,15 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func SendPhoto(file multipart.File, filename string) (uint, error) {
+func SendPhoto(file multipart.File, filename string, userID int) (uint, error) {
 
 	requestBody := &bytes.Buffer{}
-    writerFile := multipart.NewWriter(requestBody)
+	writerFile := multipart.NewWriter(requestBody)
 	userIdField, err := writerFile.CreateFormField("userID")
 	if err != nil {
 		return 0, err
 	}
-	_, err = io.WriteString(userIdField, "0")
+	_, err = io.WriteString(userIdField, fmt.Sprintf("%v", userID))
 	if err != nil {
 		return 0, err
 	}
