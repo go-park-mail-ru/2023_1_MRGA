@@ -23,7 +23,10 @@ services: # имеджи, которые запустятся по вашему 
   db-storage:
     image: postgres:latest
     volumes:
-      - ./sql_scripts/:/docker-entrypoint-initdb.d
+      - type: volume
+        source: postgresstore-data
+        target: /var/lib/postgresql/data
+
     environment:
       POSTGRES_DB: "mrga_storage"
       POSTGRES_USER: "mrga_user"
@@ -36,3 +39,7 @@ volumes: # часть настроек для хранения данных
     driver: local
   redis-data:
     driver: local
+  postgresstore-data:
+    driver: local
+
+

@@ -103,14 +103,33 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
+	body := &bytes.Buffer{}
+	writerFile := multipart.NewWriter(body)
+	fileField, err := writerFile.CreateFormFile("file", "filename")
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+	reader := bytes.NewReader(bodyBytes)
+	_, err = io.Copy(fileField, reader)
+
 	_, err = w.Write(bodyBytes)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, map[string]interface{}{})
+	w.Header().Set("Content-Type", writerFile.FormDataContentType())
+	_, err = w.Write(body.Bytes())
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
 	return
 }
 
