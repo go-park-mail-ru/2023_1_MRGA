@@ -27,41 +27,15 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
 	// Получаем файл из формы
-	file, _, err := r.FormFile("file")
-
-	buf := bytes.NewBuffer(nil)
-	if _, err = io.Copy(buf, file); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-			return
-		}
-	}()
-
-	reader := bytes.NewReader(buf.Bytes())
-
-	photoId, err := SendPhoto(reader)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		err = fmt.Errorf("cant parse json")
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	params := mux.Vars(r)
-	avatar, err := strconv.ParseBool(params["avatar"])
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		err = fmt.Errorf("cant parse json")
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
+	files := r.MultipartForm.File["files[]"]
 
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(int)
@@ -71,11 +45,44 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.useCase.SavePhoto(uint(userId), photoId, avatar)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
+	for idx, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		defer func() {
+			err := file.Close()
+			if err != nil {
+				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+				writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+				return
+			}
+		}()
+
+		photoId, err := SendPhoto(file, fileHeader.Filename, userId)
+		if err != nil {
+			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+			err = fmt.Errorf("cant parse json")
+			writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		var avatar bool
+		if idx == 0 {
+			avatar = true
+		} else {
+			avatar = false
+		}
+
+		err = h.useCase.SavePhoto(uint(userId), photoId, avatar)
+		if err != nil {
+			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+			return
+		}
 	}
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
@@ -140,24 +147,24 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func SendPhoto(reader io.Reader) (uint, error) {
+func SendPhoto(file multipart.File, filename string, userID int) (uint, error) {
 
-	body := &bytes.Buffer{}
-	writerFile := multipart.NewWriter(body)
+	requestBody := &bytes.Buffer{}
+	writerFile := multipart.NewWriter(requestBody)
 	userIdField, err := writerFile.CreateFormField("userID")
 	if err != nil {
 		return 0, err
 	}
-	_, err = io.WriteString(userIdField, "0")
+	_, err = io.WriteString(userIdField, fmt.Sprintf("%v", userID))
 	if err != nil {
 		return 0, err
 	}
 
-	fileField, err := writerFile.CreateFormFile("file", "filename")
+	fileField, err := writerFile.CreateFormFile("file", filename)
 	if err != nil {
 		return 0, err
 	}
-	_, err = io.Copy(fileField, reader)
+	_, err = io.Copy(fileField, file)
 	if err != nil {
 		return 0, err
 	}
@@ -167,7 +174,7 @@ func SendPhoto(reader io.Reader) (uint, error) {
 		return 0, err
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", body)
+	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", requestBody)
 	if err != nil {
 		return 0, err
 	}

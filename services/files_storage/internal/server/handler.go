@@ -18,8 +18,6 @@ import (
 func getRouter() *mux.Router {
 	router := mux.NewRouter()
 
-	// router.Use(SetCorsMiddleware)
-
 	router.HandleFunc("/api/files/upload", uploadFile).Methods("POST")
 	router.HandleFunc("/api/files/{id}", getFile).Methods("GET")
 	return router

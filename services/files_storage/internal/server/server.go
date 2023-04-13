@@ -17,7 +17,6 @@ type serverOptions struct {
 }
 
 func getServerOptions() (opts serverOptions) {
-	flag.StringVar(&opts.host, "h", "localhost", "set the server's host")
 	flag.StringVar(&opts.port, "p", "8081", "set the server's port")
 	flag.IntVar(&opts.maxHeaderBytes, "m", 1, "set the server's max header bytes in MB")
 
@@ -37,13 +36,13 @@ func RunServer() error {
 	serverOptions := getServerOptions()
 
 	httpServer := &http.Server{
-		Addr:           fmt.Sprintf("%s:%s", serverOptions.host, serverOptions.port),
+		Addr:           fmt.Sprintf("%s:%s", "localhost", serverOptions.port),
 		Handler:        getRouter(),
 		MaxHeaderBytes: serverOptions.maxHeaderBytes,
 		ReadTimeout:    serverOptions.readTimeout,
 		WriteTimeout:   serverOptions.writeTimeout,
 	}
 
-	log.Printf("Сервер микросервис файлов успешно запущен на %s:%s\n", serverOptions.host, serverOptions.port)
+	log.Printf("Сервер микросервис файлов успешно запущен на %s:%s\n", "localhost", serverOptions.port)
 	return httpServer.ListenAndServe()	
 }
