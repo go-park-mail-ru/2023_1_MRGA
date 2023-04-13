@@ -27,14 +27,26 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+	// Получаем файл из формы
+	file, _, err := r.FormFile("file")
+
+	buf := bytes.NewBuffer(nil)
+	if _, err = io.Copy(buf, file); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	reader := bytes.NewReader(reqBody)
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+	}()
+
+	reader := bytes.NewReader(buf.Bytes())
+
 	photoId, err := SendPhoto(reader)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -128,7 +140,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func SendPhoto(reader *bytes.Reader) (uint, error) {
+func SendPhoto(reader io.Reader) (uint, error) {
 
 	body := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(body)
