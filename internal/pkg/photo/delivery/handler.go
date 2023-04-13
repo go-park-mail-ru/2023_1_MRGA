@@ -27,55 +27,71 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	// Получаем файл из формы
-	file, _, err := r.FormFile("file")
-
-	buf := bytes.NewBuffer(nil)
-	if _, err = io.Copy(buf, file); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	defer func() {
-		err := file.Close()
+	// Получаем файл из формы
+	files := r.MultipartForm.File["files[]"]
+
+	for idx, fileHeader := range files {
+		file, err := fileHeader.Open()
 		if err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
-	}()
+		defer file.Close()
 
-	reader := bytes.NewReader(buf.Bytes())
+		buf := bytes.NewBuffer(nil)
+		if _, err = io.Copy(buf, file); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-	photoId, err := SendPhoto(reader)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		err = fmt.Errorf("cant parse json")
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	params := mux.Vars(r)
-	avatar, err := strconv.ParseBool(params["avatar"])
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		err = fmt.Errorf("cant parse json")
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
+		defer func() {
+			err := file.Close()
+			if err != nil {
+				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+				writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+				return
+			}
+		}()
 
-	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
-	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
-		return
-	}
+		reader := bytes.NewReader(buf.Bytes())
 
-	err = h.useCase.SavePhoto(uint(userId), photoId, avatar)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
+		photoId, err := SendPhoto(reader)
+		if err != nil {
+			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+			err = fmt.Errorf("cant parse json")
+			writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		var avatar bool
+		if idx == 0 {
+			avatar = true
+		} else {
+			avatar = false
+		}
+
+		userIdDB := r.Context().Value("userId")
+		userId, ok := userIdDB.(int)
+		if !ok {
+			logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+			return
+		}
+
+		err = h.useCase.SavePhoto(uint(userId), photoId, avatar)
+		if err != nil {
+			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+			return
+		}
 	}
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
