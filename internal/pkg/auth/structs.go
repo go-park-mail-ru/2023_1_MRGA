@@ -6,15 +6,13 @@ type LoginInput struct {
 }
 
 type UserRestTemp struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	Name string `json:"name"`
 }
 
 type UserRes struct {
-	Email  string  `json:"email" structs:"email"`
-	Name   string  `json:"name" structs:"name"`
-	Age    int     `json:"age"`
-	Photos []Photo `json:"photos" structs:"photos"`
+	Name   string `json:"name" structs:"name"`
+	Age    int    `json:"age" structs:"age"`
+	Avatar uint   `json:"avatarId" structs:"avatarId"`
 }
 
 type Photo struct {
