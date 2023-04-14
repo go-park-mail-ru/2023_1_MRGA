@@ -27,11 +27,16 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 	var result []match.UserRes
 	for _, user := range users {
 		matchUser, err := m.userRepo.GetUser(user.UserSecondId)
-		matchUser.UserId = user.UserSecondId
-		matchUser.Shown = user.Shown
 		if err != nil {
 			return nil, err
 		}
+		matchUser.UserId = user.UserSecondId
+		matchUser.Shown = user.Shown
+		age, err := m.userRepo.GetAge(user.UserSecondId)
+		if err != nil {
+			return nil, err
+		}
+		matchUser.Age = age
 		result = append(result, matchUser)
 	}
 	return result, nil

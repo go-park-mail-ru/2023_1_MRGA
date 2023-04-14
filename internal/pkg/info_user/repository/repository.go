@@ -207,7 +207,7 @@ func (r *InfoRepository) GetUserIdByEmail(email string) (uint, error) {
 }
 
 func CalculateAge(birthDay string) (int, error) {
-	birth, err := time.Parse("2006-01-02", birthDay)
+	birth, err := time.Parse("2006-01-02", birthDay[:10])
 	if err != nil {
 		return 0, err
 	}

@@ -13,4 +13,5 @@ type IRepositoryMatch interface {
 	AddMatchRow(row dataStruct.Match) error
 	ChangeStatusMatch(userId, profileId uint) error
 	GetChat(userId uint) (ChatAnswer, error)
+	GetAge(userId uint) (int, error)
 }

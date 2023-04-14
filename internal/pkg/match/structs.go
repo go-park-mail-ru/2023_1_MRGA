@@ -3,6 +3,7 @@ package match
 type UserRes struct {
 	UserId uint   `json:"UserId" structs:"userId"`
 	Name   string `json:"name" structs:"name"`
+	Age    int    `json:"age" structs:"age"`
 	Photo  uint   `json:"avatar" structs:"avatar"`
 	Shown  bool   `json:"shown" structs:"shown"`
 }
