@@ -23,18 +23,13 @@ func (r *MatchRepository) GetMatches(userId uint) (users []dataStruct.Match, err
 }
 
 func (r *MatchRepository) GetUser(userId uint) (user match.UserRes, err error) {
-	err = r.db.Table("users u").Select("u.email, ui.name, p.photo").
+	err = r.db.Table("users u").Select("u.id, ui.name, p.photo").
 		Where("u.id=?", userId).
 		Joins("Join user_infos ui on u.id = ui.user_id").
 		Joins("join user_photos p on u.id=p.user_id").
+		Where("p.avatar =?", true).
 		Find(&user).Error
 	return
-}
-
-func (r *MatchRepository) GetIdByEmail(email string) (uint, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "email = ?", email).Error
-	return user.Id, err
 }
 
 func (r *MatchRepository) GetIdReaction(reaction string) (uint, error) {

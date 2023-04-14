@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
@@ -91,8 +92,14 @@ func (h *Handler) GetChatByEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	params := mux.Vars(r)
-	email := params["email"]
-	chat, err := h.useCase.GetChatByEmail(uint(userId), email)
+	userIdStr := params["userId"]
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	chat, err := h.useCase.GetChatByEmail(uint(userId), uint(userId))
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
