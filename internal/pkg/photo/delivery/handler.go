@@ -112,10 +112,15 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	reader := bytes.NewReader(bodyBytes)
-	_, err = io.Copy(fileField, reader)
 
-	_, err = w.Write(bodyBytes)
+	_, err = fileField.Write(bodyBytes)
+	if err != nil {
+        logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+        return
+    }
+
+	err = writerFile.Close()
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
@@ -124,13 +129,13 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	w.Header().Set("Content-Type", writerFile.FormDataContentType())
+	w.Header().Set("Content-Disposition", "attachment")
 	_, err = w.Write(body.Bytes())
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	return
 }
 
 func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
