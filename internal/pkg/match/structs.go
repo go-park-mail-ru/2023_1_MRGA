@@ -8,8 +8,8 @@ type UserRes struct {
 }
 
 type ReactionInp struct {
-	Email    string `json:"email"`
-	Reaction string `json:"reaction"`
+	EvaluatedUserId uint   `json:"evaluatedUserId"`
+	Reaction        string `json:"reaction"`
 }
 
 type ChatAnswer struct {

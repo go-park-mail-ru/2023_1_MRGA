@@ -37,10 +37,7 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 }
 
 func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) error {
-	userToId, err := m.userRepo.GetIdByEmail(reaction.Email)
-	if err != nil {
-		return err
-	}
+	userToId := reaction.EvaluatedUserId
 
 	reactionId, err := m.userRepo.GetIdReaction(reaction.Reaction)
 	if err != nil {
