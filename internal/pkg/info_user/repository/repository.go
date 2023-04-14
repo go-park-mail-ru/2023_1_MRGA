@@ -33,6 +33,7 @@ func (r *InfoRepository) GetUserInfo(userId uint) (info_user.InfoStruct, error) 
 	var infoStruct info_user.InfoStruct
 	err := r.db.Table("user_infos").Select("*").
 		Where("user_infos.user_id =?", userId).
+		Joins("JOIN users on users.id = user_infos.user_id").
 		Joins("JOIN jobs on jobs.id = user_infos.job").
 		Joins("Join educations on educations.id = user_infos.education").
 		Joins("Join zodiacs on zodiacs.id = user_infos.zodiac").
@@ -42,9 +43,10 @@ func (r *InfoRepository) GetUserInfo(userId uint) (info_user.InfoStruct, error) 
 	return infoStruct, err
 }
 
-func (r *InfoRepository) GetUserPhoto(userId uint) (photos []dataStruct.UserPhoto, err error) {
-	err = r.db.Find(&photos, "user_id = ?", userId).Error
-	return
+func (r *InfoRepository) GetUserPhoto(userId uint) ([]uint, error) {
+	var photos []uint
+	err := r.db.Table("user_photos").Select("photo").Where("user_id = ? and avatar=?", userId, false).Find(&photos).Error
+	return photos, err
 }
 
 func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {
@@ -157,6 +159,15 @@ func (r *InfoRepository) GetCities() ([]dataStruct.City, error) {
 	return cities, nil
 }
 
+func (r *InfoRepository) GetAvatar(userId uint) (uint, error) {
+	var photo dataStruct.UserPhoto
+	err := r.db.First(&photo, "user_id=? AND avatar = ?", userId, true).Error
+	if err != nil {
+		return 0, err
+	}
+	return photo.Photo, nil
+}
+
 func (r *InfoRepository) GetAge(userId uint) (int, error) {
 	var user dataStruct.User
 	err := r.db.First(&user, "id=?", userId).Error
@@ -207,7 +218,7 @@ func (r *InfoRepository) GetUserIdByEmail(email string) (uint, error) {
 }
 
 func CalculateAge(birthDay string) (int, error) {
-	birth, err := time.Parse("2006-01-02", birthDay)
+	birth, err := time.Parse("2006-01-02", birthDay[:10])
 	if err != nil {
 		return 0, err
 	}

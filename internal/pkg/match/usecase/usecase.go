@@ -26,11 +26,18 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 	}
 	var result []match.UserRes
 	for _, user := range users {
-		match, err := m.userRepo.GetUser(user.UserSecondId)
+		matchUser, err := m.userRepo.GetUser(user.UserSecondId)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, match)
+		matchUser.UserId = user.UserSecondId
+		matchUser.Shown = user.Shown
+		age, err := m.userRepo.GetAge(user.UserSecondId)
+		if err != nil {
+			return nil, err
+		}
+		matchUser.Age = age
+		result = append(result, matchUser)
 	}
 	return result, nil
 
@@ -92,16 +99,15 @@ func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) err
 	return nil
 }
 
-func (m *MatchUseCase) GetChatByEmail(userId uint, email string) (result match.ChatAnswer, err error) {
-	profileId, err := m.userRepo.GetIdByEmail(email)
+func (m *MatchUseCase) GetChatByEmail(userId uint, matchUserId uint) (result match.ChatAnswer, err error) {
 	if err != nil {
 		return
 	}
 
-	err = m.userRepo.ChangeStatusMatch(userId, profileId)
+	err = m.userRepo.ChangeStatusMatch(userId, matchUserId)
 	if err != nil {
 		return
 	}
-	result, err = m.userRepo.GetChat(profileId)
+	result, err = m.userRepo.GetChat(matchUserId)
 	return
 }

@@ -22,5 +22,5 @@ func RegisterHTTPEndpoints(router *mux.Router, uc match.UseCase) {
 	router.HandleFunc("/meetme/match", h.GetMatches).Methods("GET")
 	router.HandleFunc("/meetme/reaction", h.AddReaction).Methods("POST")
 
-	router.HandleFunc("/meetme/chat/{email}", h.GetChatByEmail).Methods("GET")
+	router.HandleFunc("/meetme/chat/{userId}", h.GetChatByUserId).Methods("GET")
 }

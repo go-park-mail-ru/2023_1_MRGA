@@ -53,36 +53,41 @@ func (iu *InfoUseCase) AddInfo(userId uint, info info_user.InfoStruct) error {
 
 func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStructAnswer, err error) {
 	userInfoTemp, err := iu.userRepo.GetUserInfo(userId)
-	userInfo.Name = userInfoTemp.Name
-	userInfo.Sex = userInfoTemp.Sex
-	userInfo.Job = userInfoTemp.Job
-	userInfo.Education = userInfoTemp.Education
-	userInfo.Zodiac = userInfoTemp.Zodiac
-	userInfo.City = userInfoTemp.City
-	userInfo.Description = userInfoTemp.Description
 	if err != nil {
 		return
+	}
+	userInfo = info_user.InfoStructAnswer{
+		Email:       userInfoTemp.Email,
+		Name:        userInfoTemp.Name,
+		Sex:         userInfoTemp.Sex,
+		Job:         userInfoTemp.Job,
+		Education:   userInfoTemp.Education,
+		Zodiac:      userInfoTemp.Zodiac,
+		City:        userInfoTemp.City,
+		Description: userInfoTemp.Description,
 	}
 	age, err := iu.userRepo.GetAge(userId)
 	if err != nil {
 		return
 	}
 	userInfo.Age = age
-	photos, err := iu.userRepo.GetUserPhoto(userId)
-	for _, p := range photos {
-		photo := info_user.Photo{PhotoId: p.Photo, Avatar: p.Avatar}
-		userInfo.Photos = append(userInfo.Photos, photo)
-	}
-	return
-}
-
-func (iu *InfoUseCase) GetInfoByEmail(email string) (userInfo info_user.InfoStructAnswer, err error) {
-	userId, err := iu.userRepo.GetUserIdByEmail(email)
+	avatar, err := iu.userRepo.GetAvatar(userId)
 	if err != nil {
 		return
 	}
+	userInfo.Photos = append(userInfo.Photos, avatar)
+	photos, err := iu.userRepo.GetUserPhoto(userId)
+	if err != nil {
+		return
+	}
+	userInfo.Photos = append(userInfo.Photos, photos...)
+	return
+}
+
+func (iu *InfoUseCase) GetInfoByEmail(userId uint) (userInfo info_user.InfoStructAnswer, err error) {
 
 	userInfo, err = iu.GetInfo(userId)
+	userInfo.Email = ""
 	return
 }
 

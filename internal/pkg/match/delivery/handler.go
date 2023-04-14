@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
@@ -82,7 +83,7 @@ func (h *Handler) AddReaction(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (h *Handler) GetChatByEmail(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetChatByUserId(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(int)
 	if !ok {
@@ -91,8 +92,14 @@ func (h *Handler) GetChatByEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	params := mux.Vars(r)
-	email := params["email"]
-	chat, err := h.useCase.GetChatByEmail(uint(userId), email)
+	matchUserIdStr := params["userId"]
+	matchUserId, err := strconv.Atoi(matchUserIdStr)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	chat, err := h.useCase.GetChatByEmail(uint(userId), uint(matchUserId))
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
