@@ -35,7 +35,7 @@ func (r *RecRepository) GetRecommendation(userId uint, history []uint, reasons [
 		Joins("join user_hashtags uh on u.id = uh.user_id").
 		Joins("join user_reasons ur on u.id = ur.user_id").
 		Where("ui.user_id NOT IN ?", history).
-		Where("ui.sex IN", sexSlice).
+		Where("ui.sex IN ?", sexSlice).
 		Where("hashtag_id IN ?", hashtags).
 		Where("reason_id IN ?", reasons).
 		Where("ui.user_id!=?", userId).
