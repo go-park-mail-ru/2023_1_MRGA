@@ -6,7 +6,7 @@ import (
 
 type Recommendation struct {
 	Name        string        `json:"name" structs:"name"`
-	Photos      []Photo       `json:"photos" structs:"photos"`
+	Photos      []uint        `json:"photos" structs:"photos"`
 	Age         int           `json:"age" structs:"age"`
 	Sex         constform.Sex `json:"sex" structs:"sex"`
 	Description string        `json:"description"`
@@ -37,9 +37,4 @@ type FilterInput struct {
 	MaxAge    int      `json:"maxAge" structs:"maxAge"`
 	SearchSex uint     `json:"sex" structs:"searchSex"`
 	Reason    []string `json:"reason" structs:"reason"`
-}
-
-type Photo struct {
-	Photo uint `json:"photoId"`
-	Avatar  bool `json:"avatar"`
 }

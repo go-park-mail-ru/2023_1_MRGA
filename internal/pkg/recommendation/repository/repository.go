@@ -79,9 +79,9 @@ func (r *RecRepository) GetRecommendedUser(userId uint) (user recommendation.Rec
 	return user, err
 }
 
-func (r *RecRepository) GetPhotos(userId uint) ([]recommendation.Photo, error) {
-	var photos []recommendation.Photo
-	err := r.db.Table("user_photos up").Where("user_id = ?", userId).Order("id ASC").Find(&photos).Error
+func (r *RecRepository) GetPhotos(userId uint) ([]uint, error) {
+	var photos []uint
+	err := r.db.Table("user_photos up").Select("up.photo").Where("user_id = ? AND avatar = ?", userId, false).Order("up.id ASC").Find(&photos).Error
 	return photos, err
 }
 
@@ -181,6 +181,13 @@ func (r *RecRepository) GetReasonById(reasonId uint) (string, error) {
 	reasonDB := dataStruct.Reason{}
 	err := r.db.First(&reasonDB, "id = ?", reasonId).Error
 	return reasonDB.Reason, err
+}
+
+func (r *RecRepository) GetAvatar(userId uint) (uint, error) {
+	var photoId uint
+	err := r.db.Table("user_photos p").Select("photo").
+		Where("user_id = ? AND avatar = ?", userId, true).Find(&photoId).Error
+	return photoId, err
 }
 
 func (r *RecRepository) DeleteUserReason(userId, reactionId uint) error {
