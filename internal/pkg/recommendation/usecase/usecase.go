@@ -21,18 +21,22 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 	if err != nil {
 		return nil, err
 	}
+
 	reasons, err := r.userRepo.GetUserReasons(userId)
 	if err != nil {
 		return nil, err
 	}
+
 	filters, err := r.userRepo.GetFilter(userId)
 	if err != nil {
 		return nil, err
 	}
+
 	hashtagsSlice := make([]uint, 0)
 	for _, hashtagId := range hashtags {
 		hashtagsSlice = append(hashtagsSlice, hashtagId.HashtagId)
 	}
+
 	reasonsSlice := make([]uint, 0)
 	for _, reasonId := range reasons {
 		reasonsSlice = append(reasonsSlice, reasonId.ReasonId)

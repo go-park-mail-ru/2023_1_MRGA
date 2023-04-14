@@ -42,21 +42,64 @@ func (r *RecRepository) GetRecommendation(userId uint, history []uint, reasons [
 		Group("ui.user_id").
 		Order("COUNT(uh.hashtag_id) desc").
 		Find(&users).Error
+	if err != nil {
+		return users, err
+	}
 	return users, err
 }
 
 func (r *RecRepository) GetRecommendedUser(userId uint) (user recommendation.Recommendation, err error) {
-	err = r.db.Table("users u").Select("ui.name, u.email, ui.description,  ui.sex, p.photo, ed.education, z.zodiac, j.job, c.city").
+	var filteredUser recommendation.DBRecommendation
+	err = r.db.Table("users u").Select("ui.name, u.email, u.birth_day, ui.description, ui.sex, ed.education, z.zodiac, j.job, c.city").
 		Where("u.id = ?", userId).
 		Joins("Join user_infos ui on u.id = ui.user_id").
-		Joins("Join user_photos p on p.user_id=u.id").
-		Where("p.avatar = ?", true).
 		Joins("Join educations ed on ed.id=ui.education").
 		Joins("Join jobs j on j.id=ui.job").
 		Joins("Join zodiacs z on z.id=ui.zodiac").
 		Joins("Join cities c on c.id = ui.city_id").
-		Find(&user).
+		Find(&filteredUser).
 		Error
+	if err != nil {
+		return user, err
+	}
+	age, err := calculateAge(filteredUser.BirthDay)
+	if err != nil {
+		return user, err
+	}
+
+	user.Email = filteredUser.Email
+	user.Name = filteredUser.Name
+	user.Age = age
+	user.Sex = filteredUser.Sex
+	user.Description = filteredUser.Description
+	user.City = filteredUser.City
+	user.Zodiac = filteredUser.Zodiac
+	user.Job = filteredUser.Job
+	user.Education = filteredUser.Education
+
+	var photos []dataStruct.UserPhoto
+	err = r.db.Table("user_photos up").Where("user_id = ?", userId).Order("id DESC").Find(&photos).Error
+	if err != nil {
+		return user, err
+	}
+
+	var photosId []uint
+	for _, photoItem := range photos {
+		photosId = append(photosId, photoItem.Photo)
+	}
+	user.Photos = photosId
+
+	var hashtags []string
+	err = r.db.Table("user_hashtags uh").Select("h.hashtag").
+		Where("uh.user_id = ?", userId).
+		Joins("Join hashtags h on h.id = uh.hashtag_id").
+		Order("h.hashtag DESC").
+		Find(&hashtags).Error
+	if err != nil {
+		return user, err
+	}
+	user.Hashtags = hashtags
+
 	return user, err
 }
 
@@ -163,7 +206,7 @@ func calculateBirthYear(age int) string {
 }
 
 func calculateAge(birthDay string) (int, error) {
-	birth, err := time.Parse("2006-01-02T", birthDay)
+	birth, err := time.Parse("2006-01-02", birthDay[:10])
 	if err != nil {
 		return 0, err
 	}
