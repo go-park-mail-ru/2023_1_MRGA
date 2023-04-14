@@ -59,8 +59,19 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 		if err != nil {
 			return nil, err
 		}
-		age, err := r.userRepo.GetUserAge(rec.UserId)
-		user.Age = age
+
+		hashtags, err := r.userRepo.GetUserNameHashtags(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
+		user.Hashtags = hashtags
+
+		photos, err := r.userRepo.GetPhotos(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
+		user.Photos = photos
+	
 		result = append(result, user)
 	}
 

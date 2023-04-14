@@ -76,30 +76,13 @@ func (r *RecRepository) GetRecommendedUser(userId uint) (user recommendation.Rec
 	user.Job = filteredUser.Job
 	user.Education = filteredUser.Education
 
-	var photos []dataStruct.UserPhoto
-	err = r.db.Table("user_photos up").Where("user_id = ?", userId).Order("id DESC").Find(&photos).Error
-	if err != nil {
-		return user, err
-	}
-
-	var photosId []uint
-	for _, photoItem := range photos {
-		photosId = append(photosId, photoItem.Photo)
-	}
-	user.Photos = photosId
-
-	var hashtags []string
-	err = r.db.Table("user_hashtags uh").Select("h.hashtag").
-		Where("uh.user_id = ?", userId).
-		Joins("Join hashtags h on h.id = uh.hashtag_id").
-		Order("h.hashtag DESC").
-		Find(&hashtags).Error
-	if err != nil {
-		return user, err
-	}
-	user.Hashtags = hashtags
-
 	return user, err
+}
+
+func (r *RecRepository) GetPhotos(userId uint) ([]recommendation.Photo, error) {
+	var photos []recommendation.Photo
+	err := r.db.Table("user_photos up").Where("user_id = ?", userId).Order("id ASC").Find(&photos).Error
+	return photos, err
 }
 
 func (r *RecRepository) GetUserAge(userId uint) (int, error) {
@@ -121,6 +104,15 @@ func (r *RecRepository) GetUserHistory(userId uint) ([]dataStruct.UserHistory, e
 func (r *RecRepository) GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error) {
 	var hashtags []dataStruct.UserHashtag
 	err := r.db.Table("user_hashtags").Where("user_id = ? ", userId).Find(&hashtags).Error
+	return hashtags, err
+}
+
+func (r *RecRepository) GetUserNameHashtags(userId uint) ([]string, error) {
+	var hashtags []string
+	err := r.db.Table("user_hashtags uh").Select("h.hashtag").
+		Where("uh.user_id = ?", userId).
+		Joins("Join hashtags h on h.id = uh.hashtag_id").
+		Find(&hashtags).Error
 	return hashtags, err
 }
 
