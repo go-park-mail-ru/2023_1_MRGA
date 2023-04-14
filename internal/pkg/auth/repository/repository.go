@@ -108,7 +108,7 @@ func (r *AuthRepository) DeleteToken(token string) error {
 
 func (r *AuthRepository) SaveToken(userId uint, token string) (err error) {
 	userIdStr := strconv.Itoa(int(userId))
-	err = r.client.Set(token, userIdStr, 1000*time.Second).Err()
+	err = r.client.Set(token, userIdStr, 120*time.Hour).Err()
 	return
 }
 
