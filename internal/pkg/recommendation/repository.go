@@ -11,7 +11,8 @@ type IRepositoryRec interface {
 	GetUserNameHashtags(userId uint) ([]string, error)
 	GetUserHistory(userId uint) ([]dataStruct.UserHistory, error)
 
-	GetPhotos(userId uint) ([]Photo, error)
+	GetPhotos(userId uint) ([]uint, error)
+	GetAvatar(userId uint) (uint, error)
 
 	GetReasonId(reason string) (uint, error)
 	GetReasons() ([]dataStruct.Reason, error)
