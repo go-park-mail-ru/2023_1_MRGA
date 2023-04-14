@@ -13,7 +13,7 @@ type ReactionInp struct {
 }
 
 type ChatAnswer struct {
-	Uint  string `json:"email" structs:"email"`
-	Name  string `json:"name" structs:"name"`
-	Photo uint   `json:"avatar" structs:"avatar"`
+	UserId uint   `json:"userId" structs:"userId"`
+	Name   string `json:"name" structs:"name"`
+	Photo  uint   `json:"avatar" structs:"avatar"`
 }

@@ -27,7 +27,8 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 	var result []match.UserRes
 	for _, user := range users {
 		matchUser, err := m.userRepo.GetUser(user.UserSecondId)
-		matchUser.UserId = userId
+		matchUser.UserId = user.UserSecondId
+		matchUser.Shown = user.Shown
 		if err != nil {
 			return nil, err
 		}
