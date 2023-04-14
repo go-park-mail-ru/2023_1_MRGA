@@ -84,13 +84,10 @@ func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStructAnswer
 	return
 }
 
-func (iu *InfoUseCase) GetInfoByEmail(email string) (userInfo info_user.InfoStructAnswer, err error) {
-	userId, err := iu.userRepo.GetUserIdByEmail(email)
-	if err != nil {
-		return
-	}
+func (iu *InfoUseCase) GetInfoByEmail(userId uint) (userInfo info_user.InfoStructAnswer, err error) {
 
 	userInfo, err = iu.GetInfo(userId)
+	userInfo.Email = ""
 	return
 }
 

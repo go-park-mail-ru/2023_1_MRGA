@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
@@ -185,10 +186,17 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, mapInfo)
 }
 
-func (h *Handler) GetInfoByEmail(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	email := params["email"]
-	infoBD, err := h.useCase.GetInfoByEmail(email)
+	userIdStr := params["userId"]
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	infoBD, err := h.useCase.GetInfo(uint(userId))
+	infoBD.Email = ""
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
