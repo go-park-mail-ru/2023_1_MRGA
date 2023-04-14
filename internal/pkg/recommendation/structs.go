@@ -5,7 +5,6 @@ import (
 )
 
 type Recommendation struct {
-	Email       string        `json:"email"`
 	Name        string        `json:"name" structs:"name"`
 	Photos      []uint        `json:"photos" structs:"photos"`
 	Age         int           `json:"age" structs:"age"`
@@ -19,7 +18,6 @@ type Recommendation struct {
 }
 
 type DBRecommendation struct {
-	Email       string        `json:"email"`
 	Name        string        `json:"name" structs:"name"`
 	BirthDay    string        `json:"birthDay" structs:"birthDay" sql:"type:date" gorm:"type:date"`
 	Sex         constform.Sex `json:"sex" structs:"sex"`
