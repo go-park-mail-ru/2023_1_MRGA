@@ -80,20 +80,16 @@ func (u *AuthUseCase) GetUserById(userId uint) (user auth.UserRes, err error) {
 		return
 	}
 	user.Name = userTemp.Name
-	user.Email = userTemp.Email
 	age, err := u.userRepo.GetAge(userId)
 	if err != nil {
 		return
 	}
 	user.Age = age
-	photos, err := u.userRepo.GetUserPhoto(userId)
+	avatar, err := u.userRepo.GetAvatarId(userId)
 	if err != nil {
 		return
 	}
-	for _, p := range photos {
-		photo := auth.Photo{PhotoId: p.Photo, Avatar: p.Avatar}
-		user.Photos = append(user.Photos, photo)
-	}
+	user.Avatar = avatar
 	return
 }
 

@@ -72,7 +72,7 @@ func (r *AuthRepository) ChangeUser(user dataStruct.User) error {
 func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRestTemp, err error) {
 
 	user := auth.UserRestTemp{}
-	err = r.db.Table("users").Select("users.email, user_infos.name").
+	err = r.db.Table("users").Select("user_infos.name").
 		Where("users.id =?", userId).
 		Joins("Join user_infos on users.id = user_infos.user_id").
 		Find(&user).Error
@@ -81,11 +81,15 @@ func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRestTemp, er
 	}
 
 	return user, nil
-
 }
 
 func (r *AuthRepository) GetUserPhoto(userId uint) (photos []dataStruct.UserPhoto, err error) {
 	err = r.db.Find(&photos, "user_id = ?", userId).Error
+	return
+}
+
+func (r *AuthRepository) GetAvatarId(userId uint) (avatar uint, err error) {
+	err = r.db.Table("user_photos up").Select("up.photo").Where("user_id = ? AND avatar = ?", userId, true).Find(&avatar).Error
 	return
 }
 
