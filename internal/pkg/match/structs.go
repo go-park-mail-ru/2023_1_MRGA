@@ -1,7 +1,7 @@
 package match
 
 type UserRes struct {
-	UserId uint   `json:"UserId" structs:"userId"`
+	UserId uint   `json:"userId" structs:"userId"`
 	Name   string `json:"name" structs:"name"`
 	Age    int    `json:"age" structs:"age"`
 	Photo  uint   `json:"avatar" structs:"avatar"`
