@@ -31,7 +31,9 @@ var frontendHosts = []string{
 	"http://5.159.100.59:8080",
 	"http://192.168.0.2:3000",
 	"http://192.168.0.2:8080",
-	"",
+	"http://5.159.100.59:8080",
+	"http://192.168.0.45:3000",
+	"http://95.163.180.8:3000",
 }
 
 func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
