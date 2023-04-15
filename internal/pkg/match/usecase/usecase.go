@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"sort"
 	"time"
 
 	"gorm.io/gorm"
@@ -32,6 +33,13 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 		}
 		matchUser.UserId = user.UserSecondId
 		matchUser.Shown = user.Shown
+		if user.Shown == false {
+			err = m.userRepo.ChangeStatusMatch(userId, user.UserSecondId)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		age, err := m.userRepo.GetAge(user.UserSecondId)
 		if err != nil {
 			return nil, err
@@ -39,6 +47,13 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 		matchUser.Age = age
 		result = append(result, matchUser)
 	}
+
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].Shown != result[j].Shown {
+			return !result[i].Shown && result[j].Shown
+		}
+		return false
+	})
 	return result, nil
 
 }
@@ -104,10 +119,10 @@ func (m *MatchUseCase) GetChatByEmail(userId uint, matchUserId uint) (result mat
 		return
 	}
 
-	err = m.userRepo.ChangeStatusMatch(userId, matchUserId)
-	if err != nil {
-		return
-	}
+	// err = m.userRepo.ChangeStatusMatch(userId, matchUserId)
+	// if err != nil {
+	// 	return
+	// }
 	result, err = m.userRepo.GetChat(matchUserId)
 	return
 }
