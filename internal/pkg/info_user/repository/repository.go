@@ -169,15 +169,20 @@ func (r *InfoRepository) GetAvatar(userId uint) (uint, error) {
 }
 
 func (r *InfoRepository) GetAge(userId uint) (int, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "id=?", userId).Error
+	var birthday string
+	err := r.db.Table("users").
+		Select("birth_day").
+		Where("id=?", userId).
+		Find(&birthday).Error
 	if err != nil {
 		return 0, err
 	}
-	age, err := CalculateAge(user.BirthDay)
+
+	age, err := CalculateAge(birthday)
 	if err != nil {
 		return 0, err
 	}
+
 	return age, nil
 }
 

@@ -28,9 +28,9 @@ func RegisterHTTPEndpoints(router *mux.Router, ic info_user.UseCase) {
 	router.HandleFunc("/meetme/hashtags-user", h.GetUserHashtags).Methods("GET")
 	router.HandleFunc("/meetme/hashtags-user", h.ChangeUserHashtags).Methods("PUT")
 
-	router.HandleFunc("/api/hashtags", h.GetHashtags).Methods("GET")
-	router.HandleFunc("/api/cities", h.GetCities).Methods("GET")
-	router.HandleFunc("/api/zodiac", h.GetZodiac).Methods("GET")
-	router.HandleFunc("/api/job", h.GetJobs).Methods("GET")
-	router.HandleFunc("/api/education", h.GetEducation).Methods("GET")
+	router.HandleFunc("/api/hashtags", h.GetHashtags).Methods("GET")   //move
+	router.HandleFunc("/api/cities", h.GetCities).Methods("GET")       //move
+	router.HandleFunc("/api/zodiac", h.GetZodiac).Methods("GET")       //move
+	router.HandleFunc("/api/job", h.GetJobs).Methods("GET")            //move
+	router.HandleFunc("/api/education", h.GetEducation).Methods("GET") //move
 }
