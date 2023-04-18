@@ -8,10 +8,4 @@ type UseCase interface {
 	AddHashtags(userId uint, inp HashtagInp) error
 	GetUserHashtags(userId uint) (HashtagInp, error)
 	ChangeUserHashtags(userId uint, inp HashtagInp) error
-
-	GetHashtags() ([]string, error)
-	GetZodiacs() ([]string, error)
-	GetCities() ([]string, error)
-	GetJobs() ([]string, error)
-	GetEducation() ([]string, error)
 }
