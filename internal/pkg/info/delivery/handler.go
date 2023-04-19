@@ -76,3 +76,17 @@ func (h *Handler) GetEducation(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, result)
 
 }
+
+func (h *Handler) GetReasons(w http.ResponseWriter, r *http.Request) {
+	reasons, err := h.useCase.GetReasons()
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+	result := make(map[string]interface{})
+	result["reasons"] = reasons
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, result)
+
+}

@@ -81,3 +81,57 @@ func (iu *InfoUseCase) GetZodiacs() ([]string, error) {
 
 	return zodiacResult, nil
 }
+
+func (iu *InfoUseCase) GetReasons() ([]string, error) {
+	reasons, err := iu.userRepo.GetReasons()
+	if err != nil {
+		return nil, err
+	}
+
+	var reasonsResult []string
+	for _, reason := range reasons {
+		reasonsResult = append(reasonsResult, reason.Reason)
+	}
+
+	return reasonsResult, nil
+}
+
+func (iu *InfoUseCase) GetCityId(city string) (uint, error) {
+	cityId, err := iu.userRepo.GetCityId(city)
+	if err != nil {
+		return 0, err
+	}
+	return cityId, nil
+}
+
+func (iu *InfoUseCase) GetZodiacId(zodiac string) (uint, error) {
+	zodiacId, err := iu.userRepo.GetZodiacId(zodiac)
+	if err != nil {
+		return 0, err
+	}
+	return zodiacId, nil
+}
+
+func (iu *InfoUseCase) GetEducationId(education string) (uint, error) {
+	educationId, err := iu.userRepo.GetEducationId(education)
+	if err != nil {
+		return 0, err
+	}
+	return educationId, nil
+}
+
+func (iu *InfoUseCase) GetJobId(job string) (uint, error) {
+	jobId, err := iu.userRepo.GetJobId(job)
+	if err != nil {
+		return 0, err
+	}
+	return jobId, nil
+}
+
+func (iu *InfoUseCase) GetHashtagId(hashtagId []string) ([]uint, error) {
+	hashtags, err := iu.userRepo.GetHashtagId(hashtagId)
+	if err != nil {
+		return nil, err
+	}
+	return hashtags, nil
+}

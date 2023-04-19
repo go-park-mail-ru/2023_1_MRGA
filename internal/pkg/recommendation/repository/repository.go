@@ -81,125 +81,47 @@ func (r *RecRepository) GetRecommendedUser(userId uint) (user recommendation.Rec
 	return user, err
 }
 
-func (r *RecRepository) GetPhotos(userId uint) ([]uint, error) {
-	var photos []uint
-	err := r.db.Table("user_photos up").Select("up.photo").Where("user_id = ? AND avatar = ?", userId, false).Order("up.id ASC").Find(&photos).Error
-	return photos, err
-}
-
-func (r *RecRepository) GetUserAge(userId uint) (int, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "id=?", userId).Error
-	if err != nil {
-		return 0, err
-	}
-	age, err := calculateAge(user.BirthDay)
-	return age, err
-}
-
-func (r *RecRepository) GetUserHistory(userId uint) ([]dataStruct.UserHistory, error) {
-	var users []dataStruct.UserHistory
-	err := r.db.Table("user_histories").Where("user_id = ? ", userId).Find(&users).Error
+//
+//func (r *RecRepository) GetUserAge(userId uint) (int, error) {
+//	var user dataStruct.User
+//	err := r.db.First(&user, "id=?", userId).Error
+//	if err != nil {
+//		return 0, err
+//	}
+//	age, err := calculateAge(user.BirthDay)
+//	return age, err
+//}
+//
+func (r *RecRepository) GetUserHistory(userId uint) ([]uint, error) {
+	var users []uint
+	err := r.db.Table("user_histories").Select("user_profile_id").Where("user_id = ? ", userId).Find(&users).Error
 	return users, err
 }
 
-func (r *RecRepository) GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error) {
-	var hashtags []dataStruct.UserHashtag
-	err := r.db.Table("user_hashtags").Where("user_id = ? ", userId).Find(&hashtags).Error
-	return hashtags, err
-}
+//
+//func (r *RecRepository) GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error) {
+//	var hashtags []dataStruct.UserHashtag
+//	err := r.db.Table("user_hashtags").Where("user_id = ? ", userId).Find(&hashtags).Error
+//	return hashtags, err
+//}
+//
+//func (r *RecRepository) GetUserNameHashtags(userId uint) ([]string, error) {
+//	var hashtags []string
+//	err := r.db.Table("user_hashtags uh").Select("h.hashtag").
+//		Where("uh.user_id = ?", userId).
+//		Joins("Join hashtags h on h.id = uh.hashtag_id").
+//		Find(&hashtags).Error
+//	return hashtags, err
+//}
+//
 
-func (r *RecRepository) GetUserNameHashtags(userId uint) ([]string, error) {
-	var hashtags []string
-	err := r.db.Table("user_hashtags uh").Select("h.hashtag").
-		Where("uh.user_id = ?", userId).
-		Joins("Join hashtags h on h.id = uh.hashtag_id").
-		Find(&hashtags).Error
-	return hashtags, err
-}
+//}
+//
 
-func (r *RecRepository) GetReasonId(reason string) (uint, error) {
-	reasonDB := &dataStruct.Reason{}
-	err := r.db.First(reasonDB, "reason = ?", reason).Error
-	return reasonDB.Id, err
-}
+//
 
-func (r *RecRepository) AddUserReason(reason *dataStruct.UserReason) error {
-	err := r.db.Create(&reason).Error
-	return err
-}
-
-func (r *RecRepository) AddFilter(filter *dataStruct.UserFilter) error {
-	err := r.db.Create(&filter).Error
-	return err
-}
-
-func (r *RecRepository) GetReasons() ([]dataStruct.Reason, error) {
-	var reasons []dataStruct.Reason
-	err := r.db.Find(&reasons).Error
-	if err != nil {
-		return nil, err
-	}
-	return reasons, nil
-}
-
-func (r *RecRepository) GetFilter(userId uint) (dataStruct.UserFilter, error) {
-	filterDB := dataStruct.UserFilter{}
-	err := r.db.First(&filterDB, "user_id = ?", userId).Error
-	return filterDB, err
-}
-
-func (r *RecRepository) ChangeFilter(newFilter dataStruct.UserFilter) error {
-	filterDB := &dataStruct.UserFilter{}
-	err := r.db.First(filterDB, "user_id = ?", newFilter.UserId).Error
-	if err != nil {
-		return err
-	}
-	if filterDB.MaxAge != newFilter.MaxAge {
-		filterDB.MaxAge = newFilter.MaxAge
-	}
-	if filterDB.MinAge != newFilter.MinAge {
-		filterDB.MinAge = newFilter.MinAge
-	}
-	if filterDB.SearchSex != newFilter.SearchSex {
-		filterDB.SearchSex = newFilter.SearchSex
-	}
-
-	err = r.db.Save(&filterDB).Error
-	return err
-
-}
-
-func (r *RecRepository) GetUserReasons(userId uint) ([]dataStruct.UserReason, error) {
-	var reasons []dataStruct.UserReason
-	err := r.db.Find(&reasons, "user_id =?", userId).Error
-	if err != nil {
-		return nil, err
-	}
-	return reasons, nil
-}
-
-func (r *RecRepository) GetReasonById(reasonId uint) (string, error) {
-	reasonDB := dataStruct.Reason{}
-	err := r.db.First(&reasonDB, "id = ?", reasonId).Error
-	return reasonDB.Reason, err
-}
-
-func (r *RecRepository) GetAvatar(userId uint) (uint, error) {
-	var photoId uint
-	err := r.db.Table("user_photos p").Select("photo").
-		Where("user_id = ? AND avatar = ?", userId, true).Find(&photoId).Error
-	return photoId, err
-}
-
-func (r *RecRepository) DeleteUserReason(userId, reactionId uint) error {
-	err := r.db.First(&dataStruct.UserReason{}, "user_id = ? AND reason_id=?", userId, reactionId).Error
-	if err != nil {
-		return err
-	}
-	err = r.db.Delete(&dataStruct.UserReason{}, "user_id = ? AND reason_id=?", userId, reactionId).Error
-	return err
-}
+//
+//
 
 func calculateBirthYear(age int) string {
 	return fmt.Sprintf("%d-01-01", time.Now().Year()-age)

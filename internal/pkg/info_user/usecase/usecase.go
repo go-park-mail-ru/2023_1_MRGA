@@ -4,17 +4,20 @@ import (
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 )
 
 type InfoUseCase struct {
-	userRepo info_user.IRepositoryInfo
-	infoRepo info.IRepositoryInfo
+	userRepo     info_user.IRepositoryInfo
+	infoUseCase  info.UseCase
+	photoUseCase photo.UseCase
 }
 
-func NewInfoUseCase(userRepo info_user.IRepositoryInfo, infoRepo info.IRepositoryInfo) *InfoUseCase {
+func NewInfoUseCase(userRepo info_user.IRepositoryInfo, infoUC info.UseCase, photoUC photo.UseCase) *InfoUseCase {
 	return &InfoUseCase{
-		userRepo: userRepo,
-		infoRepo: infoRepo,
+		userRepo:     userRepo,
+		infoUseCase:  infoUC,
+		photoUseCase: photoUC,
 	}
 }
 
@@ -26,19 +29,19 @@ func (iu *InfoUseCase) AddInfo(userId uint, info info_user.InfoStruct) error {
 		Sex:         info.Sex,
 	}
 
-	cityId, err := iu.infoRepo.GetCityId(info.City)
+	cityId, err := iu.infoUseCase.GetCityId(info.City)
 	if err != nil {
 		return err
 	}
-	zodiacId, err := iu.infoRepo.GetZodiacId(info.Zodiac)
+	zodiacId, err := iu.infoUseCase.GetZodiacId(info.Zodiac)
 	if err != nil {
 		return err
 	}
-	educationId, err := iu.infoRepo.GetEducationId(info.Education)
+	educationId, err := iu.infoUseCase.GetEducationId(info.Education)
 	if err != nil {
 		return err
 	}
-	jobId, err := iu.infoRepo.GetJobId(info.Job)
+	jobId, err := iu.infoUseCase.GetJobId(info.Job)
 	if err != nil {
 		return err
 	}
@@ -75,18 +78,14 @@ func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStructAnswer
 		return
 	}
 	userInfo.Age = age
-	avatar, err := iu.userRepo.GetAvatar(userId) //fix
+
+	photos, err := iu.photoUseCase.GetAllPhotos(userId)
 	if err != nil {
 		return
 	}
-	userInfo.Photos = append(userInfo.Photos, avatar) //fix
-	photos, err := iu.userRepo.GetUserPhoto(userId)
-	if err != nil {
-		return
-	}
-	userInfo.Photos = append(userInfo.Photos, photos...)
+	userInfo.Photos = photos
 	return
-} //fix
+}
 
 func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (info_user.InfoStructAnswer, error) {
 	userInfo := dataStruct.UserInfo{
@@ -96,25 +95,25 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (in
 		UserId:      userId,
 	}
 
-	cityId, err := iu.infoRepo.GetCityId(infoInp.City)
+	cityId, err := iu.infoUseCase.GetCityId(infoInp.City)
 	if err != nil {
 		return info_user.InfoStructAnswer{}, err
 	}
 	userInfo.CityId = cityId
 
-	zodiacId, err := iu.infoRepo.GetZodiacId(infoInp.Zodiac)
+	zodiacId, err := iu.infoUseCase.GetZodiacId(infoInp.Zodiac)
 	if err != nil {
 		return info_user.InfoStructAnswer{}, err
 	}
 	userInfo.Zodiac = zodiacId
 
-	educationId, err := iu.infoRepo.GetEducationId(infoInp.Education)
+	educationId, err := iu.infoUseCase.GetEducationId(infoInp.Education)
 	if err != nil {
 		return info_user.InfoStructAnswer{}, err
 	}
 	userInfo.Education = educationId
 
-	jobId, err := iu.infoRepo.GetJobId(infoInp.Job)
+	jobId, err := iu.infoUseCase.GetJobId(infoInp.Job)
 	if err != nil {
 		return info_user.InfoStructAnswer{}, err
 	}
@@ -132,7 +131,7 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (in
 } //ok
 
 func (iu *InfoUseCase) AddHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
-	hashtagId, err := iu.infoRepo.GetHashtagId(hashtagInp.Hashtag)
+	hashtagId, err := iu.infoUseCase.GetHashtagId(hashtagInp.Hashtag)
 	if err != nil {
 		return err
 	}
@@ -151,28 +150,22 @@ func (iu *InfoUseCase) AddHashtags(userId uint, hashtagInp info_user.HashtagInp)
 	return nil
 }
 
-func (iu *InfoUseCase) GetUserHashtags(userId uint) (info_user.HashtagInp, error) {
+func (iu *InfoUseCase) GetUserHashtags(userId uint) ([]string, error) {
 	hashtags, err := iu.userRepo.GetUserHashtags(userId)
 	if err != nil {
-		return info_user.HashtagInp{}, err
+		return nil, err
 	}
+	return hashtags, nil
 
-	var result info_user.HashtagInp
-	result.Hashtag, err = iu.userRepo.GetHashtagById(hashtags)
-	if err != nil {
-		return info_user.HashtagInp{}, err
-	}
-
-	return result, nil
 }
 
 func (iu *InfoUseCase) ChangeUserHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
-	hashtagsBD, err := iu.userRepo.GetUserHashtags(userId)
+	hashtagsBD, err := iu.userRepo.GetUserHashtagsId(userId)
 	if err != nil {
 		return err
 	}
 
-	hashtagsId, err := iu.infoRepo.GetHashtagId(hashtagInp.Hashtag)
+	hashtagsId, err := iu.infoUseCase.GetHashtagId(hashtagInp.Hashtag)
 	if err != nil {
 		return err
 	}
@@ -214,6 +207,14 @@ func (iu *InfoUseCase) ChangeUserHashtags(userId uint, hashtagInp info_user.Hash
 		}
 	}
 	return nil
+}
+
+func (iu *InfoUseCase) GetUserHashtagsId(userId uint) ([]uint, error) {
+	hashtags, err := iu.userRepo.GetUserHashtagsId(userId)
+	if err != nil {
+		return nil, err
+	}
+	return hashtags, nil
 }
 
 func Contains(s []uint, elem uint) bool {

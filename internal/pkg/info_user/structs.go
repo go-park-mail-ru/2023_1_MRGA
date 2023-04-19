@@ -38,8 +38,3 @@ type InfoChange struct {
 type HashtagInp struct {
 	Hashtag []string `json:"hashtag" structs:"hashtag"`
 }
-
-type Photo struct {
-	PhotoId uint `json:"photoId" structs:"photoId"`
-	Avatar  bool `json:"avatar" structs:"avatar"`
-}

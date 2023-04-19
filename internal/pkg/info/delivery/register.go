@@ -23,5 +23,5 @@ func RegisterHTTPEndpoints(router *mux.Router, ic info.UseCase) {
 	router.HandleFunc("/api/zodiac", h.GetZodiac).Methods("GET")       //move
 	router.HandleFunc("/api/job", h.GetJobs).Methods("GET")            //move
 	router.HandleFunc("/api/education", h.GetEducation).Methods("GET") //move
-
+	router.HandleFunc("/api/reason", h.GetReasons).Methods("GET")
 }

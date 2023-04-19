@@ -52,6 +52,15 @@ func (r *InfoRepository) GetCities() ([]dataStruct.City, error) {
 	return cities, nil
 }
 
+func (r *InfoRepository) GetReasons() ([]dataStruct.Reason, error) {
+	var reasons []dataStruct.Reason
+	err := r.db.Find(&reasons).Error
+	if err != nil {
+		return nil, err
+	}
+	return reasons, nil
+}
+
 func (r *InfoRepository) GetHashtags() ([]dataStruct.Hashtag, error) {
 	var hashtags []dataStruct.Hashtag
 	err := r.db.Find(&hashtags).Error

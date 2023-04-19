@@ -4,17 +4,12 @@ import dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_
 
 type IRepositoryInfo interface {
 	AddInfoUser(userInfo *dataStruct.UserInfo) error
-	AddUserPhoto(userPhoto *dataStruct.UserPhoto) error  //delete
-	GetUserInfo(userId uint) (InfoStruct, error)         //ok
-	GetUserPhoto(userId uint) (photos []uint, err error) //photo
+	GetUserInfo(userId uint) (InfoStruct, error) //ok
 	ChangeInfo(userInfo *dataStruct.UserInfo) error
+	GetAge(userId uint) (int, error) //ok
 
-	GetUserIdByEmail(email string) (uint, error)
-	GetAge(userId uint) (int, error)     //ok
-	GetAvatar(userId uint) (uint, error) //photo
-
-	GetUserHashtags(userId uint) ([]uint, error)
+	GetUserHashtagsId(userId uint) ([]uint, error)
+	GetUserHashtags(userId uint) ([]string, error)
 	AddUserHashtag(hashtag []dataStruct.UserHashtag) error
-	GetHashtagById(hashtagId []uint) ([]string, error) //delete
 	DeleteUserHashtag(userId uint, hashtagId []uint) error
 }

@@ -85,9 +85,20 @@ func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {
 
 }
 
-func (r *InfoRepository) GetUserHashtags(userId uint) ([]uint, error) {
+func (r *InfoRepository) GetUserHashtags(userId uint) ([]string, error) {
+	var hashtags []string
+	err := r.db.Table("user_hashtags uh").
+		Select("h.hashtag").
+		Joins("Join hashtags h on h.id= uh.hashtag_id").
+		Where("uh.user_id = ? ", userId).Find(&hashtags).Error
+	return hashtags, err
+}
+
+func (r *InfoRepository) GetUserHashtagsId(userId uint) ([]uint, error) {
 	var hashtags []uint
-	err := r.db.Table("user_hashtags").Select("hashtag_id").Where("user_id = ? ", userId).Find(&hashtags).Error
+	err := r.db.Table("user_hashtags ").
+		Select("hashtag_id").
+		Where("user_id = ? ", userId).Find(&hashtags).Error
 	return hashtags, err
 }
 
@@ -103,22 +114,6 @@ func (r *InfoRepository) DeleteUserHashtag(userId uint, hashtagId []uint) error 
 	}
 	err = r.db.Delete(&dataStruct.UserHashtag{}, "user_id = ? AND hashtag_id IN ?", userId, hashtagId).Error
 	return err
-}
-
-func (r *InfoRepository) GetHashtagById(hashtagId []uint) ([]string, error) {
-	var hashtagDB []string
-	err := r.db.Table("hashtags").Select("hashtag").
-		Where("id IN ?", hashtagId).Find(&hashtagDB).Error
-	return hashtagDB, err
-}
-
-func (r *InfoRepository) GetAvatar(userId uint) (uint, error) {
-	var photo dataStruct.UserPhoto
-	err := r.db.First(&photo, "user_id=? AND avatar = ?", userId, true).Error
-	if err != nil {
-		return 0, err
-	}
-	return photo.Photo, nil
 }
 
 func (r *InfoRepository) GetAge(userId uint) (int, error) {
@@ -137,15 +132,6 @@ func (r *InfoRepository) GetAge(userId uint) (int, error) {
 	}
 
 	return age, nil
-}
-
-func (r *InfoRepository) GetUserIdByEmail(email string) (uint, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "email = ?", email).Error
-	if err != nil {
-		return 0, err
-	}
-	return user.Id, err
 }
 
 func CalculateAge(birthDay string) (int, error) {
