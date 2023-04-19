@@ -56,7 +56,7 @@ func (iu *InfoUseCase) AddInfo(userId uint, info info_user.InfoStruct) error {
 		return err
 	}
 	return nil
-} //ok
+}
 
 func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStructAnswer, err error) {
 	userInfoTemp, err := iu.userRepo.GetUserInfo(userId)
@@ -128,7 +128,7 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (in
 		return info_user.InfoStructAnswer{}, err
 	}
 	return result, nil
-} //ok
+}
 
 func (iu *InfoUseCase) AddHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
 	hashtagId, err := iu.infoUseCase.GetHashtagId(hashtagInp.Hashtag)

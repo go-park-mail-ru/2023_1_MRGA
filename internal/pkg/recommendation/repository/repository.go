@@ -81,47 +81,11 @@ func (r *RecRepository) GetRecommendedUser(userId uint) (user recommendation.Rec
 	return user, err
 }
 
-//
-//func (r *RecRepository) GetUserAge(userId uint) (int, error) {
-//	var user dataStruct.User
-//	err := r.db.First(&user, "id=?", userId).Error
-//	if err != nil {
-//		return 0, err
-//	}
-//	age, err := calculateAge(user.BirthDay)
-//	return age, err
-//}
-//
 func (r *RecRepository) GetUserHistory(userId uint) ([]uint, error) {
 	var users []uint
 	err := r.db.Table("user_histories").Select("user_profile_id").Where("user_id = ? ", userId).Find(&users).Error
 	return users, err
 }
-
-//
-//func (r *RecRepository) GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error) {
-//	var hashtags []dataStruct.UserHashtag
-//	err := r.db.Table("user_hashtags").Where("user_id = ? ", userId).Find(&hashtags).Error
-//	return hashtags, err
-//}
-//
-//func (r *RecRepository) GetUserNameHashtags(userId uint) ([]string, error) {
-//	var hashtags []string
-//	err := r.db.Table("user_hashtags uh").Select("h.hashtag").
-//		Where("uh.user_id = ?", userId).
-//		Joins("Join hashtags h on h.id = uh.hashtag_id").
-//		Find(&hashtags).Error
-//	return hashtags, err
-//}
-//
-
-//}
-//
-
-//
-
-//
-//
 
 func calculateBirthYear(age int) string {
 	return fmt.Sprintf("%d-01-01", time.Now().Year()-age)
