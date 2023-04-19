@@ -1,9 +1,9 @@
 package info_user
 
 type UseCase interface {
-	AddInfo(userId uint, info InfoStruct) error                        //ok
-	ChangeInfo(userId uint, info InfoChange) (InfoStructAnswer, error) //ok
-	GetInfo(userId uint) (InfoStructAnswer, error)                     //fix
+	AddInfo(userId uint, info InfoStruct) error
+	ChangeInfo(userId uint, info InfoChange) (InfoStructAnswer, error)
+	GetInfo(userId uint) (InfoStructAnswer, error)
 
 	AddHashtags(userId uint, inp HashtagInp) error
 	GetUserHashtags(userId uint) ([]string, error)

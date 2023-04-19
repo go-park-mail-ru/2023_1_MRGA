@@ -4,9 +4,9 @@ import dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_
 
 type IRepositoryInfo interface {
 	AddInfoUser(userInfo *dataStruct.UserInfo) error
-	GetUserInfo(userId uint) (InfoStruct, error) //ok
+	GetUserInfo(userId uint) (InfoStruct, error)
 	ChangeInfo(userInfo *dataStruct.UserInfo) error
-	GetAge(userId uint) (int, error) //ok
+	GetAge(userId uint) (int, error)
 
 	GetUserHashtagsId(userId uint) ([]uint, error)
 	GetUserHashtags(userId uint) ([]string, error)

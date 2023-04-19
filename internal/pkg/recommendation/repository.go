@@ -7,8 +7,4 @@ type IRepositoryRec interface {
 	GetRecommendedUser(userId uint) (user Recommendation, err error)
 
 	GetUserHistory(userId uint) ([]uint, error)
-
-	//GetPhotos(userId uint) ([]uint, error) //photo
-	//GetAvatar(userId uint) (uint, error)   //photo
-
 }
