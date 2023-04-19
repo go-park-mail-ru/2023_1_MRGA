@@ -10,9 +10,12 @@ import (
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
-	infoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/delivery"
-	InfoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/repository"
-	infoUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/usecase"
+	InfoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/delivery"
+	InfoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/repository"
+	infoUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/usecase"
+	infoUserDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/delivery"
+	InfoUserRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/repository"
+	infoUserUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/usecase"
 	matchDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/delivery"
 	MatchRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/repository"
 	matchUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/usecase"
@@ -51,7 +54,11 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 
 	infoRepo := InfoRepository.NewInfoRepo(db)
 	ucInfo := infoUC.NewInfoUseCase(infoRepo)
-	infoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
+	InfoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
+
+	infoUserRepo := InfoUserRepository.NewInfoRepo(db)
+	ucUser := infoUserUC.NewInfoUseCase(infoUserRepo, infoRepo)
+	infoUserDel.RegisterHTTPEndpoints(a.Router, ucUser)
 
 	recRepo := RecRepository.NewRepo(db)
 	ucRec := recUC.NewRecUseCase(recRepo)
