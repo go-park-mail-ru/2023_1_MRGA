@@ -20,7 +20,7 @@ func NewMatchRepo(db *gorm.DB) *MatchRepository {
 }
 
 func (r *MatchRepository) GetMatches(userId uint) (users []dataStruct.Match, err error) {
-	err = r.db.Table("matches").Find(&users, "user_first_id=?", userId).Limit(30).Error
+	err = r.db.Table("matches").Find(&users, "user_first_id=?", userId).Error
 	return
 }
 
@@ -112,7 +112,7 @@ func CalculateAge(birthDay string) (int, error) {
 	}
 	now := time.Now()
 	age := now.Year() - birth.Year()
-	if now.Month() > birth.Month() {
+	if now.Month() < birth.Month() {
 		age -= 1
 	}
 	if now.Month() == birth.Month() && now.Day() < birth.Day() {
