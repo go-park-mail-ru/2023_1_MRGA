@@ -48,6 +48,7 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
+
 	err = h.useCase.AddInfo(uint(userId), infoInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -107,13 +108,13 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	mapInfo := structs.Map(&result)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, mapInfo)
 }
 
 func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
-
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(int)
 	if !ok {
@@ -183,6 +184,7 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	mapInfo := structs.Map(&result)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, mapInfo)
@@ -197,6 +199,7 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	infoBD, err := h.useCase.GetInfo(uint(userId))
 	infoBD.Email = ""
 	if err != nil {

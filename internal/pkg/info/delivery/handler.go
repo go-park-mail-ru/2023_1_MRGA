@@ -14,11 +14,11 @@ func (h *Handler) GetHashtags(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["hashtags"] = jobs
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
-
 }
 
 func (h *Handler) GetCities(w http.ResponseWriter, r *http.Request) {
@@ -28,11 +28,11 @@ func (h *Handler) GetCities(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["cities"] = cities
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
-
 }
 
 func (h *Handler) GetZodiac(w http.ResponseWriter, r *http.Request) {
@@ -42,11 +42,11 @@ func (h *Handler) GetZodiac(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["zodiac"] = zodiac
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
-
 }
 
 func (h *Handler) GetJobs(w http.ResponseWriter, r *http.Request) {
@@ -56,11 +56,11 @@ func (h *Handler) GetJobs(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["jobs"] = jobs
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
-
 }
 
 func (h *Handler) GetEducation(w http.ResponseWriter, r *http.Request) {
@@ -70,11 +70,11 @@ func (h *Handler) GetEducation(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["education"] = education
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
-
 }
 
 func (h *Handler) GetReasons(w http.ResponseWriter, r *http.Request) {
@@ -84,9 +84,9 @@ func (h *Handler) GetReasons(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["reasons"] = reasons
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
-
 }

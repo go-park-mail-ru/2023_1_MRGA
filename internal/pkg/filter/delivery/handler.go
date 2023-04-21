@@ -63,17 +63,18 @@ func (h *Handler) GetFilter(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
+
 	filters, err := h.useCase.GetFilters(uint(userId))
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["filters"] = filters
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
-
 }
 
 func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {

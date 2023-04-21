@@ -8,7 +8,6 @@ import (
 )
 
 func (h *Handler) GetRecommendations(w http.ResponseWriter, r *http.Request) {
-
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(int)
 	if !ok {
@@ -23,9 +22,9 @@ func (h *Handler) GetRecommendations(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	mapResp := make(map[string]interface{})
 	mapResp["recommendations"] = recs
-
 	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
 	writer.Respond(w, r, mapResp)
 }

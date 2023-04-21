@@ -18,7 +18,6 @@ import (
 )
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
-
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -58,7 +57,6 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -81,12 +79,14 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	userToken, err := h.useCase.Login(logInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Hour))
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
@@ -125,6 +125,7 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
+
 	userJson.Id = uint(userId)
 	err = h.useCase.ChangeUser(userJson)
 	if err != nil {
@@ -138,7 +139,6 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(int)
 	if !ok {
@@ -146,6 +146,7 @@ func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
+
 	user, err := c.useCase.GetUserById(uint(userId))
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -179,7 +180,6 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie.SetCookie(w, _default.SessionTokenCookieName, "", -120*time.Second)
-
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }
