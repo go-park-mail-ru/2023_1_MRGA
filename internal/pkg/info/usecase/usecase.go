@@ -18,12 +18,7 @@ func (iu *InfoUseCase) GetHashtags() ([]string, error) {
 		return nil, err
 	}
 
-	var hashtagsResult []string
-	for _, hashtag := range hashtags {
-		hashtagsResult = append(hashtagsResult, hashtag.Hashtag)
-	}
-
-	return hashtagsResult, nil
+	return hashtags, nil
 }
 
 func (iu *InfoUseCase) GetCities() ([]string, error) {
@@ -32,12 +27,7 @@ func (iu *InfoUseCase) GetCities() ([]string, error) {
 		return nil, err
 	}
 
-	var citiesResult []string
-	for _, city := range cities {
-		citiesResult = append(citiesResult, city.City)
-	}
-
-	return citiesResult, nil
+	return cities, nil
 }
 
 func (iu *InfoUseCase) GetJobs() ([]string, error) {
@@ -46,12 +36,7 @@ func (iu *InfoUseCase) GetJobs() ([]string, error) {
 		return nil, err
 	}
 
-	var jobsResult []string
-	for _, job := range jobs {
-		jobsResult = append(jobsResult, job.Job)
-	}
-
-	return jobsResult, nil
+	return jobs, nil
 }
 
 func (iu *InfoUseCase) GetEducation() ([]string, error) {
@@ -60,12 +45,7 @@ func (iu *InfoUseCase) GetEducation() ([]string, error) {
 		return nil, err
 	}
 
-	var educationResult []string
-	for _, ed := range education {
-		educationResult = append(educationResult, ed.Education)
-	}
-
-	return educationResult, nil
+	return education, nil
 }
 
 func (iu *InfoUseCase) GetZodiacs() ([]string, error) {
@@ -74,12 +54,7 @@ func (iu *InfoUseCase) GetZodiacs() ([]string, error) {
 		return nil, err
 	}
 
-	var zodiacResult []string
-	for _, z := range zodiac {
-		zodiacResult = append(zodiacResult, z.Zodiac)
-	}
-
-	return zodiacResult, nil
+	return zodiac, nil
 }
 
 func (iu *InfoUseCase) GetReasons() ([]string, error) {
@@ -88,12 +63,7 @@ func (iu *InfoUseCase) GetReasons() ([]string, error) {
 		return nil, err
 	}
 
-	var reasonsResult []string
-	for _, reason := range reasons {
-		reasonsResult = append(reasonsResult, reason.Reason)
-	}
-
-	return reasonsResult, nil
+	return reasons, nil
 }
 
 func (iu *InfoUseCase) GetCityId(city string) (uint, error) {

@@ -1,7 +1,5 @@
 package info
 
-import dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
-
 type IRepositoryInfo interface {
 	GetHashtagId(nameHashtag []string) ([]uint, error)
 	GetEducationId(nameEducation string) (uint, error)
@@ -9,10 +7,10 @@ type IRepositoryInfo interface {
 	GetZodiacId(nameZodiac string) (uint, error)
 	GetCityId(nameCity string) (uint, error)
 
-	GetHashtags() ([]dataStruct.Hashtag, error)
-	GetReasons() ([]dataStruct.Reason, error)
-	GetCities() ([]dataStruct.City, error)
-	GetJobs() ([]dataStruct.Job, error)
-	GetEducation() ([]dataStruct.Education, error)
-	GetZodiac() ([]dataStruct.Zodiac, error)
+	GetHashtags() ([]string, error)
+	GetReasons() ([]string, error)
+	GetCities() ([]string, error)
+	GetJobs() ([]string, error)
+	GetEducation() ([]string, error)
+	GetZodiac() ([]string, error)
 }

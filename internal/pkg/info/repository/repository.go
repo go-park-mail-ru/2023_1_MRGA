@@ -16,54 +16,54 @@ func NewInfoRepo(db *gorm.DB) *InfoRepository {
 	}
 }
 
-func (r *InfoRepository) GetZodiac() ([]dataStruct.Zodiac, error) {
-	var zodiac []dataStruct.Zodiac
-	err := r.db.Find(&zodiac).Error
+func (r *InfoRepository) GetZodiac() ([]string, error) {
+	var zodiac []string
+	err := r.db.Table("zodiacs").Select("zodiac").Find(&zodiac).Error
 	if err != nil {
 		return nil, err
 	}
 	return zodiac, nil
 }
 
-func (r *InfoRepository) GetJobs() ([]dataStruct.Job, error) {
-	var jobs []dataStruct.Job
-	err := r.db.Find(&jobs).Error
+func (r *InfoRepository) GetJobs() ([]string, error) {
+	var jobs []string
+	err := r.db.Table("jobs").Select("job").Find(&jobs).Error
 	if err != nil {
 		return nil, err
 	}
 	return jobs, nil
 }
 
-func (r *InfoRepository) GetEducation() ([]dataStruct.Education, error) {
-	var education []dataStruct.Education
-	err := r.db.Find(&education).Error
+func (r *InfoRepository) GetEducation() ([]string, error) {
+	var education []string
+	err := r.db.Table("educations").Select("education").Find(&education).Error
 	if err != nil {
 		return nil, err
 	}
 	return education, nil
 }
 
-func (r *InfoRepository) GetCities() ([]dataStruct.City, error) {
-	var cities []dataStruct.City
-	err := r.db.Find(&cities).Error
+func (r *InfoRepository) GetCities() ([]string, error) {
+	var cities []string
+	err := r.db.Table("cities").Select("city").Find(&cities).Error
 	if err != nil {
 		return nil, err
 	}
 	return cities, nil
 }
 
-func (r *InfoRepository) GetReasons() ([]dataStruct.Reason, error) {
-	var reasons []dataStruct.Reason
-	err := r.db.Find(&reasons).Error
+func (r *InfoRepository) GetReasons() ([]string, error) {
+	var reasons []string
+	err := r.db.Table("reasons").Select("reason").Find(&reasons).Error
 	if err != nil {
 		return nil, err
 	}
 	return reasons, nil
 }
 
-func (r *InfoRepository) GetHashtags() ([]dataStruct.Hashtag, error) {
-	var hashtags []dataStruct.Hashtag
-	err := r.db.Find(&hashtags).Error
+func (r *InfoRepository) GetHashtags() ([]string, error) {
+	var hashtags []string
+	err := r.db.Table("hashtags").Select("hashtag").Find(&hashtags).Error
 	if err != nil {
 		return nil, err
 	}
