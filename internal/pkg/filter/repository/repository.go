@@ -33,16 +33,9 @@ func (r *FilterRepository) ChangeFilter(newFilter dataStruct.UserFilter) error {
 	if err != nil {
 		return err
 	}
-	if filterDB.MaxAge != newFilter.MaxAge {
-		filterDB.MaxAge = newFilter.MaxAge
-	}
-	if filterDB.MinAge != newFilter.MinAge {
-		filterDB.MinAge = newFilter.MinAge
-	}
-	if filterDB.SearchSex != newFilter.SearchSex {
-		filterDB.SearchSex = newFilter.SearchSex
-	}
-
+	filterDB.MaxAge = newFilter.MaxAge
+	filterDB.MinAge = newFilter.MinAge
+	filterDB.SearchSex = newFilter.SearchSex
 	err = r.db.Save(&filterDB).Error
 	return err
 

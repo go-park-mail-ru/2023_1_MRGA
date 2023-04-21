@@ -55,30 +55,13 @@ func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {
 	if err != nil {
 		return err
 	}
-	if userInfo.CityId != infoDB.CityId {
-		infoDB.CityId = userInfo.CityId
-	}
-	if userInfo.Zodiac != infoDB.Zodiac {
-		infoDB.Zodiac = userInfo.Zodiac
-	}
-	if userInfo.Job != infoDB.Job {
-		infoDB.Job = userInfo.Job
-	}
-	if userInfo.Education != infoDB.Education {
-		infoDB.Education = userInfo.Education
-	}
-
-	if userInfo.Description != "" {
-		infoDB.Description = userInfo.Description
-	}
-
-	if userInfo.Name != "" {
-		infoDB.Name = userInfo.Name
-	}
-
-	if userInfo.Sex != userInfo.Sex {
-		infoDB.Sex = userInfo.Sex
-	}
+	infoDB.CityId = userInfo.CityId
+	infoDB.Zodiac = userInfo.Zodiac
+	infoDB.Job = userInfo.Job
+	infoDB.Education = userInfo.Education
+	infoDB.Description = userInfo.Description
+	infoDB.Name = userInfo.Name
+	infoDB.Sex = userInfo.Sex
 
 	err = r.db.Save(&infoDB).Error
 	return err
