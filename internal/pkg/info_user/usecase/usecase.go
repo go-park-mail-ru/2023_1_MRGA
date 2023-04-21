@@ -2,39 +2,46 @@ package usecase
 
 import (
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 )
 
 type InfoUseCase struct {
-	userRepo info_user.IRepositoryInfo
+	userRepo     info_user.IRepositoryInfo
+	infoUseCase  info.UseCase
+	photoUseCase photo.UseCase
 }
 
-func NewInfoUseCase(userRepo info_user.IRepositoryInfo) *InfoUseCase {
+func NewInfoUseCase(userRepo info_user.IRepositoryInfo, infoUC info.UseCase, photoUC photo.UseCase) *InfoUseCase {
 	return &InfoUseCase{
-		userRepo: userRepo,
+		userRepo:     userRepo,
+		infoUseCase:  infoUC,
+		photoUseCase: photoUC,
 	}
 }
 
 func (iu *InfoUseCase) AddInfo(userId uint, info info_user.InfoStruct) error {
-	var userInfo dataStruct.UserInfo
-	userInfo.UserId = userId
-	userInfo.Name = info.Name
-	userInfo.Description = info.Description
-	userInfo.Sex = info.Sex
+	userInfo := dataStruct.UserInfo{
+		UserId:      userId,
+		Name:        info.Name,
+		Description: info.Description,
+		Sex:         info.Sex,
+	}
 
-	cityId, err := iu.userRepo.GetCityId(info.City)
+	cityId, err := iu.infoUseCase.GetCityId(info.City)
 	if err != nil {
 		return err
 	}
-	zodiacId, err := iu.userRepo.GetZodiacId(info.Zodiac)
+	zodiacId, err := iu.infoUseCase.GetZodiacId(info.Zodiac)
 	if err != nil {
 		return err
 	}
-	educationId, err := iu.userRepo.GetEducationId(info.Education)
+	educationId, err := iu.infoUseCase.GetEducationId(info.Education)
 	if err != nil {
 		return err
 	}
-	jobId, err := iu.userRepo.GetJobId(info.Job)
+	jobId, err := iu.infoUseCase.GetJobId(info.Job)
 	if err != nil {
 		return err
 	}
@@ -71,62 +78,48 @@ func (iu *InfoUseCase) GetInfo(userId uint) (userInfo info_user.InfoStructAnswer
 		return
 	}
 	userInfo.Age = age
-	avatar, err := iu.userRepo.GetAvatar(userId)
+
+	photos, err := iu.photoUseCase.GetAllPhotos(userId)
 	if err != nil {
 		return
 	}
-	userInfo.Photos = append(userInfo.Photos, avatar)
-	photos, err := iu.userRepo.GetUserPhoto(userId)
-	if err != nil {
-		return
-	}
-	userInfo.Photos = append(userInfo.Photos, photos...)
-	return
-}
-
-func (iu *InfoUseCase) GetInfoByEmail(userId uint) (userInfo info_user.InfoStructAnswer, err error) {
-
-	userInfo, err = iu.GetInfo(userId)
-	userInfo.Email = ""
+	userInfo.Photos = photos
 	return
 }
 
 func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (info_user.InfoStructAnswer, error) {
-	var userInfo dataStruct.UserInfo
+	userInfo := dataStruct.UserInfo{
+		Sex:         infoInp.Sex,
+		Description: infoInp.Description,
+		Name:        infoInp.Name,
+		UserId:      userId,
+	}
 
-	if infoInp.City != "" {
-		cityId, err := iu.userRepo.GetCityId(infoInp.City)
-		if err != nil {
-			return info_user.InfoStructAnswer{}, err
-		}
-		userInfo.CityId = cityId
+	cityId, err := iu.infoUseCase.GetCityId(infoInp.City)
+	if err != nil {
+		return info_user.InfoStructAnswer{}, err
 	}
-	if infoInp.Zodiac != "" {
-		zodiacId, err := iu.userRepo.GetZodiacId(infoInp.Zodiac)
-		if err != nil {
-			return info_user.InfoStructAnswer{}, err
-		}
-		userInfo.Zodiac = zodiacId
+	userInfo.CityId = cityId
+
+	zodiacId, err := iu.infoUseCase.GetZodiacId(infoInp.Zodiac)
+	if err != nil {
+		return info_user.InfoStructAnswer{}, err
 	}
-	if infoInp.Education != "" {
-		educationId, err := iu.userRepo.GetEducationId(infoInp.Education)
-		if err != nil {
-			return info_user.InfoStructAnswer{}, err
-		}
-		userInfo.Education = educationId
+	userInfo.Zodiac = zodiacId
+
+	educationId, err := iu.infoUseCase.GetEducationId(infoInp.Education)
+	if err != nil {
+		return info_user.InfoStructAnswer{}, err
 	}
-	if infoInp.Job != "" {
-		jobId, err := iu.userRepo.GetJobId(infoInp.Job)
-		if err != nil {
-			return info_user.InfoStructAnswer{}, err
-		}
-		userInfo.Job = jobId
+	userInfo.Education = educationId
+
+	jobId, err := iu.infoUseCase.GetJobId(infoInp.Job)
+	if err != nil {
+		return info_user.InfoStructAnswer{}, err
 	}
-	userInfo.Sex = infoInp.Sex
-	userInfo.Description = infoInp.Description
-	userInfo.Name = infoInp.Name
-	userInfo.UserId = userId
-	err := iu.userRepo.ChangeInfo(&userInfo)
+	userInfo.Job = jobId
+
+	err = iu.userRepo.ChangeInfo(&userInfo)
 	if err != nil {
 		return info_user.InfoStructAnswer{}, err
 	}
@@ -138,155 +131,93 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (in
 }
 
 func (iu *InfoUseCase) AddHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
-	for _, hashtag := range hashtagInp.Hashtag {
-		hashtagId, err := iu.userRepo.GetHashtagId(hashtag)
-		if err != nil {
-			return err
-		}
-		var userHashtag dataStruct.UserHashtag
-		userHashtag.HashtagId = hashtagId
-		userHashtag.UserId = userId
-		err = iu.userRepo.AddUserHashtag(userHashtag)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (iu *InfoUseCase) GetUserHashtags(userId uint) (info_user.HashtagInp, error) {
-	hashtags, err := iu.userRepo.GetUserHashtags(userId)
-	if err != nil {
-		return info_user.HashtagInp{}, err
-	}
-
-	var result info_user.HashtagInp
-	for _, hashtagId := range hashtags {
-		hashtag, err := iu.userRepo.GetHashtagById(hashtagId.HashtagId)
-		if err != nil {
-			return info_user.HashtagInp{}, err
-		}
-
-		result.Hashtag = append(result.Hashtag, hashtag)
-	}
-	return result, nil
-}
-
-func (iu *InfoUseCase) ChangeUserHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
-	hashtagsBD, err := iu.userRepo.GetUserHashtags(userId)
+	hashtagId, err := iu.infoUseCase.GetHashtagId(hashtagInp.Hashtag)
 	if err != nil {
 		return err
 	}
-	var hashtagSlice []string
-	for _, hashtagId := range hashtagsBD {
-		reason, err := iu.userRepo.GetHashtagById(hashtagId.HashtagId)
-		if err != nil {
-			return err
-		}
-		hashtagSlice = append(hashtagSlice, reason)
+	var addHashtags []dataStruct.UserHashtag
+	for _, hashtag := range hashtagId {
+		var userHashtag dataStruct.UserHashtag
+		userHashtag.HashtagId = hashtag
+		userHashtag.UserId = userId
+		addHashtags = append(addHashtags, userHashtag)
 	}
-
-	for _, hashtag := range hashtagInp.Hashtag {
-		if !Contains(hashtagSlice, hashtag) {
-			var hashtagAdd dataStruct.UserHashtag
-			hashtagId, err := iu.userRepo.GetHashtagId(hashtag)
-			if err != nil {
-				return err
-			}
-			hashtagAdd.UserId = userId
-			hashtagAdd.HashtagId = hashtagId
-			err = iu.userRepo.AddUserHashtag(hashtagAdd)
-		}
-	}
-
-	for _, hashtag := range hashtagSlice {
-		if !Contains(hashtagInp.Hashtag, hashtag) {
-			hashtagId, err := iu.userRepo.GetHashtagId(hashtag)
-			if err != nil {
-				return err
-			}
-			err = iu.userRepo.DeleteUserHashtag(userId, hashtagId)
-			if err != nil {
-				return err
-			}
-		}
+	err = iu.userRepo.AddUserHashtag(addHashtags)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (iu *InfoUseCase) GetHashtags() ([]string, error) {
-	hashtags, err := iu.userRepo.GetHashtags()
+func (iu *InfoUseCase) GetUserHashtags(userId uint) ([]string, error) {
+	hashtags, err := iu.userRepo.GetUserHashtags(userId)
 	if err != nil {
 		return nil, err
 	}
+	return hashtags, nil
 
-	var hashtagsResult []string
-	for _, hashtag := range hashtags {
-		hashtagsResult = append(hashtagsResult, hashtag.Hashtag)
-	}
-
-	return hashtagsResult, nil
 }
 
-func (iu *InfoUseCase) GetCities() ([]string, error) {
-	cities, err := iu.userRepo.GetCities()
+func (iu *InfoUseCase) ChangeUserHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
+	hashtagsBD, err := iu.userRepo.GetUserHashtagsId(userId)
+	if err != nil {
+		return err
+	}
+
+	hashtagsId, err := iu.infoUseCase.GetHashtagId(hashtagInp.Hashtag)
+	if err != nil {
+		return err
+	}
+
+	var addHashtags []uint
+	if err != nil {
+		return err
+	}
+	for _, hashtag := range hashtagsId {
+		if !Contains(hashtagsBD, hashtag) {
+			addHashtags = append(addHashtags, hashtag)
+		}
+	}
+	if len(addHashtags) > 0 {
+		var hashtagsAdd []dataStruct.UserHashtag
+		for _, hashtagId := range addHashtags {
+			var hashtag dataStruct.UserHashtag
+			hashtag.UserId = userId
+			hashtag.HashtagId = hashtagId
+			hashtagsAdd = append(hashtagsAdd, hashtag)
+		}
+
+		err = iu.userRepo.AddUserHashtag(hashtagsAdd)
+		if err != nil {
+			return err
+		}
+	}
+
+	var deletedHashtags []uint
+	for _, hashtag := range hashtagsBD {
+		if !Contains(hashtagsId, hashtag) {
+			deletedHashtags = append(deletedHashtags, hashtag)
+		}
+	}
+	if len(deletedHashtags) > 0 {
+		err = iu.userRepo.DeleteUserHashtag(userId, deletedHashtags)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (iu *InfoUseCase) GetUserHashtagsId(userId uint) ([]uint, error) {
+	hashtags, err := iu.userRepo.GetUserHashtagsId(userId)
 	if err != nil {
 		return nil, err
 	}
-
-	var citiesResult []string
-	for _, city := range cities {
-		citiesResult = append(citiesResult, city.City)
-	}
-
-	return citiesResult, nil
+	return hashtags, nil
 }
 
-func (iu *InfoUseCase) GetJobs() ([]string, error) {
-	jobs, err := iu.userRepo.GetJobs()
-	if err != nil {
-		return nil, err
-	}
-
-	var jobsResult []string
-	for _, job := range jobs {
-		jobsResult = append(jobsResult, job.Job)
-	}
-
-	return jobsResult, nil
-}
-
-func (iu *InfoUseCase) GetEducation() ([]string, error) {
-	education, err := iu.userRepo.GetEducation()
-	if err != nil {
-		return nil, err
-	}
-
-	var educationResult []string
-	for _, ed := range education {
-		educationResult = append(educationResult, ed.Education)
-	}
-
-	return educationResult, nil
-}
-
-func (iu *InfoUseCase) GetZodiacs() ([]string, error) {
-	zodiac, err := iu.userRepo.GetZodiac()
-	if err != nil {
-		return nil, err
-	}
-
-	var zodiacResult []string
-	for _, z := range zodiac {
-		zodiacResult = append(zodiacResult, z.Zodiac)
-	}
-
-	return zodiacResult, nil
-}
-
-func Contains(s []string, elem string) bool {
+func Contains(s []uint, elem uint) bool {
 	for _, elemS := range s {
 		if elem == elemS {
 			return true

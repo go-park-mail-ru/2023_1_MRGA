@@ -38,3 +38,18 @@ func (r *PhotoRepository) DeletePhoto(row dataStruct.UserPhoto) error {
 	err = r.db.Delete(&dataStruct.UserPhoto{}, "user_id =? AND photo =?", row.UserId, row.Photo).Error
 	return err
 }
+
+func (r *PhotoRepository) GetAvatar(userId uint) (uint, error) {
+	var photoId uint
+	err := r.db.Table("user_photos p").Select("photo").
+		Where("user_id = ? AND avatar = ?", userId, true).Find(&photoId).Error
+	return photoId, err
+}
+
+func (r *PhotoRepository) GetPhotos(userId uint) ([]uint, error) {
+	var photos []uint
+	err := r.db.Table("user_photos up").Select("up.photo").
+		Where("user_id = ? AND avatar = ?", userId, false).
+		Order("up.id ASC").Find(&photos).Error
+	return photos, err
+}

@@ -34,9 +34,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем файл из формы
 	files := r.MultipartForm.File["files[]"]
-
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(int)
 	if !ok {
@@ -115,10 +113,10 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 
 	_, err = fileField.Write(bodyBytes)
 	if err != nil {
-        logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-        return
-    }
+		return
+	}
 
 	err = writerFile.Close()
 	if err != nil {
