@@ -27,6 +27,7 @@ import (
 // @schemes http
 // @BasePath /meetme/
 func main() {
+
 	log.Println("Application is starting")
 
 	a := app.New()

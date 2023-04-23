@@ -1,15 +1,16 @@
 package app
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/go-redis/redis"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
-	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
-	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
 	filterDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/delivery"
 	FilterRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/repository"
 	filterUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/usecase"
@@ -28,6 +29,7 @@ import (
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
+	auth "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
 )
 
 var frontendHosts = []string{
@@ -51,9 +53,14 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.AuthMiddleware(client, h)
 	})
-	authRepo := AuthRepository.NewRepo(db, client)
-	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
-	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
+
+	conn, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	//defer conn.Close()
+
+	authClient := auth.NewAuthClient(conn)
 
 	photoRepo := PhotoRepository.NewPhotoRepo(db)
 	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
@@ -79,8 +86,6 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	ucMatch := matchUC.NewMatchUseCase(matchRepo)
 	matchDel.RegisterHTTPEndpoints(a.Router, ucMatch)
 
-	//userRepo := userRepository.NewRepo(db)
-	//ucUser := userUC.NewUserUseCase(userRepo)
-	//userDel.RegisterHTTPEndpoints(a.Router, ucUser)
+	authDel.RegisterHTTPEndpoints(a.Router, authClient)
 
 }

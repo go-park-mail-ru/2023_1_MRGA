@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option go_package = 	"./";
+
+package auth;
+
+service Auth{
+  rpc Register(UserRegisterInfo) returns(UserResponse);
+  rpc Login(UserLoginInfo) returns(UserResponse);
+  rpc CheckSession(UserToken) returns (UserResponse);
+  rpc Logout(UserToken) returns(Response);
+}
+
+message UserRegisterInfo{
+  string email=1;
+  string password=2;
+  string birthday=3;
+}
+
+message UserLoginInfo{
+  string email=1;
+  string password=2;
+}
+
+message UserResponse{
+  uint32 userId=1;
+  string token=2;
+  bool ok=3;
+}
+
+message UserToken{
+  string token=1;
+}
+
+message Response{
+  bool ok=1;
+}
