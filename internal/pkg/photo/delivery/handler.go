@@ -36,7 +36,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 
 	files := r.MultipartForm.File["files[]"]
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -60,7 +60,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		photoId, err := SendPhoto(file, fileHeader.Filename, userId)
+		photoId, err := SendPhoto(file, fileHeader.Filename, uint(userId))
 		if err != nil {
 			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 			err = fmt.Errorf("cant parse json")
@@ -151,7 +151,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -169,7 +169,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func SendPhoto(file multipart.File, filename string, userID int) (uint, error) {
+func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) {
 
 	requestBody := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(requestBody)

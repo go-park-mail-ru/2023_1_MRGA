@@ -9,12 +9,20 @@ service Auth{
   rpc Login(UserLoginInfo) returns(UserResponse);
   rpc CheckSession(UserToken) returns (UserResponse);
   rpc Logout(UserToken) returns(Response);
+  rpc ChangeUser(UserChangeInfo) returns(Response);
 }
 
 message UserRegisterInfo{
   string email=1;
   string password=2;
   string birthday=3;
+}
+
+message UserChangeInfo{
+  uint32 userId=1;
+  string email=2;
+  string password=3;
+  string birthday=4;
 }
 
 message UserLoginInfo{

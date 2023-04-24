@@ -93,10 +93,11 @@ func (f *FilterUseCase) ChangeFilters(userId uint, filterInp filter.FilterInput)
 			addReasons = append(addReasons, reasonAdd)
 		}
 	}
-
-	err = f.Repo.AddUserReason(addReasons)
-	if err != nil {
-		return err
+	if len(addReasons) > 0 {
+		err = f.Repo.AddUserReason(addReasons)
+		if err != nil {
+			return err
+		}
 	}
 
 	var deleteReason []uint
@@ -105,9 +106,12 @@ func (f *FilterUseCase) ChangeFilters(userId uint, filterInp filter.FilterInput)
 			deleteReason = append(deleteReason, reason)
 		}
 	}
-	err = f.Repo.DeleteUserReason(userId, deleteReason)
-	if err != nil {
-		return err
+
+	if len(deleteReason) > 0 {
+		err = f.Repo.DeleteUserReason(userId, deleteReason)
+		if err != nil {
+			return err
+		}
 	}
 
 	var newFilter dataStruct.UserFilter

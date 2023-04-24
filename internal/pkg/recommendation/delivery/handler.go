@@ -9,7 +9,7 @@ import (
 
 func (h *Handler) GetRecommendations(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)

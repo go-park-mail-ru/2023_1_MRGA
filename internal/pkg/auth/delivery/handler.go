@@ -16,12 +16,6 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
-type UserRegisterInfo struct {
-	Email    string
-	Password string
-	Birthday string
-}
-
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
@@ -62,89 +56,88 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
-//
-//func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-//	defer func() {
-//		err := r.Body.Close()
-//		if err != nil {
-//			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-//			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-//			return
-//		}
-//	}()
-//	reqBody, err := ioutil.ReadAll(r.Body)
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-//		return
-//	}
-//
-//	var logInp auth.LoginInput
-//	err = json.Unmarshal(reqBody, &logInp)
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-//		return
-//	}
-//
-//	userToken, err := h.useCase.Login(logInp)
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-//		return
-//	}
-//
-//	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken, (120 * time.Hour))
-//	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-//	writer.Respond(w, r, map[string]interface{}{})
-//}
-//
-//func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
-//	defer func() {
-//		err := r.Body.Close()
-//		if err != nil {
-//			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-//			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-//			return
-//		}
-//	}()
-//
-//	reqBody, err := ioutil.ReadAll(r.Body)
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-//		return
-//	}
-//
-//	var userJson dataStruct.User
-//	err = json.Unmarshal(reqBody, &userJson)
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		err = fmt.Errorf("cant parse json")
-//		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-//		return
-//	}
-//
-//	userIdDB := r.Context().Value("userId")
-//	userId, ok := userIdDB.(int)
-//	if !ok {
-//		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
-//		return
-//	}
-//
-//	userJson.Id = uint(userId)
-//	err = h.useCase.ChangeUser(userJson)
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-//		return
-//	}
-//
-//	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-//	writer.Respond(w, r, map[string]interface{}{})
-//}
-//
+func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		err := r.Body.Close()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+	}()
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	var logInp authProto.UserLoginInfo
+	err = json.Unmarshal(reqBody, &logInp)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userToken, err := h.AuthService.Login(r.Context(), &logInp)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken.Token, (120 * time.Hour))
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, map[string]interface{}{})
+}
+
+func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		err := r.Body.Close()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+	}()
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	var userJson authProto.UserChangeInfo
+	err = json.Unmarshal(reqBody, &userJson)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		err = fmt.Errorf("cant parse json")
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	userJson.UserId = userId
+	_, err = h.AuthService.ChangeUser(r.Context(), &userJson)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, map[string]interface{}{})
+}
+
 //func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 //	userIdDB := r.Context().Value("userId")
 //	userId, ok := userIdDB.(int)
@@ -165,28 +158,31 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 //	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
 //	writer.Respond(w, r, mapUser)
 //}
-//
-//func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
-//	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
-//	if err != nil {
-//		if err == http.ErrNoCookie {
-//			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
-//			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
-//			return
-//		}
-//		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-//		return
-//	}
-//
-//	err = h.useCase.Logout(userToken)
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-//		return
-//	}
-//
-//	cookie.SetCookie(w, _default.SessionTokenCookieName, "", -120*time.Second)
-//	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-//	writer.Respond(w, r, map[string]interface{}{})
-//}
+
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
+	if err != nil {
+		if err == http.ErrNoCookie {
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
+			return
+		}
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	reqBody := authProto.UserToken{
+		Token: userToken,
+	}
+	_, err = h.AuthService.Logout(r.Context(), &reqBody)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	cookie.SetCookie(w, _default.SessionTokenCookieName, "", -120*time.Second)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, map[string]interface{}{})
+}

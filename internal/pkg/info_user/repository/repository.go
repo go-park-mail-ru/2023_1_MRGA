@@ -99,6 +99,20 @@ func (r *InfoRepository) DeleteUserHashtag(userId uint, hashtagId []uint) error 
 	return err
 }
 
+func (r *InfoRepository) GetUserById(userId uint) (userRes info_user.UserRestTemp, err error) {
+
+	user := info_user.UserRestTemp{}
+	err = r.db.Table("users").Select("user_infos.name").
+		Where("users.id =?", userId).
+		Joins("Join user_infos on users.id = user_infos.user_id").
+		Find(&user).Error
+	if err != nil {
+		return
+	}
+
+	return user, nil
+}
+
 func (r *InfoRepository) GetAge(userId uint) (int, error) {
 	var birthday string
 	err := r.db.Table("users").

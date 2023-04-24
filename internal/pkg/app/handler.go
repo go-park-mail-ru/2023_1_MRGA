@@ -1,12 +1,8 @@
 package app
 
 import (
-	"log"
 	"net/http"
 
-	"github.com/go-redis/redis"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
@@ -29,7 +25,7 @@ import (
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
-	auth "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
 )
 
 var frontendHosts = []string{
@@ -44,23 +40,15 @@ var frontendHosts = []string{
 	"http://95.163.180.8:3000",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
+func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient) {
 
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.CorsMiddleware(frontendHosts, h)
 	})
 
 	a.Router.Use(func(h http.Handler) http.Handler {
-		return middleware.AuthMiddleware(client, h)
+		return middleware.AuthMiddleware(authServ, h)
 	})
-
-	conn, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	//defer conn.Close()
-
-	authClient := auth.NewAuthClient(conn)
 
 	photoRepo := PhotoRepository.NewPhotoRepo(db)
 	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
@@ -86,6 +74,6 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	ucMatch := matchUC.NewMatchUseCase(matchRepo)
 	matchDel.RegisterHTTPEndpoints(a.Router, ucMatch)
 
-	authDel.RegisterHTTPEndpoints(a.Router, authClient)
+	authDel.RegisterHTTPEndpoints(a.Router, authServ)
 
 }
