@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -46,12 +47,14 @@ func TestUploadFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mockRepository.EXPECT().UploadFile(tmpfile.Name()).Return(uint(1), nil)
-	mockService.EXPECT().UploadFile(gomock.Any(), filepath.Base(tmpfile.Name())).Return(tmpfile.Name(), nil)
+	var userID uint = 1
+
+	mockRepository.EXPECT().UploadFile(tmpfile.Name(), userID).Return(uint(1), nil)
+	mockService.EXPECT().UploadFile(gomock.Any(), filepath.Base(tmpfile.Name()), userID).Return(tmpfile.Name(), nil)
 
 	server := Server{
-		repo:    mockRepository,
-		service: mockService,
+		repository: mockRepository,
+		service:    mockService,
 	}
 
 	// Создание *multipart.Writer
@@ -64,6 +67,15 @@ func TestUploadFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err = io.Copy(part, tmpfile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userIdField, err := writer.CreateFormField("userID")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = io.WriteString(userIdField, fmt.Sprintf("%v", userID))
 	if err != nil {
 		t.Fatal(err)
 	}
