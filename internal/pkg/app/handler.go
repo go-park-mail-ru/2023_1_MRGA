@@ -22,6 +22,9 @@ import (
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
+
+	ChatRouterPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
+	ChatServicePackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/service"
 )
 
 var frontendHosts = []string{
@@ -64,8 +67,8 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	photoRepo := PhotoRepository.NewPhotoRepo(db)
 	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
 	photoDel.RegisterHTTPEndpoints(a.Router, ucPhoto)
-	//userRepo := userRepository.NewRepo(db)
-	//ucUser := userUC.NewUserUseCase(userRepo)
-	//userDel.RegisterHTTPEndpoints(a.Router, ucUser)
 
+	chatService := ChatServicePackage.InitService()
+	chatRouter := ChatRouterPackage.InitServer(chatService)
+	a.Router.PathPrefix("/meetme/chat").Handler(chatRouter)
 }

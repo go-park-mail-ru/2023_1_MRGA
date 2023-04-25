@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package proto_chat;
+
+option go_package = "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+message Message {
+    google.protobuf.UInt32Value sender_id = 1;
+    google.protobuf.UInt32Value receiver_id = 2;
+    string content = 3;
+    google.protobuf.Timestamp sent_at = 4;
+}
+
+message GetResentMessagesRequest {
+    google.protobuf.UInt32Value user_id = 1;
+}
+
+service ChatService {
+    rpc SendMessage(Message) returns (google.protobuf.Empty) {}
+    rpc GetRecentMessages(GetResentMessagesRequest) returns (stream Message) {}
+    rpc GetConversationMessages(Message) returns (stream Message) {}
+}
