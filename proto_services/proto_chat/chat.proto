@@ -15,12 +15,12 @@ message Message {
     google.protobuf.Timestamp sent_at = 4;
 }
 
-message GetResentMessagesRequest {
+message ResentMessagesRequest {
     google.protobuf.UInt32Value user_id = 1;
 }
 
 service ChatService {
     rpc SendMessage(Message) returns (google.protobuf.Empty) {}
-    rpc GetRecentMessages(GetResentMessagesRequest) returns (stream Message) {}
+    rpc GetRecentMessages(ResentMessagesRequest) returns (stream Message) {}
     rpc GetConversationMessages(Message) returns (stream Message) {}
 }

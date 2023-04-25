@@ -9,6 +9,8 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
 )
 
 type Repository struct {
@@ -47,7 +49,7 @@ func getConn() (db *gorm.DB, err error) {
 }
 
 func (repo *Repository) makeMigrate() error {
-	err := repo.db.AutoMigrate(&Message{})
+	err := repo.db.AutoMigrate(&app.Message{})
 	if err != nil {
 		return errors.New("Не удалось обновить таблицу Message")
 	}

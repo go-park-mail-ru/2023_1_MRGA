@@ -1,12 +1,9 @@
 package app
 
 import (
-	"net/http"
-
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
@@ -23,7 +20,7 @@ import (
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
 
-	ChatRouterPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
+	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
 	ChatServicePackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/service"
 )
 
@@ -41,13 +38,13 @@ var frontendHosts = []string{
 
 func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 
-	a.Router.Use(func(h http.Handler) http.Handler {
-		return middleware.CorsMiddleware(frontendHosts, h)
-	})
+	// a.Router.Use(func(h http.Handler) http.Handler {
+	// 	return middleware.CorsMiddleware(frontendHosts, h)
+	// })
 
-	a.Router.Use(func(h http.Handler) http.Handler {
-		return middleware.AuthMiddleware(client, h)
-	})
+	// a.Router.Use(func(h http.Handler) http.Handler {
+	// 	return middleware.AuthMiddleware(client, h)
+	// })
 	authRepo := AuthRepository.NewRepo(db, client)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
@@ -68,7 +65,8 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
 	photoDel.RegisterHTTPEndpoints(a.Router, ucPhoto)
 
+	chatPathPrefix := "/meetme/chat"
 	chatService := ChatServicePackage.InitService()
-	chatRouter := ChatRouterPackage.InitServer(chatService)
-	a.Router.PathPrefix("/meetme/chat").Handler(chatRouter)
+	chatRouter := ChatServerPackage.InitServer(chatService, chatPathPrefix)
+	a.Router.PathPrefix(chatPathPrefix).Handler(chatRouter)
 }

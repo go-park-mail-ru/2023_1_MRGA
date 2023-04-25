@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChatServiceClient interface {
 	SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetRecentMessages(ctx context.Context, in *GetResentMessagesRequest, opts ...grpc.CallOption) (ChatService_GetRecentMessagesClient, error)
+	GetRecentMessages(ctx context.Context, in *ResentMessagesRequest, opts ...grpc.CallOption) (ChatService_GetRecentMessagesClient, error)
 	GetConversationMessages(ctx context.Context, in *Message, opts ...grpc.CallOption) (ChatService_GetConversationMessagesClient, error)
 }
 
@@ -45,7 +45,7 @@ func (c *chatServiceClient) SendMessage(ctx context.Context, in *Message, opts .
 	return out, nil
 }
 
-func (c *chatServiceClient) GetRecentMessages(ctx context.Context, in *GetResentMessagesRequest, opts ...grpc.CallOption) (ChatService_GetRecentMessagesClient, error) {
+func (c *chatServiceClient) GetRecentMessages(ctx context.Context, in *ResentMessagesRequest, opts ...grpc.CallOption) (ChatService_GetRecentMessagesClient, error) {
 	stream, err := c.cc.NewStream(ctx, &ChatService_ServiceDesc.Streams[0], "/proto_chat.ChatService/GetRecentMessages", opts...)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (x *chatServiceGetConversationMessagesClient) Recv() (*Message, error) {
 // for forward compatibility
 type ChatServiceServer interface {
 	SendMessage(context.Context, *Message) (*emptypb.Empty, error)
-	GetRecentMessages(*GetResentMessagesRequest, ChatService_GetRecentMessagesServer) error
+	GetRecentMessages(*ResentMessagesRequest, ChatService_GetRecentMessagesServer) error
 	GetConversationMessages(*Message, ChatService_GetConversationMessagesServer) error
 	mustEmbedUnimplementedChatServiceServer()
 }
@@ -126,7 +126,7 @@ type UnimplementedChatServiceServer struct {
 func (UnimplementedChatServiceServer) SendMessage(context.Context, *Message) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
 }
-func (UnimplementedChatServiceServer) GetRecentMessages(*GetResentMessagesRequest, ChatService_GetRecentMessagesServer) error {
+func (UnimplementedChatServiceServer) GetRecentMessages(*ResentMessagesRequest, ChatService_GetRecentMessagesServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetRecentMessages not implemented")
 }
 func (UnimplementedChatServiceServer) GetConversationMessages(*Message, ChatService_GetConversationMessagesServer) error {
@@ -164,7 +164,7 @@ func _ChatService_SendMessage_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _ChatService_GetRecentMessages_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(GetResentMessagesRequest)
+	m := new(ResentMessagesRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
