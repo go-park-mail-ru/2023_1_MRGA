@@ -8,9 +8,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
-	//dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
-	//"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
 	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -43,7 +41,6 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	answerBody, err := h.AuthService.Register(r.Context(), &userJson)
-
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -51,7 +48,6 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie.SetCookie(w, _default.SessionTokenCookieName, answerBody.Token, (120 * time.Hour))
-
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }
@@ -65,6 +61,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}()
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -137,27 +134,6 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }
-
-//func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-//	userIdDB := r.Context().Value("userId")
-//	userId, ok := userIdDB.(int)
-//	if !ok {
-//		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
-//		return
-//	}
-//
-//	user, err := c.useCase.GetUserById(uint(userId))
-//	if err != nil {
-//		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-//		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-//		return
-//	}
-//
-//	mapUser := structs.Map(&user)
-//	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
-//	writer.Respond(w, r, mapUser)
-//}
 
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)

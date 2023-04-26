@@ -89,19 +89,6 @@ func (r *AuthRepository) SaveToken(userId uint, token string) (err error) {
 	return
 }
 
-func (r *AuthRepository) GetAge(userId uint) (int, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "id=?", userId).Error
-	if err != nil {
-		return 0, err
-	}
-	age, err := CalculateAge(user.BirthDay)
-	if err != nil {
-		return 0, err
-	}
-	return age, nil
-}
-
 func (r *AuthRepository) CheckSession(token string) (uint, error) {
 	userIdStr, err := r.client.Get(token).Result()
 	if err != nil {

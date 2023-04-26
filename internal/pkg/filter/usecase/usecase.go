@@ -26,6 +26,7 @@ func (f *FilterUseCase) AddFilters(userId uint, filterInp filter.FilterInput) er
 	if err != nil {
 		return err
 	}
+
 	var addReason []dataStruct.UserReason
 	for _, reason := range reasonId {
 		var userReason dataStruct.UserReason

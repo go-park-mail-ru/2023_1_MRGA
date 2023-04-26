@@ -18,10 +18,10 @@ func NewHandler(useCase info.UseCase) *Handler {
 
 func RegisterHTTPEndpoints(router *mux.Router, ic info.UseCase) {
 	h := NewHandler(ic)
-	router.HandleFunc("/api/hashtags", h.GetHashtags).Methods("GET")   //move
-	router.HandleFunc("/api/cities", h.GetCities).Methods("GET")       //move
-	router.HandleFunc("/api/zodiac", h.GetZodiac).Methods("GET")       //move
-	router.HandleFunc("/api/job", h.GetJobs).Methods("GET")            //move
-	router.HandleFunc("/api/education", h.GetEducation).Methods("GET") //move
+	router.HandleFunc("/api/hashtags", h.GetHashtags).Methods("GET")
+	router.HandleFunc("/api/cities", h.GetCities).Methods("GET")
+	router.HandleFunc("/api/zodiac", h.GetZodiac).Methods("GET")
+	router.HandleFunc("/api/job", h.GetJobs).Methods("GET")
+	router.HandleFunc("/api/education", h.GetEducation).Methods("GET")
 	router.HandleFunc("/api/reason", h.GetReasons).Methods("GET")
 }

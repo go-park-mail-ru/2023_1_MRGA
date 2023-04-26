@@ -21,7 +21,6 @@ func RegisterHTTPEndpoints(router *mux.Router, authServ authProto.AuthClient) {
 
 	router.HandleFunc("/api/register", h.Register).Methods("POST")
 	router.HandleFunc("/api/login", h.Login).Methods("POST")
-	//
 	router.HandleFunc("/meetme/user", h.ChangeUser).Methods("PUT")
 	router.HandleFunc("/meetme/logout", h.Logout).Methods("POST")
 }

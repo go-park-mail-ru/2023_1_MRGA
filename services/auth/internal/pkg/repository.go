@@ -10,5 +10,4 @@ type UserRepo interface {
 	ChangeUser(user dataStruct.User) error
 	SaveToken(id uint, token string) error
 	CheckSession(token string) (uint, error)
-	GetAge(userId uint) (int, error)
 }

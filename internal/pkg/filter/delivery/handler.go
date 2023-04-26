@@ -51,6 +51,7 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }
@@ -124,6 +125,7 @@ func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["filters"] = filters
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)

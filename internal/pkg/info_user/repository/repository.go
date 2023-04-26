@@ -1,12 +1,11 @@
 package repository
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
+	ageCalc "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/age_calculator"
 )
 
 type InfoRepository struct {
@@ -123,26 +122,10 @@ func (r *InfoRepository) GetAge(userId uint) (int, error) {
 		return 0, err
 	}
 
-	age, err := CalculateAge(birthday)
+	age, err := ageCalc.CalculateAge(birthday)
 	if err != nil {
 		return 0, err
 	}
 
-	return age, nil
-}
-
-func CalculateAge(birthDay string) (int, error) {
-	birth, err := time.Parse("2006-01-02", birthDay[:10])
-	if err != nil {
-		return 0, err
-	}
-	now := time.Now()
-	age := now.Year() - birth.Year()
-	if now.Month() > birth.Month() {
-		age -= 1
-	}
-	if now.Month() == birth.Month() && now.Day() < birth.Day() {
-		age -= 1
-	}
 	return age, nil
 }
