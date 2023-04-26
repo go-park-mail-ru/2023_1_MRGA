@@ -1,13 +1,11 @@
 package repository
 
 import (
-	"fmt"
-	"time"
-
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation"
+	ageCalc "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/age_calculator"
 )
 
 type RecRepository struct {
@@ -39,7 +37,7 @@ func (r *RecRepository) GetRecommendation(userId uint, history []uint, reasons [
 		Where("hashtag_id IN ?", hashtags).
 		Where("reason_id IN ?", reasons).
 		Where("ui.user_id!=?", userId).
-		Where("u.birth_day BETWEEN ? AND ?", calculateBirthYear(filters.MaxAge), calculateBirthYear(filters.MinAge)).
+		Where("u.birth_day BETWEEN ? AND ?", ageCalc.CalculateBirthYear(filters.MaxAge), ageCalc.CalculateBirthYear(filters.MinAge)).
 		Group("ui.user_id").
 		Order("COUNT(uh.hashtag_id) desc").
 		Find(&users).Error
@@ -63,7 +61,7 @@ func (r *RecRepository) GetRecommendedUser(userId uint) (user recommendation.Rec
 	if err != nil {
 		return user, err
 	}
-	age, err := calculateAge(filteredUser.BirthDay)
+	age, err := ageCalc.CalculateAge(filteredUser.BirthDay)
 	if err != nil {
 		return user, err
 	}
@@ -85,24 +83,4 @@ func (r *RecRepository) GetUserHistory(userId uint) ([]uint, error) {
 	var users []uint
 	err := r.db.Table("user_histories").Select("user_profile_id").Where("user_id = ? ", userId).Find(&users).Error
 	return users, err
-}
-
-func calculateBirthYear(age int) string {
-	return fmt.Sprintf("%d-01-01", time.Now().Year()-age)
-}
-
-func calculateAge(birthDay string) (int, error) {
-	birth, err := time.Parse("2006-01-02", birthDay[:10])
-	if err != nil {
-		return 0, err
-	}
-	now := time.Now()
-	age := now.Year() - birth.Year()
-	if now.Month() > birth.Month() {
-		age -= 1
-	}
-	if now.Month() == birth.Month() && now.Day() < birth.Day() {
-		age -= 1
-	}
-	return age, nil
 }

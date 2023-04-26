@@ -130,6 +130,26 @@ func (iu *InfoUseCase) ChangeInfo(userId uint, infoInp info_user.InfoChange) (in
 	return result, nil
 }
 
+func (iu *InfoUseCase) GetUserById(userId uint) (user info_user.UserRes, err error) {
+
+	userTemp, err := iu.userRepo.GetUserById(userId)
+	if err != nil {
+		return
+	}
+	user.Name = userTemp.Name
+	age, err := iu.userRepo.GetAge(userId)
+	if err != nil {
+		return
+	}
+	user.Age = age
+	avatar, err := iu.photoUseCase.GetAvatar(userId)
+	if err != nil {
+		return
+	}
+	user.Avatar = avatar
+	return
+}
+
 func (iu *InfoUseCase) AddHashtags(userId uint, hashtagInp info_user.HashtagInp) error {
 	hashtagId, err := iu.infoUseCase.GetHashtagId(hashtagInp.Hashtag)
 	if err != nil {

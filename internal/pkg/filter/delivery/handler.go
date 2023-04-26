@@ -38,7 +38,7 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -51,13 +51,14 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
 func (h *Handler) GetFilter(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -104,7 +105,7 @@ func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -124,6 +125,7 @@ func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	result := make(map[string]interface{})
 	result["filters"] = filters
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)

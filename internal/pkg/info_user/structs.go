@@ -10,6 +10,15 @@ type InfoStruct struct {
 	Job         string `json:"job" structs:"job"`
 	Education   string `json:"education" structs:"education"`
 }
+type UserRestTemp struct {
+	Name string `json:"name"`
+}
+
+type UserRes struct {
+	Name   string `json:"name" structs:"name"`
+	Age    int    `json:"age" structs:"age"`
+	Avatar uint   `json:"avatarId" structs:"avatarId"`
+}
 
 type InfoStructAnswer struct {
 	Name        string `json:"name" structs:"name"`

@@ -42,7 +42,7 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -88,7 +88,7 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -102,9 +102,11 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.useCase.GetUserHashtags(uint(userId))
+	hashtags, err := h.useCase.GetUserHashtags(uint(userId))
+	var result info_user.HashtagInp
+	result.Hashtag = hashtags
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
@@ -116,7 +118,7 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -164,7 +166,7 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -178,9 +180,11 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.useCase.GetUserHashtags(uint(userId))
+	hashtags, err := h.useCase.GetUserHashtags(uint(userId))
+	var result info_user.HashtagInp
+	result.Hashtag = hashtags
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
@@ -215,7 +219,7 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetInfo(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -261,7 +265,7 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -278,4 +282,25 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 	mapInfo := structs.Map(&newInfo)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, mapInfo)
+}
+
+func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	user, err := c.useCase.GetUserById(uint(userId))
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	mapUser := structs.Map(&user)
+	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
+	writer.Respond(w, r, mapUser)
 }

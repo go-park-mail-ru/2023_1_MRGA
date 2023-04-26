@@ -8,7 +8,7 @@ import (
 )
 
 func (h *Handler) GetHashtags(w http.ResponseWriter, r *http.Request) {
-	jobs, err := h.useCase.GetHashtags()
+	hashtags, err := h.useCase.GetHashtags()
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
@@ -16,7 +16,7 @@ func (h *Handler) GetHashtags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := make(map[string]interface{})
-	result["hashtags"] = jobs
+	result["hashtags"] = hashtags
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)
 }

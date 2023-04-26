@@ -1,12 +1,11 @@
 package repository
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
+	ageCalc "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/age_calculator"
 )
 
 type InfoRepository struct {
@@ -99,6 +98,20 @@ func (r *InfoRepository) DeleteUserHashtag(userId uint, hashtagId []uint) error 
 	return err
 }
 
+func (r *InfoRepository) GetUserById(userId uint) (userRes info_user.UserRestTemp, err error) {
+
+	user := info_user.UserRestTemp{}
+	err = r.db.Table("users").Select("user_infos.name").
+		Where("users.id =?", userId).
+		Joins("Join user_infos on users.id = user_infos.user_id").
+		Find(&user).Error
+	if err != nil {
+		return
+	}
+
+	return user, nil
+}
+
 func (r *InfoRepository) GetAge(userId uint) (int, error) {
 	var birthday string
 	err := r.db.Table("users").
@@ -109,26 +122,10 @@ func (r *InfoRepository) GetAge(userId uint) (int, error) {
 		return 0, err
 	}
 
-	age, err := CalculateAge(birthday)
+	age, err := ageCalc.CalculateAge(birthday)
 	if err != nil {
 		return 0, err
 	}
 
-	return age, nil
-}
-
-func CalculateAge(birthDay string) (int, error) {
-	birth, err := time.Parse("2006-01-02", birthDay[:10])
-	if err != nil {
-		return 0, err
-	}
-	now := time.Now()
-	age := now.Year() - birth.Year()
-	if now.Month() > birth.Month() {
-		age -= 1
-	}
-	if now.Month() == birth.Month() && now.Day() < birth.Day() {
-		age -= 1
-	}
 	return age, nil
 }
