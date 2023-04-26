@@ -51,6 +51,26 @@ func (p *PhotoUseCase) GetAllPhotos(userId uint) ([]uint, error) {
 	return result, nil
 }
 
+func (p *PhotoUseCase) ChangePhoto(num int, photoId uint, userId uint) error {
+	photos, err := p.GetAllPhotos(userId)
+	if err != nil {
+		return err
+	}
+	if len(photos) <= num {
+		err = p.SavePhoto(userId, photoId, false)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	oldPhoto := photos[num]
+	err = p.userRepo.ChangePhoto(oldPhoto, userId, photoId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *PhotoUseCase) GetAvatar(userId uint) (uint, error) {
 	avatar, err := p.userRepo.GetAvatar(userId)
 	if err != nil {
