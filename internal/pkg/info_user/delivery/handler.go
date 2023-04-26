@@ -102,9 +102,11 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.useCase.GetUserHashtags(uint(userId))
+	hashtags, err := h.useCase.GetUserHashtags(uint(userId))
+	var result info_user.HashtagInp
+	result.Hashtag = hashtags
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
@@ -178,9 +180,11 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.useCase.GetUserHashtags(uint(userId))
+	hashtags, err := h.useCase.GetUserHashtags(uint(userId))
+	var result info_user.HashtagInp
+	result.Hashtag = hashtags
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
