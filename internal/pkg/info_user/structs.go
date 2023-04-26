@@ -18,6 +18,7 @@ type UserRes struct {
 	Name   string `json:"name" structs:"name"`
 	Age    int    `json:"age" structs:"age"`
 	Avatar uint   `json:"avatarId" structs:"avatarId"`
+	Step   uint   `json:"step" structs:"step"`
 }
 
 type InfoStructAnswer struct {

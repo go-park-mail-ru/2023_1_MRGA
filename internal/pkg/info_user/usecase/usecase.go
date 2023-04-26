@@ -147,6 +147,35 @@ func (iu *InfoUseCase) GetUserById(userId uint) (user info_user.UserRes, err err
 		return
 	}
 	user.Avatar = avatar
+
+	if user.Name == "" {
+		user.Step = 1
+		return
+	}
+
+	hashtags, err := iu.GetUserHashtags(userId)
+	if err != nil {
+		return
+	}
+	if len(hashtags) == 0 {
+		user.Step = 2
+		return
+	}
+
+	reasons, err := iu.userRepo.CheckFilter(userId)
+	if err != nil {
+		return
+	}
+	if !reasons {
+		user.Step = 3
+		return
+	}
+
+	if user.Avatar == 0 {
+		user.Step = 4
+		return
+	}
+
 	return
 }
 
