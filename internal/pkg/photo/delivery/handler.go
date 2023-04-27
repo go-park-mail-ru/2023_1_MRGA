@@ -178,7 +178,6 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}()
-
 	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
@@ -186,7 +185,11 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	file, _, err := r.FormFile("file")
-
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
