@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
 	"net/http"
 	"strings"
 
