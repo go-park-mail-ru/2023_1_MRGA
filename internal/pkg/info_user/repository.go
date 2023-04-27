@@ -9,6 +9,7 @@ type IRepositoryInfo interface {
 	GetAge(userId uint) (int, error)
 
 	GetUserById(uint) (UserRestTemp, error)
+	CheckFilter(userId uint) (bool, error)
 
 	GetUserHashtagsId(userId uint) ([]uint, error)
 	GetUserHashtags(userId uint) ([]string, error)

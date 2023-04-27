@@ -129,3 +129,15 @@ func (r *InfoRepository) GetAge(userId uint) (int, error) {
 
 	return age, nil
 }
+
+func (r *InfoRepository) CheckFilter(userId uint) (bool, error) {
+	var reasons []uint
+	err := r.db.Table("user_reasons").Select("reason_id").Where("user_id = ?", userId).Find(&reasons).Error
+	if err != nil {
+		return false, err
+	}
+	if len(reasons) == 0 {
+		return false, nil
+	}
+	return true, nil
+}

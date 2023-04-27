@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
@@ -147,6 +148,35 @@ func (iu *InfoUseCase) GetUserById(userId uint) (user info_user.UserRes, err err
 		return
 	}
 	user.Avatar = avatar
+
+	if user.Name == "" {
+		user.Step = constform.MainInfo
+		return
+	}
+
+	hashtags, err := iu.GetUserHashtags(userId)
+	if err != nil {
+		return
+	}
+	if len(hashtags) == 0 {
+		user.Step = constform.Hashtag
+		return
+	}
+
+	reasons, err := iu.userRepo.CheckFilter(userId)
+	if err != nil {
+		return
+	}
+	if !reasons {
+		user.Step = constform.Filters
+		return
+	}
+
+	if user.Avatar == 0 {
+		user.Step = constform.Photos
+		return
+	}
+	user.Step = constform.FullInfo
 	return
 }
 

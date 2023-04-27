@@ -53,3 +53,15 @@ func (r *PhotoRepository) GetPhotos(userId uint) ([]uint, error) {
 		Order("up.id ASC").Find(&photos).Error
 	return photos, err
 }
+
+func (r *PhotoRepository) ChangePhoto(photoId, userId, newPhotoId uint) error {
+	var photo dataStruct.UserPhoto
+	err := r.db.First(&photo, "user_id = ? AND photo = ?", userId, photoId).Error
+	if err != nil {
+		return err
+	}
+
+	photo.Photo = newPhotoId
+	err = r.db.Save(&photo).Error
+	return err
+}
