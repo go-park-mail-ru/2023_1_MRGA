@@ -150,7 +150,7 @@ func (iu *InfoUseCase) GetUserById(userId uint) (user info_user.UserRes, err err
 	user.Avatar = avatar
 
 	if user.Name == "" {
-		user.Step = constform.NoInfo
+		user.Step = constform.MainInfo
 		return
 	}
 
@@ -159,7 +159,7 @@ func (iu *InfoUseCase) GetUserById(userId uint) (user info_user.UserRes, err err
 		return
 	}
 	if len(hashtags) == 0 {
-		user.Step = constform.NoHashtags
+		user.Step = constform.Hashtag
 		return
 	}
 
@@ -168,12 +168,12 @@ func (iu *InfoUseCase) GetUserById(userId uint) (user info_user.UserRes, err err
 		return
 	}
 	if !reasons {
-		user.Step = constform.NoFilters
+		user.Step = constform.Filters
 		return
 	}
 
 	if user.Avatar == 0 {
-		user.Step = constform.NoPhotos
+		user.Step = constform.Photos
 		return
 	}
 	user.Step = constform.FullInfo

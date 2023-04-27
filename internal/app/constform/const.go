@@ -10,9 +10,9 @@ const (
 type Step int
 
 const (
-	FullInfo   Step = iota //0
-	NoInfo                 //1
-	NoHashtags             //2
-	NoFilters              //3
-	NoPhotos               //4
+	FullInfo Step = iota //0
+	MainInfo             //1
+	Hashtag              //2
+	Filters              //3
+	Photos               //4
 )
