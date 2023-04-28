@@ -38,7 +38,6 @@ type InfoStructAnswer struct {
 
 type InfoChange struct {
 	Name        string `json:"name" structs:"name"`
-	Email       string `json:"email" structs:"email"`
 	City        string `json:"city" structs:"city"`
 	Sex         uint   `json:"sex" structs:"sex"`
 	Description string `json:"description" structs:"description"`
