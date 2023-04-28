@@ -12,10 +12,14 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 )
 
-func (server Server) SendMessage(ctx context.Context, msgReq *chatpc.Message) (*emptypb.Empty, error) {
-	msg := app.GetStructMessage(msgReq)
+func (server Server) CreateChat(ctx context.Context, initialChatData *chatpc.CreateChatRequest) (outputChatData *chatpc.CreateChatResponse, err error) {
+	return
+}
 
-	err := server.repository.SendMessage(ctx, msg)
+func (server Server) SendMessage(ctx context.Context, newMsg *chatpc.SendMessageRequest) (outputMsgData *emptypb.Empty, err error) {
+	msg := app.GetMessageStruct(newMsg)
+
+	err = server.repository.SendMessage(ctx, msg)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), "POST", "SendMessage")
 		return &emptypb.Empty{}, err
@@ -25,33 +29,32 @@ func (server Server) SendMessage(ctx context.Context, msgReq *chatpc.Message) (*
 	return &emptypb.Empty{}, nil
 }
 
-func (server Server) GetRecentMessages(req *chatpc.ResentMessagesRequest, stream chatpc.ChatService_GetRecentMessagesServer) error {
-	resentMessagesRequest := app.GetStructResentMessagesRequest(req)
+func (server Server) GetChatsList(userData *chatpc.GetChatsListRequest, recentMsgs chatpc.ChatService_GetChatsListServer) (err error) {
+	resentMessagesRequest := app.GetInitialUserStruct(userData)
 
-	recentMessages, err := server.repository.GetRecentMessages(resentMessagesRequest.UserId)
+	recentMessages, err := server.repository.GetChatsList(resentMessagesRequest)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetRecentMessages")
 		return err
 	}
-	log.Println(recentMessages)
 
 	for _, msg := range recentMessages {
-		grpcMsg := app.GetGRPCMessage(msg)
-		if err := stream.Send(grpcMsg); err != nil {
+		grpcChatMsg := app.GetGrpcChatMessage(msg)
+		if err := recentMsgs.Send(grpcChatMsg); err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetRecentMessages")
 			return err
 		}
 	}
 
 	logger.Log(http.StatusOK, "Success", "GET", "GetRecentMessages")
-	return nil
+	return
 }
 
-func (server Server) GetConversationMessages(msgReq *chatpc.Message, stream chatpc.ChatService_GetConversationMessagesServer) error {
-	message := app.GetStructMessage(msgReq)
+func (server Server) GetChat(chatData *chatpc.GetChatRequest, chatMsgs chatpc.ChatService_GetChatServer) (err error) {
+	// message := app.GetStructMessage(chatData)
 
-	log.Printf("Структура Message в запросе GetConversationMessages: %+v\n", message)
-	return nil
+	// log.Printf("Структура Message в запросе GetConversationMessages: %+v\n", message)
+	return
 }
 
 func (server Server) mustEmbedUnimplementedChatServiceServer() {

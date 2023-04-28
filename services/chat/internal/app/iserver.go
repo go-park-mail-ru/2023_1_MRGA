@@ -8,8 +8,9 @@ import (
 )
 
 type IServer interface {
-	SendMessage(context.Context, *chatpc.Message) (*emptypb.Empty, error)
-	GetRecentMessages(*chatpc.ResentMessagesRequest, chatpc.ChatService_GetRecentMessagesServer) error
-	GetConversationMessages(*chatpc.Message, chatpc.ChatService_GetConversationMessagesServer) error
+	CreateChat(context.Context, *chatpc.CreateChatRequest) (*chatpc.CreateChatResponse, error)
+	SendMessage(context.Context, *chatpc.SendMessageRequest) (*emptypb.Empty, error)
+	GetChatsList(*chatpc.GetChatsListRequest, chatpc.ChatService_GetChatsListServer) error
+	GetConversationMessages(*chatpc.GetChatRequest, chatpc.ChatService_GetChatServer) error
 	mustEmbedUnimplementedChatServiceServer()
 }

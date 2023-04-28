@@ -10,17 +10,46 @@ import "google/protobuf/empty.proto";
 
 message Message {
     google.protobuf.UInt32Value sender_id = 1;
-    google.protobuf.UInt32Value receiver_id = 2;
-    string content = 3;
-    google.protobuf.Timestamp sent_at = 4;
+    string content = 2;
+    google.protobuf.Timestamp sent_at = 3;
+    bool read_status = 4;
 }
 
-message ResentMessagesRequest {
+message CreateChatRequest {
+    repeated google.protobuf.UInt32Value user_ids = 1;
+}
+
+message CreateChatResponse {
+    google.protobuf.UInt32Value chat_id = 1;
+}
+
+message SendMessageRequest {
+    Message msg = 1;
+    google.protobuf.UInt32Value chat_id = 2;
+}
+
+message GetChatsListRequest {
     google.protobuf.UInt32Value user_id = 1;
 }
 
+message GetChatsListResponse {
+    Message msg = 1;
+    google.protobuf.UInt32Value chat_id = 2;
+}
+
+message GetChatRequest {
+    google.protobuf.UInt32Value chat_id = 1;
+    google.protobuf.UInt32Value user_id = 2;
+}
+
+message GetChatResponse {
+    Message msg = 1;
+    google.protobuf.UInt32Value msg_id = 2;
+}
+
 service ChatService {
-    rpc SendMessage(Message) returns (google.protobuf.Empty) {}
-    rpc GetRecentMessages(ResentMessagesRequest) returns (stream Message) {}
-    rpc GetConversationMessages(Message) returns (stream Message) {}
+    rpc CreateChat(CreateChatRequest) returns (CreateChatResponse) {}
+    rpc SendMessage(SendMessageRequest) returns (google.protobuf.Empty) {}
+    rpc GetChatsList(GetChatsListRequest) returns (stream GetChatsListResponse) {}
+    rpc GetChat(GetChatRequest) returns (stream GetChatResponse) {}
 }

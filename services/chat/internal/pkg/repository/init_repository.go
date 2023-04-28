@@ -54,6 +54,16 @@ func (repo *Repository) makeMigrate() error {
 		return errors.New("Не удалось обновить таблицу Message")
 	}
 
+	err = repo.db.AutoMigrate(&app.Chat{})
+	if err != nil {
+		return errors.New("Не удалось обновить таблицу Chat")
+	}
+
+	err = repo.db.AutoMigrate(&app.ChatUser{})
+	if err != nil {
+		return errors.New("Не удалось обновить таблицу ChatUser")
+	}
+
 	return nil
 }
 

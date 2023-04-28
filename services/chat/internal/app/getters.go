@@ -6,26 +6,38 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-func GetStructMessage(data *chatpc.Message) Message {
+func GetMessageStruct(data *chatpc.SendMessageRequest) Message {
 	return Message{
-		SenderId:   uint(data.GetSenderId().GetValue()),
-		ReceiverId: uint(data.GetReceiverId().GetValue()),
-		Content:    data.GetContent(),
-		SentAt:     data.GetSentAt().AsTime().Local(),
+		ChatId:   uint(data.GetChatId().GetValue()),
+		SenderId: uint(data.GetMsg().GetSenderId().GetValue()),
+		Content:  data.GetMsg().GetContent(),
+		SentAt:   data.GetMsg().GetSentAt().AsTime().Local(),
 	}
 }
 
-func GetStructResentMessagesRequest(data *chatpc.ResentMessagesRequest) ResentMessagesRequest {
-	return ResentMessagesRequest{
+func GetInitialUserStruct(data *chatpc.GetChatsListRequest) GetChatsListRequest {
+	return GetChatsListRequest{
 		UserId: uint(data.GetUserId().GetValue()),
 	}
 }
 
-func GetGRPCMessage(data Message) *chatpc.Message {
-	return &chatpc.Message{
-		SenderId:   wrapperspb.UInt32(uint32(data.SenderId)),
-		ReceiverId: wrapperspb.UInt32(uint32(data.ReceiverId)),
-		Content:    data.Content,
-		SentAt:     timestamppb.New(data.SentAt),
+func GetGrpcChatMessage(data Message) *chatpc.GetChatsListResponse {
+	return &chatpc.GetChatsListResponse{
+		Msg: &chatpc.Message{
+			SenderId: wrapperspb.UInt32(uint32(data.SenderId)),
+			Content:    data.Content,
+			SentAt:     timestamppb.New(data.SentAt),
+			ReadStatus: data.ReadStatus,
+		},
+		ChatId: wrapperspb.UInt32(uint32(data.ChatId)),
 	}
 }
+
+// func GetGRPCMessage(data Message) *chatpc.Message {
+// 	return &chatpc.Message{
+// 		SenderId:   wrapperspb.UInt32(uint32(data.SenderId)),
+// 		// ReceiverId: wrapperspb.UInt32(uint32(data.ReceiverId)),
+// 		Content:    data.Content,
+// 		SentAt:     timestamppb.New(data.SentAt),
+// 	}
+// }

@@ -5,6 +5,8 @@ import (
 )
 
 type IRepository interface {
+	CreateChat(context.Context, []ChatUser) (CreateChatResponse, error)
 	SendMessage(context.Context, Message) error
-	GetRecentMessages(uint) ([]Message, error)
+	GetChatsList(GetChatsListRequest) ([]Message, error)
+	GetChat(GetChatRequest) ([]Message, error)
 }
