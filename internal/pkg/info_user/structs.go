@@ -21,6 +21,7 @@ type UserRes struct {
 	Age    int            `json:"age" structs:"age"`
 	Avatar uint           `json:"avatarId" structs:"avatarId"`
 	Step   constform.Step `json:"step" structs:"step"`
+	Banned bool           `json:"banned" structs:"banned"`
 }
 
 type InfoStructAnswer struct {

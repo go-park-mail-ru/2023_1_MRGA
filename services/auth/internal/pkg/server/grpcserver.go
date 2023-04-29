@@ -9,7 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/app/token"
 	authRepo "github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg"
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/pkg/data_struct"
-	auth "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
 )
 
 type GRPCServer struct {
