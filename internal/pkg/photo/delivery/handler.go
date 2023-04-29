@@ -158,7 +158,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.useCase.DeletePhoto(uint(userId), uint(photoId))
+	err = h.useCase.DeletePhoto(uint(userId), photoId)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)

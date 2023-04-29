@@ -1,7 +1,9 @@
 package middleware
 
 import (
-	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
+
 	"net/http"
 	"strings"
 
@@ -9,7 +11,6 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
-	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -34,7 +35,7 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 var ContextUserKey = "userId"
 var ProtectedPath = "/meetme/"
 
-func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handler {
+func AuthMiddleware(authServ auth.AuthClient, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !strings.HasPrefix(r.URL.Path, ProtectedPath) {
 			next.ServeHTTP(w, r)
@@ -47,7 +48,7 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 			return
 		}
 
-		reqBody := authProto.UserToken{
+		reqBody := auth.UserToken{
 			Token: token,
 		}
 		userResp, err := authServ.CheckSession(r.Context(), &reqBody)

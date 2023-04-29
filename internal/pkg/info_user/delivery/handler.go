@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -299,6 +300,14 @@ func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+	compInp := &complaints.UserId{UserId: userId}
+	banned, err := c.compService.CheckBanned(r.Context(), compInp)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	user.Banned = banned.Banned
 
 	mapUser := structs.Map(&user)
 	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = 	"./";
+
+package complaints;
+
+service Complaints{
+  rpc Complain(UserId) returns(Response);
+  rpc CheckBanned(UserId) returns(Response);
+}
+
+message UserId{
+  uint32 UserId=1;
+}
+
+
+message Response{
+  bool Banned=1;
+}

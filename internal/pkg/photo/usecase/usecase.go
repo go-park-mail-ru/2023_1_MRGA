@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"fmt"
+
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 )
@@ -27,12 +29,21 @@ func (p *PhotoUseCase) SavePhoto(userId uint, photoId uint, avatar bool) error {
 	return err
 }
 
-func (p *PhotoUseCase) DeletePhoto(userId uint, photoId uint) error {
+func (p *PhotoUseCase) DeletePhoto(userId uint, num int) error {
+	photos, err := p.GetAllPhotos(userId)
+	if err != nil {
+		return err
+	}
+	if len(photos) <= num {
+		err = fmt.Errorf("wrong number of photo")
+		return err
+	}
+
 	var rowPhoto dataStruct.UserPhoto
-	rowPhoto.Photo = photoId
+	rowPhoto.Photo = photos[num]
 	rowPhoto.UserId = userId
 
-	err := p.userRepo.DeletePhoto(rowPhoto)
+	err = p.userRepo.DeletePhoto(rowPhoto)
 	return err
 }
 
