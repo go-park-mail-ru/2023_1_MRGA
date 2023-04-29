@@ -12,7 +12,7 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/complaints/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/complaints/internal/pkg/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/complaints/internal/pkg/server"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
 )
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 	s := grpc.NewServer()
 	compRepo := repository.NewRepo(db)
 	srv := server.NewGPRCServer(compRepo)
-	complaintProto.RegisterComplaintsServer(s, srv)
+	complaints.RegisterComplaintsServer(s, srv)
 
 	l, err := net.Listen("tcp", ":8083")
 	if err != nil {

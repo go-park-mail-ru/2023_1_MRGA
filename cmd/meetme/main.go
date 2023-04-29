@@ -12,7 +12,6 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
-
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 )

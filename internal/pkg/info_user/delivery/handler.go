@@ -215,7 +215,7 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mapInfo := structs.Map(&infoBD)
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, false)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, true)
 	writer.Respond(w, r, mapInfo)
 }
 
@@ -301,14 +301,6 @@ func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	compInp := &complaintProto.UserId{UserId: userId}
-	banned, err := c.compService.CheckBanned(r.Context(), compInp)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	user.Banned = banned.Banned
 
 	compInp := &complaintProto.UserId{UserId: userId}
 	banned, err := c.compService.CheckBanned(r.Context(), compInp)

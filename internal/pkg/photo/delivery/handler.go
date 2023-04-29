@@ -187,7 +187,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	file, _, err := r.FormFile("file")
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}

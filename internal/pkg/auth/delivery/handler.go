@@ -49,7 +49,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie.SetCookie(w, _default.SessionTokenCookieName, answerBody.Token, (120 * time.Hour))
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, true)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, false)
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
