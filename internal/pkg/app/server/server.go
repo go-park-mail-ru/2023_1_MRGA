@@ -2,9 +2,11 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -21,7 +23,7 @@ type ServerOptions struct {
 }
 
 func GetServerOptions() (opts ServerOptions) {
-	flag.StringVar(&opts.Host, "h", "localhost", "set the server's host")
+	flag.StringVar(&opts.Host, "h", "0.0.0.0", "set the server's host")
 	flag.StringVar(&opts.Port, "p", "8080", "set the server's port")
 	flag.IntVar(&opts.MaxHeaderBytes, "m", 1, "set the server's max header bytes in MB")
 	readTimeout := flag.Int64("rt", 10, "set the server's read timeout in seconds")
@@ -34,6 +36,24 @@ func GetServerOptions() (opts ServerOptions) {
 	return opts
 }
 
+func loadTLS() tls.Certificate {
+	_, err := os.Open("server.key")
+	if err != nil {
+		log.Println(err)
+		log.Fatalln(err)
+	}
+	_, err = os.Open("server.crt")
+	if err != nil {
+		log.Println(err)
+		log.Fatalln(err)
+	}
+	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	if err != nil {
+		panic(err)
+	}
+	return cert
+}
+
 func (s *Server) Run(opts ServerOptions, handler http.Handler) error {
 	s.httpServer = &http.Server{
 		Addr:           opts.Host + ":" + opts.Port,
@@ -41,6 +61,11 @@ func (s *Server) Run(opts ServerOptions, handler http.Handler) error {
 		MaxHeaderBytes: opts.MaxHeaderBytes,
 		ReadTimeout:    opts.ReadTimeout,
 		WriteTimeout:   opts.WriteTimeout,
+		//TLSConfig: &tls.Config{
+		//	Certificates: []tls.Certificate{
+		//		loadTLS(),
+		//	},
+		//},
 	}
 	log.Println("server starts on ", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()

@@ -23,7 +23,7 @@ func RegisterHTTPEndpoints(router *mux.Router, ic info_user.UseCase) {
 	router.HandleFunc("/meetme/user", h.GetCurrentUser).Methods("GET")
 
 	router.HandleFunc("/meetme/info-user", h.GetInfo).Methods("GET")
-	router.HandleFunc("/meetme/info-user", h.ChangeInfo).Methods("PUT")
+	router.HandleFunc("/meetme/info-user", h.ChangeInfo).Methods("PUT, OPTIONS, HEAD")
 	router.HandleFunc("/meetme/info-user", h.CreateInfo).Methods("POST")
 
 	router.HandleFunc("/meetme/hashtags-user", h.AddUserHashtags).Methods("POST")
