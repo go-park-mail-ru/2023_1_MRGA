@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
+	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
 
 	"net/http"
 	"strings"
@@ -35,7 +35,7 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 var ContextUserKey = "userId"
 var ProtectedPath = "/meetme/"
 
-func AuthMiddleware(authServ auth.AuthClient, next http.Handler) http.Handler {
+func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !strings.HasPrefix(r.URL.Path, ProtectedPath) {
 			next.ServeHTTP(w, r)
@@ -48,7 +48,7 @@ func AuthMiddleware(authServ auth.AuthClient, next http.Handler) http.Handler {
 			return
 		}
 
-		reqBody := auth.UserToken{
+		reqBody := authProto.UserToken{
 			Token: token,
 		}
 		userResp, err := authServ.CheckSession(r.Context(), &reqBody)

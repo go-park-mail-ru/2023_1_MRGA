@@ -2,11 +2,9 @@ package server
 
 import (
 	"context"
-	"crypto/tls"
 	"flag"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -36,24 +34,6 @@ func GetServerOptions() (opts ServerOptions) {
 	return opts
 }
 
-func loadTLS() tls.Certificate {
-	_, err := os.Open("server.key")
-	if err != nil {
-		log.Println(err)
-		log.Fatalln(err)
-	}
-	_, err = os.Open("server.crt")
-	if err != nil {
-		log.Println(err)
-		log.Fatalln(err)
-	}
-	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
-	if err != nil {
-		panic(err)
-	}
-	return cert
-}
-
 func (s *Server) Run(opts ServerOptions, handler http.Handler) error {
 	s.httpServer = &http.Server{
 		Addr:           opts.Host + ":" + opts.Port,
@@ -61,11 +41,6 @@ func (s *Server) Run(opts ServerOptions, handler http.Handler) error {
 		MaxHeaderBytes: opts.MaxHeaderBytes,
 		ReadTimeout:    opts.ReadTimeout,
 		WriteTimeout:   opts.WriteTimeout,
-		//TLSConfig: &tls.Config{
-		//	Certificates: []tls.Certificate{
-		//		loadTLS(),
-		//	},
-		//},
 	}
 	log.Println("server starts on ", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()

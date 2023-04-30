@@ -35,8 +35,7 @@ func (p *PhotoUseCase) DeletePhoto(userId uint, num int) error {
 		return err
 	}
 	if len(photos) <= num {
-		err = fmt.Errorf("wrong number of photo")
-		return err
+		return fmt.Errorf("wrong number of photo")
 	}
 
 	var rowPhoto dataStruct.UserPhoto
