@@ -22,25 +22,84 @@ import (
 func (server *Server) InitRouter(pathPrefix string) {
 	server.router = mux.NewRouter().PathPrefix(pathPrefix).Subrouter()
 
-	// С префиксом /chat все ниже
-	server.router.HandleFunc("/send/message", server.SendMessage).Methods("POST")
-	server.router.HandleFunc("/recent/messages/{user_id}", server.GetRecentMessages).Methods("GET")
-	server.router.HandleFunc("/{single_user_id}/{other_user_id}/messages", server.GetConversationMessages).Methods("GET")
+	// С префиксом /meetme/chats все ниже
+	server.router.HandleFunc("/create", server.CreateChatHander).Methods("POST")
+	server.router.HandleFunc("/{chat_id}/send", server.SendMessageHander).Methods("POST")
+	server.router.HandleFunc("/list", server.GetChatsListHander).Methods("GET")
+	server.router.HandleFunc("/{chat_id}/messages", server.GetChatHander).Methods("GET")
 }
 
-func (server *Server) SendMessage(w http.ResponseWriter, r *http.Request) {
+func (server Server) CreateChatHander(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	var msg app.Message
-	err := json.NewDecoder(r.Body).Decode(&msg)
+	var initialChatData app.CreateChatRequest
+	err := json.NewDecoder(r.Body).Decode(&initialChatData)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
-	msg.SentAt = time.Now()
-	grpcMsg := app.GetGRPCMessage(msg)
+	grpcInitialChatData := app.GetGRPCInitialChatData(initialChatData)
+
+	client, conn, err := server.InitClient()
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+	defer conn.Close()
+
+	var grpcCreatedChatData *chatpc.CreateChatResponse
+	grpcCreatedChatData, err = client.CreateChat(context.Background(), grpcInitialChatData)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	createdChatData := app.GetCreatedChatDataStruct(grpcCreatedChatData)
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
+	writer.Respond(w, r, structs.Map(createdChatData))
+}
+
+func (server Server) SendMessageHander(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	var msgData app.SendMessageRequest
+	err := json.NewDecoder(r.Body).Decode(&msgData)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	vars := mux.Vars(r)
+	strChatId := vars["chat_id"]
+	uint64ChatId, err := strconv.ParseUint(strChatId, 10, 64)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(int)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, errors.New("Нет кук пользователя"), http.StatusBadRequest)
+		return
+	}
+
+	msg := app.Message{
+		SenderId:   uint(userId),
+		Content:    msgData.Content,
+		SentAt:     time.Now(),
+		ReadStatus: false,
+	}
+
+	grpcMsg := app.GetGRPCChatMessage(msg, uint(uint64ChatId))
 
 	client, conn, err := server.InitClient()
 	if err != nil {
@@ -58,27 +117,21 @@ func (server *Server) SendMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, map[string]interface{}{})
+	writer.Respond(w, r, structs.Map(app.SendMessageResponse{
+		SentAt: msg.SentAt.Format("15:04 02.01.2006"),
+	}))
 }
 
-func (server *Server) GetRecentMessages(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	varUserId := vars["user_id"]
-	if varUserId == "" {
-		err := errors.New("Отсутствует userId в url")
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+func (server Server) GetChatsListHander(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(int)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, errors.New("Нет кук пользователя"), http.StatusBadRequest)
 		return
 	}
 
-	userId, err := strconv.ParseUint(varUserId, 10, 64)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-
-	recentMessagesRequest := chatpc.ResentMessagesRequest{
+	grpcChatsListRequest := chatpc.GetChatsListRequest{
 		UserId: wrapperspb.UInt32(uint32(userId)),
 	}
 
@@ -90,16 +143,16 @@ func (server *Server) GetRecentMessages(w http.ResponseWriter, r *http.Request) 
 	}
 	defer conn.Close()
 
-	stream, err := client.GetRecentMessages(context.Background(), &recentMessagesRequest)
+	streamChatsList, err := client.GetChatsList(context.Background(), &grpcChatsListRequest)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	var messages []app.Message
+	var chatsMessages []app.ChatMessage
 	for {
-		grpcMsg, err := stream.Recv()
+		grpcChatMsg, err := streamChatsList.Recv()
 		if err == io.EOF {
 			break
 		}
@@ -109,15 +162,72 @@ func (server *Server) GetRecentMessages(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		msg := app.GetStructMessage(grpcMsg)
-		messages = append(messages, msg)
+		chatMsg := app.GetChatMessageStruct(grpcChatMsg)
+		chatsMessages = append(chatsMessages, chatMsg)
 	}
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, structs.Map(app.Messages{Messages: messages}))
+	writer.Respond(w, r, structs.Map(app.GetChatsListResponse{
+		ChatsList: chatsMessages,
+	}))
 }
 
-func (server *Server) GetConversationMessages(w http.ResponseWriter, r *http.Request) {
+func (server Server) GetChatHander(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	strChatId := vars["chat_id"]
+	uint64ChatId, err := strconv.ParseUint(strChatId, 10, 64)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(int)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, errors.New("Нет кук пользователя"), http.StatusBadRequest)
+		return
+	}
+
+	grpcChatRequest := chatpc.GetChatRequest{
+		ChatId: wrapperspb.UInt32(uint32(uint64ChatId)),
+		UserId: wrapperspb.UInt32(uint32(userId)),
+	}
+
+	client, conn, err := server.InitClient()
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+	defer conn.Close()
+
+	streamChat, err := client.GetChat(context.Background(), &grpcChatRequest)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	var messagesData []app.MessageData
+	for {
+		grpcMsgData, err := streamChat.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		msgData := app.GetMessageDataStruct(grpcMsgData)
+		messagesData = append(messagesData, msgData)
+	}
+
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, map[string]interface{}{})
+	writer.Respond(w, r, structs.Map(app.GetChatResponse{
+		Chat: messagesData,
+	}))
 }

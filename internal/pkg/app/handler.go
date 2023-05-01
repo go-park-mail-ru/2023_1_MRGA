@@ -1,9 +1,12 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
 	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
 	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
@@ -37,14 +40,13 @@ var frontendHosts = []string{
 }
 
 func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
+	a.Router.Use(func(h http.Handler) http.Handler {
+		return middleware.CorsMiddleware(frontendHosts, h)
+	})
 
-	// a.Router.Use(func(h http.Handler) http.Handler {
-	// 	return middleware.CorsMiddleware(frontendHosts, h)
-	// })
-
-	// a.Router.Use(func(h http.Handler) http.Handler {
-	// 	return middleware.AuthMiddleware(client, h)
-	// })
+	a.Router.Use(func(h http.Handler) http.Handler {
+		return middleware.AuthMiddleware(client, h)
+	})
 	authRepo := AuthRepository.NewRepo(db, client)
 	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
 	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
@@ -65,8 +67,13 @@ func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
 	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
 	photoDel.RegisterHTTPEndpoints(a.Router, ucPhoto)
 
-	chatPathPrefix := "/meetme/chat"
+	chatServerOptions := ChatServerPackage.ServerOptions{
+		Addr:       "localhost",
+		Port:       3000,
+		PathPrefix: "/meetme/chats",
+	}
 	chatService := ChatServicePackage.InitService()
-	chatRouter := ChatServerPackage.InitServer(chatService, chatPathPrefix)
-	a.Router.PathPrefix(chatPathPrefix).Handler(chatRouter)
+	chatRouter := ChatServerPackage.InitServer(chatService, chatServerOptions)
+
+	a.Router.PathPrefix(chatServerOptions.PathPrefix).Handler(chatRouter)
 }

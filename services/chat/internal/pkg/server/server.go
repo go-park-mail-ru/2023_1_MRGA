@@ -13,6 +13,22 @@ import (
 )
 
 func (server Server) CreateChat(ctx context.Context, initialChatData *chatpc.CreateChatRequest) (outputChatData *chatpc.CreateChatResponse, err error) {
+	var userIds []app.ChatUser
+	for _, grpcUserId := range initialChatData.GetUserIds() {
+		userId := uint(grpcUserId.GetValue())
+		userIds = append(userIds, app.ChatUser{UserId: userId})
+	}
+
+	var createdChat app.CreateChatResponse
+	createdChat, err = server.repository.CreateChat(ctx, userIds)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), "POST", "CreateChat")
+		return
+	}
+
+	outputChatData = app.GetGrpcInitialChatData(createdChat)
+
+	logger.Log(http.StatusOK, "Success", "POST", "CreateChat")
 	return
 }
 
@@ -29,34 +45,49 @@ func (server Server) SendMessage(ctx context.Context, newMsg *chatpc.SendMessage
 	return &emptypb.Empty{}, nil
 }
 
-func (server Server) GetChatsList(userData *chatpc.GetChatsListRequest, recentMsgs chatpc.ChatService_GetChatsListServer) (err error) {
+func (server Server) GetChatsList(userData *chatpc.GetChatsListRequest, streamRecentMsgs chatpc.ChatService_GetChatsListServer) (err error) {
 	resentMessagesRequest := app.GetInitialUserStruct(userData)
 
 	recentMessages, err := server.repository.GetChatsList(resentMessagesRequest)
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetRecentMessages")
+		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChatsList")
 		return err
 	}
 
 	for _, msg := range recentMessages {
 		grpcChatMsg := app.GetGrpcChatMessage(msg)
-		if err := recentMsgs.Send(grpcChatMsg); err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetRecentMessages")
+		if err := streamRecentMsgs.Send(grpcChatMsg); err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChatsList")
 			return err
 		}
 	}
 
-	logger.Log(http.StatusOK, "Success", "GET", "GetRecentMessages")
+	logger.Log(http.StatusOK, "Success", "GET", "GetChatsList")
 	return
 }
 
-func (server Server) GetChat(chatData *chatpc.GetChatRequest, chatMsgs chatpc.ChatService_GetChatServer) (err error) {
-	// message := app.GetStructMessage(chatData)
+func (server Server) GetChat(chatData *chatpc.GetChatRequest, streamChatMsgs chatpc.ChatService_GetChatServer) (err error) {
+	initialChatData := app.GetInitialChatStruct(chatData)
 
-	// log.Printf("Структура Message в запросе GetConversationMessages: %+v\n", message)
+	var chatMsgs []app.Message
+	chatMsgs, err = server.repository.GetChat(initialChatData)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChat")
+		return err
+	}
+
+	for _, msg := range chatMsgs {
+		grpcMsg := app.GetGrpcMessage(msg)
+		if err := streamChatMsgs.Send(grpcMsg); err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChat")
+			return err
+		}
+	}
+
+	logger.Log(http.StatusOK, "Success", "GET", "GetChat")
 	return
 }
 
 func (server Server) mustEmbedUnimplementedChatServiceServer() {
-	log.Printf("Не реализованный метод")
+	log.Printf("Нереализованный метод")
 }

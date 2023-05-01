@@ -6,20 +6,26 @@ import (
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/service"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
 )
+
+type ServerOptions struct {
+	Addr       string
+	Port       int
+	PathPrefix string
+}
 
 type Server struct {
 	clientConn *grpc.ClientConn
 	router     *mux.Router
-	service    service.Service
+	service    app.IService
 
-	target string
+	clientTarget string
 }
 
-func (server *Server) InitClient() (chatClient chatpc.ChatServiceClient, chatClientConn *grpc.ClientConn, err error) {
-	chatClientConn, err = grpc.Dial(server.target, grpc.WithInsecure())
+func (server Server) InitClient() (chatClient chatpc.ChatServiceClient, chatClientConn *grpc.ClientConn, err error) {
+	chatClientConn, err = grpc.Dial(server.clientTarget, grpc.WithInsecure())
 	if err != nil {
 		return
 	}
@@ -29,18 +35,14 @@ func (server *Server) InitClient() (chatClient chatpc.ChatServiceClient, chatCli
 	return
 }
 
-func InitServer(service service.Service, pathPrefix string) (*mux.Router) {
+func InitServer(service app.IService, opts ServerOptions) *mux.Router {
 	server := Server{
 		service: service,
 	}
 
-	server.InitRouter(pathPrefix)
+	server.clientTarget = fmt.Sprintf("%s:%d", opts.Addr, opts.Port)
 
-	const (
-		addr string = "localhost"
-		port uint   = 3000
-	)
-	server.target = fmt.Sprintf("%s:%d", addr, port)
+	server.InitRouter(opts.PathPrefix)
 
 	return server.router
 }

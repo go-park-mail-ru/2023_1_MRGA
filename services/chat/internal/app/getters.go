@@ -24,7 +24,7 @@ func GetInitialUserStruct(data *chatpc.GetChatsListRequest) GetChatsListRequest 
 func GetGrpcChatMessage(data Message) *chatpc.GetChatsListResponse {
 	return &chatpc.GetChatsListResponse{
 		Msg: &chatpc.Message{
-			SenderId: wrapperspb.UInt32(uint32(data.SenderId)),
+			SenderId:   wrapperspb.UInt32(uint32(data.SenderId)),
 			Content:    data.Content,
 			SentAt:     timestamppb.New(data.SentAt),
 			ReadStatus: data.ReadStatus,
@@ -33,11 +33,27 @@ func GetGrpcChatMessage(data Message) *chatpc.GetChatsListResponse {
 	}
 }
 
-// func GetGRPCMessage(data Message) *chatpc.Message {
-// 	return &chatpc.Message{
-// 		SenderId:   wrapperspb.UInt32(uint32(data.SenderId)),
-// 		// ReceiverId: wrapperspb.UInt32(uint32(data.ReceiverId)),
-// 		Content:    data.Content,
-// 		SentAt:     timestamppb.New(data.SentAt),
-// 	}
-// }
+func GetGrpcInitialChatData(data CreateChatResponse) *chatpc.CreateChatResponse {
+	return &chatpc.CreateChatResponse{
+		ChatId: wrapperspb.UInt32(uint32(data.ChatId)),
+	}
+}
+
+func GetInitialChatStruct(data *chatpc.GetChatRequest) GetChatRequest {
+	return GetChatRequest{
+		ChatId: uint(data.GetChatId().GetValue()),
+		UserId: uint(data.GetUserId().GetValue()),
+	}
+}
+
+func GetGrpcMessage(data Message) *chatpc.GetChatResponse {
+	return &chatpc.GetChatResponse{
+		Msg: &chatpc.Message{
+			SenderId:   wrapperspb.UInt32(uint32(data.SenderId)),
+			Content:    data.Content,
+			SentAt:     timestamppb.New(data.SentAt),
+			ReadStatus: data.ReadStatus,
+		},
+		MsgId: wrapperspb.UInt32(uint32(data.Id)),
+	}
+}
