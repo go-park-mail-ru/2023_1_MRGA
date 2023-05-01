@@ -1,0 +1,233 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Meetme backend documentation",
+        "title": "MRGA",
+        "contact": {
+            "name": "API Support",
+            "url": "mrga.com",
+            "email": "mrga@mail.com"
+        },
+        "license": {
+            "name": "AS IS (NO WARRANTY)"
+        },
+        "version": "1.0"
+    },
+    "host": "5.159.100.59",
+    "basePath": "/meetme/",
+    "paths": {
+        "/meetme/city": {
+            "get": {
+                "description": "returned list of cities",
+                "tags": [
+                    "info"
+                ],
+                "summary": "get list of cities for registration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/meetme/login": {
+            "post": {
+                "description": "authorise existing user with username/email and password",
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "authorise user",
+                "parameters": [
+                    {
+                        "description": "nickname/email password",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.LoginInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/meetme/logout": {
+            "post": {
+                "description": "user can log out and end session",
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "Logout authorised user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/meetme/recommendations": {
+            "get": {
+                "description": "now just return other 10 or fewer users",
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "return recommendations for user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/meetme/register": {
+            "post": {
+                "description": "create new account with unique username and email",
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "Register new user",
+                "parameters": [
+                    {
+                        "description": "info about user",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dataStruct.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/meetme/user": {
+            "get": {
+                "description": "you can get info about current user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "info"
+                ],
+                "summary": "get info about current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserRes"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.LoginInput": {
+            "type": "object",
+            "properties": {
+                "input": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.UserRes": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dataStruct.User": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

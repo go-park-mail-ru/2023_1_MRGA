@@ -215,7 +215,7 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mapInfo := structs.Map(&infoBD)
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, true)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, false)
 	writer.Respond(w, r, mapInfo)
 }
 

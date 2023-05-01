@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: complaints.proto
+// source: complaintProto.proto
 
 package complaintProto
 
@@ -37,7 +37,7 @@ func NewComplaintsClient(cc grpc.ClientConnInterface) ComplaintsClient {
 
 func (c *complaintsClient) Complain(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/complaints.Complaints/Complain", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/complaintProto.Complaints/Complain", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *complaintsClient) Complain(ctx context.Context, in *UserId, opts ...grp
 
 func (c *complaintsClient) CheckBanned(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/complaints.Complaints/CheckBanned", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/complaintProto.Complaints/CheckBanned", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func _Complaints_Complain_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/complaints.Complaints/Complain",
+		FullMethod: "/complaintProto.Complaints/Complain",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ComplaintsServer).Complain(ctx, req.(*UserId))
@@ -113,7 +113,7 @@ func _Complaints_CheckBanned_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/complaints.Complaints/CheckBanned",
+		FullMethod: "/complaintProto.Complaints/CheckBanned",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ComplaintsServer).CheckBanned(ctx, req.(*UserId))
@@ -125,7 +125,7 @@ func _Complaints_CheckBanned_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Complaints_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "complaints.Complaints",
+	ServiceName: "complaintProto.Complaints",
 	HandlerType: (*ComplaintsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -138,5 +138,5 @@ var Complaints_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "complaints.proto",
+	Metadata: "complaintProto.proto",
 }

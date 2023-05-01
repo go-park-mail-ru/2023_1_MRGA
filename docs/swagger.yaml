@@ -1,0 +1,153 @@
+basePath: /meetme/
+definitions:
+  app.LoginInput:
+    properties:
+      input:
+        type: string
+      password:
+        type: string
+    type: object
+  app.UserRes:
+    properties:
+      age:
+        type: integer
+      avatar:
+        type: string
+      city:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      sex:
+        type: integer
+      username:
+        type: string
+    type: object
+  dataStruct.User:
+    properties:
+      age:
+        type: integer
+      avatar:
+        type: string
+      city:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      sex:
+        type: integer
+      userId:
+        type: integer
+      username:
+        type: string
+    type: object
+host: 5.159.100.59
+info:
+  contact:
+    email: mrga@mail.com
+    name: API Support
+    url: mrga.com
+  description: Meetme backend documentation
+  license:
+    name: AS IS (NO WARRANTY)
+  title: MRGA
+  version: "1.0"
+paths:
+  /meetme/city:
+    get:
+      description: returned list of cities
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      summary: get list of cities for registration
+      tags:
+      - info_user
+  /meetme/login:
+    post:
+      description: authorise existing user with username/email and password
+      parameters:
+      - description: nickname/email password
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/app.LoginInput'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: authorise user
+      tags:
+      - Registration
+  /meetme/logout:
+    post:
+      description: user can log out and end session
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Logout authorised user
+      tags:
+      - Registration
+  /meetme/recommendations:
+    get:
+      description: now just return info_user 10 or fewer users
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: return recommendations for user
+      tags:
+      - Recommendations
+  /meetme/register:
+    post:
+      description: create new account with unique username and email
+      parameters:
+      - description: info_user about user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/dataStruct.User'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register new user
+      tags:
+      - Registration
+  /meetme/user:
+    get:
+      description: you can get info_user about current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.UserRes'
+      summary: get info_user about current user
+      tags:
+      - info_user
+schemes:
+- http
+swagger: "2.0"

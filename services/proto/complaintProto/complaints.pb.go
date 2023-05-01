@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.12
-// source: complaints.proto
+// source: complaintProto.proto
 
 package complaintProto
 
@@ -149,14 +149,14 @@ func file_complaints_proto_rawDescGZIP() []byte {
 
 var file_complaints_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_complaints_proto_goTypes = []interface{}{
-	(*UserId)(nil),   // 0: complaints.UserId
-	(*Response)(nil), // 1: complaints.Response
+	(*UserId)(nil),   // 0: complaintProto.UserId
+	(*Response)(nil), // 1: complaintProto.Response
 }
 var file_complaints_proto_depIdxs = []int32{
-	0, // 0: complaints.Complaints.Complain:input_type -> complaints.UserId
-	0, // 1: complaints.Complaints.CheckBanned:input_type -> complaints.UserId
-	1, // 2: complaints.Complaints.Complain:output_type -> complaints.Response
-	1, // 3: complaints.Complaints.CheckBanned:output_type -> complaints.Response
+	0, // 0: complaintProto.Complaints.Complain:input_type -> complaintProto.UserId
+	0, // 1: complaintProto.Complaints.CheckBanned:input_type -> complaintProto.UserId
+	1, // 2: complaintProto.Complaints.Complain:output_type -> complaintProto.Response
+	1, // 3: complaintProto.Complaints.CheckBanned:output_type -> complaintProto.Response
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
