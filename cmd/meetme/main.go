@@ -14,7 +14,7 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 )
 
 // @title MRGA
@@ -58,7 +58,7 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer connComp.Close()
-	compClient := complaints.NewComplaintsClient(connComp)
+	compClient := complaintProto.NewComplaintsClient(connComp)
 
 	serv := new(server.Server)
 	opts := server.GetServerOptions()

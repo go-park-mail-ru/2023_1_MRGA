@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -28,7 +28,7 @@ func (h *Handler) Complain(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var logInp complaints.UserId
+	var logInp complaintProto.UserId
 	err = json.Unmarshal(reqBody, &logInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)

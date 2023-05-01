@@ -3,20 +3,20 @@ package delivery
 import (
 	"github.com/gorilla/mux"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 )
 
 type Handler struct {
-	CompService complaints.ComplaintsClient
+	CompService complaintProto.ComplaintsClient
 }
 
-func NewHandler(compService complaints.ComplaintsClient) *Handler {
+func NewHandler(compService complaintProto.ComplaintsClient) *Handler {
 	return &Handler{
 		CompService: compService,
 	}
 }
 
-func RegisterHTTPEndpoints(router *mux.Router, compServ complaints.ComplaintsClient) {
+func RegisterHTTPEndpoints(router *mux.Router, compServ complaintProto.ComplaintsClient) {
 	h := NewHandler(compServ)
 
 	router.HandleFunc("/meetme/complain", h.Complain).Methods("POST")

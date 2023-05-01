@@ -26,7 +26,7 @@ import (
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
-	compProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
+	compProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 )
