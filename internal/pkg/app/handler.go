@@ -26,8 +26,9 @@ import (
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
-	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
-	compProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 )
 
 var frontendHosts = []string{
@@ -42,7 +43,7 @@ var frontendHosts = []string{
 	"http://95.163.180.8:3000",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ compProto.ComplaintsClient) {
+func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient) {
 
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.CorsMiddleware(frontendHosts, h)
