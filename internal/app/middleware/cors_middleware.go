@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
-	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -20,6 +20,11 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 		if slices.Contains(allowedHosts, origin) {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
+		}
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
 		}
 		next.ServeHTTP(w, r)
 	})

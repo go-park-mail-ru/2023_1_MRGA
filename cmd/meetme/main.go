@@ -12,7 +12,8 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
-	auth "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
 )
 
 // @title MRGA
@@ -43,17 +44,24 @@ func main() {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
 
-	conn, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connAuth, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
 
-	authClient := auth.NewAuthClient(conn)
+	defer connAuth.Close()
+	authClient := auth.NewAuthClient(connAuth)
+
+	connComp, err := grpc.Dial(":8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer connComp.Close()
+	compClient := complaints.NewComplaintsClient(connComp)
 
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
-	a.InitRoutes(db, authClient)
+	a.InitRoutes(db, authClient, compClient)
 	err = serv.Run(opts, a.Router)
 	if err != nil {
 		log.Fatalf("error occured while server starting: %v", err)

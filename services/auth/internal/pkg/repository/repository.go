@@ -56,6 +56,9 @@ func (r *AuthRepository) ChangeUser(user dataStruct.User) error {
 		userDb.Email = user.Email
 	}
 	if user.BirthDay != "" {
+		if err = r.CheckBirthDay(user.BirthDay); err != nil {
+			return err
+		}
 		userDb.BirthDay = user.BirthDay
 	}
 	if user.Password != "" {
