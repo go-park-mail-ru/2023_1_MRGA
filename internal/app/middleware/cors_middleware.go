@@ -7,9 +7,8 @@ import (
 	"golang.org/x/exp/slices"
 	"golang.org/x/net/context"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
-
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -41,7 +40,7 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 			next.ServeHTTP(w, r)
 			return
 		}
-		token, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
+		token, err := cookie.GetValueCookie(r, servicedefault.SessionTokenCookieName)
 		if err != nil {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)

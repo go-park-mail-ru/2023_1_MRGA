@@ -27,7 +27,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
+	err := r.ParseMultipartForm(32 << 20) // 32MB is the servicedefault size limit for a request
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
@@ -178,7 +178,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}()
-	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
+	err := r.ParseMultipartForm(32 << 20) // 32MB is the servicedefault size limit for a request
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)

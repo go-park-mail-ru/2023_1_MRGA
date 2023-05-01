@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -47,7 +47,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie.SetCookie(w, _default.SessionTokenCookieName, answerBody.Token, (120 * time.Hour))
+	cookie.SetCookie(w, servicedefault.SessionTokenCookieName, answerBody.Token, (120 * time.Hour))
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
 }
@@ -84,7 +84,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie.SetCookie(w, _default.SessionTokenCookieName, userToken.Token, (120 * time.Hour))
+	cookie.SetCookie(w, servicedefault.SessionTokenCookieName, userToken.Token, (120 * time.Hour))
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
 }
@@ -136,7 +136,7 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
-	userToken, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
+	userToken, err := cookie.GetValueCookie(r, servicedefault.SessionTokenCookieName)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)
@@ -158,7 +158,7 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie.SetCookie(w, _default.SessionTokenCookieName, "", -120*time.Second)
+	cookie.SetCookie(w, servicedefault.SessionTokenCookieName, "", -120*time.Second)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
 }
