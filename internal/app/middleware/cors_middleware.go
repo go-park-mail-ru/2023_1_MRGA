@@ -31,7 +31,6 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 	})
 
 }
-
 var ContextUserKey = "userId"
 var ProtectedPath = "/meetme/"
 

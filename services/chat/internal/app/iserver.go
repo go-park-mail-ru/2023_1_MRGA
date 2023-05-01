@@ -1,0 +1,16 @@
+package app
+
+import (
+	"context"
+
+	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
+	"google.golang.org/protobuf/types/known/emptypb"
+)
+
+type IServer interface {
+	CreateChat(context.Context, *chatpc.CreateChatRequest) (*chatpc.CreateChatResponse, error)
+	SendMessage(context.Context, *chatpc.SendMessageRequest) (*emptypb.Empty, error)
+	GetChatsList(*chatpc.GetChatsListRequest, chatpc.ChatService_GetChatsListServer) error
+	GetConversationMessages(*chatpc.GetChatRequest, chatpc.ChatService_GetChatServer) error
+	mustEmbedUnimplementedChatServiceServer()
+}
