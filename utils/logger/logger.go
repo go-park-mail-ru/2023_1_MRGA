@@ -6,7 +6,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var serviceName string
+var (
+	serviceName   string
+	formatStdOut  = &log.TextFormatter{DisableColors: false, FullTimestamp: true}
+	formatFileOut = &log.TextFormatter{DisableColors: true, FullTimestamp: true}
+)
 
 func Init(service string) {
 	serviceName = service
@@ -20,22 +24,24 @@ func Log(httpStatus int, message string, method string, url string, errorFlag bo
 		"url":         url,
 	}
 	if errorFlag {
-		log.SetFormatter(&log.TextFormatter{DisableColors: false, FullTimestamp: true})
+		log.SetFormatter(formatStdOut)
 		log.SetOutput(os.Stdout)
 		log.WithFields(fields).Error(message)
 
 		fileOut := openFile(serviceName)
-		log.SetFormatter(&log.TextFormatter{DisableColors: true, FullTimestamp: true})
+		defer fileOut.Close()
+		log.SetFormatter(formatFileOut)
 		log.SetOutput(fileOut)
 		log.WithFields(fields).Error(message)
 	}
 
-	log.SetFormatter(&log.TextFormatter{DisableColors: false, FullTimestamp: true})
+	log.SetFormatter(formatStdOut)
 	log.SetOutput(os.Stdout)
 	log.WithFields(fields).Info(message)
 
 	fileOut := openFile(serviceName)
-	log.SetFormatter(&log.TextFormatter{DisableColors: true, FullTimestamp: true})
+	defer fileOut.Close()
+	log.SetFormatter(formatFileOut)
 	log.SetOutput(fileOut)
 	log.WithFields(fields).Info(message)
 }
