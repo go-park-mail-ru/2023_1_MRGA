@@ -14,6 +14,7 @@ var (
 
 func Init(service string) {
 	serviceName = service
+	createINotExist(service)
 }
 
 func Log(httpStatus int, message string, method string, url string, errorFlag bool) {
@@ -49,8 +50,21 @@ func Log(httpStatus int, message string, method string, url string, errorFlag bo
 func openFile(service string) *os.File {
 	filepath := "./logs/" + service + ".txt"
 	fileOut, err := os.OpenFile(filepath, os.O_WRONLY|os.O_APPEND, os.ModeAppend)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"http_status": 0,
+			"service":     "logger",
+		}).Error(err.Error())
+	}
+	return fileOut
+
+}
+
+func createINotExist(service string) {
+	filepath := "./logs/" + service + ".txt"
+	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		fileOut, err = os.Create(filepath)
+		_, err = os.Create(filepath)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"http_status": 0,
@@ -63,6 +77,4 @@ func openFile(service string) *os.File {
 			"service":     "logger",
 		}).Error(err.Error())
 	}
-	return fileOut
-
 }
