@@ -26,8 +26,9 @@ import (
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
-	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
 	compProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 )
 
 var frontendHosts = []string{

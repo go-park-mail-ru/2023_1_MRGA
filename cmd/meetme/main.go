@@ -12,7 +12,8 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaints"
 )
 
@@ -50,7 +51,7 @@ func main() {
 	}
 
 	defer connAuth.Close()
-	authClient := auth.NewAuthClient(connAuth)
+	authClient := authProto.NewAuthClient(connAuth)
 
 	connComp, err := grpc.Dial(":8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

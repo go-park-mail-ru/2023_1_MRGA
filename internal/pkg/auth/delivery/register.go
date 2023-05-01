@@ -3,20 +3,20 @@ package delivery
 import (
 	"github.com/gorilla/mux"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 )
 
 type Handler struct {
-	AuthService auth.AuthClient
+	AuthService authProto.AuthClient
 }
 
-func NewHandler(authService auth.AuthClient) *Handler {
+func NewHandler(authService authProto.AuthClient) *Handler {
 	return &Handler{
 		AuthService: authService,
 	}
 }
 
-func RegisterHTTPEndpoints(router *mux.Router, authServ auth.AuthClient) {
+func RegisterHTTPEndpoints(router *mux.Router, authServ authProto.AuthClient) {
 	h := NewHandler(authServ)
 
 	router.HandleFunc("/api/register", h.Register).Methods("POST")

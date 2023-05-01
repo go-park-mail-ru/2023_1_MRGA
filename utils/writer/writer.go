@@ -13,6 +13,8 @@ type SuccessResult struct {
 	Body   map[string]interface{} `json:"body"`
 }
 
+const NameServise = "writer"
+
 func Respond(w http.ResponseWriter, r *http.Request, data map[string]interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 
@@ -25,10 +27,10 @@ func Respond(w http.ResponseWriter, r *http.Request, data map[string]interface{}
 	err := encoder.Encode(result)
 
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
 		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "err": "%s"}`, http.StatusInternalServerError, err.Error())))
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
 			return
 		}
 		return
@@ -52,10 +54,10 @@ func ErrorRespond(w http.ResponseWriter, r *http.Request, servarErr error, statu
 	err := encoder.Encode(result)
 
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
 		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())))
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
 			return
 		}
 		return
