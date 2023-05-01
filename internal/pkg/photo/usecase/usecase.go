@@ -35,3 +35,46 @@ func (p *PhotoUseCase) DeletePhoto(userId uint, photoId uint) error {
 	err := p.userRepo.DeletePhoto(rowPhoto)
 	return err
 }
+
+func (p *PhotoUseCase) GetAllPhotos(userId uint) ([]uint, error) {
+	avatar, err := p.userRepo.GetAvatar(userId)
+	if err != nil {
+		return nil, err
+	}
+	var result []uint
+	result = append(result, avatar)
+	photos, err := p.userRepo.GetPhotos(userId)
+	if err != nil {
+		return nil, err
+	}
+	result = append(result, photos...)
+	return result, nil
+}
+
+func (p *PhotoUseCase) ChangePhoto(num int, photoId uint, userId uint) error {
+	photos, err := p.GetAllPhotos(userId)
+	if err != nil {
+		return err
+	}
+	if len(photos) <= num {
+		err = p.SavePhoto(userId, photoId, false)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	oldPhoto := photos[num]
+	err = p.userRepo.ChangePhoto(oldPhoto, userId, photoId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PhotoUseCase) GetAvatar(userId uint) (uint, error) {
+	avatar, err := p.userRepo.GetAvatar(userId)
+	if err != nil {
+		return 0, err
+	}
+	return avatar, nil
+}

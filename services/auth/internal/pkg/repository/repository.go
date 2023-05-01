@@ -8,8 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth"
+	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/pkg/data_struct"
 )
 
 type AuthRepository struct {
@@ -34,9 +33,7 @@ func (r *AuthRepository) Login(email string, passwordInp string) (uint, error) {
 	if err != nil {
 		return 0, err
 	}
-	if passwordInp == userDB.Password {
 
-	}
 	return userDB.Id, nil
 }
 
@@ -69,30 +66,6 @@ func (r *AuthRepository) ChangeUser(user dataStruct.User) error {
 	return err
 }
 
-func (r *AuthRepository) GetUserById(userId uint) (userRes auth.UserRestTemp, err error) {
-
-	user := auth.UserRestTemp{}
-	err = r.db.Table("users").Select("user_infos.name").
-		Where("users.id =?", userId).
-		Joins("Join user_infos on users.id = user_infos.user_id").
-		Find(&user).Error
-	if err != nil {
-		return
-	}
-
-	return user, nil
-}
-
-func (r *AuthRepository) GetUserPhoto(userId uint) (photos []dataStruct.UserPhoto, err error) {
-	err = r.db.Find(&photos, "user_id = ?", userId).Error
-	return
-}
-
-func (r *AuthRepository) GetAvatarId(userId uint) (avatar uint, err error) {
-	err = r.db.Table("user_photos up").Select("up.photo").Where("user_id = ? AND avatar = ?", userId, true).Find(&avatar).Error
-	return
-}
-
 func (r *AuthRepository) GetUserIdByToken(token string) (uint, error) {
 	user, err := r.client.Get(token).Result()
 	if err != nil {
@@ -116,15 +89,16 @@ func (r *AuthRepository) SaveToken(userId uint, token string) (err error) {
 	return
 }
 
-func (r *AuthRepository) GetAge(userId uint) (int, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "id=?", userId).Error
+func (r *AuthRepository) CheckSession(token string) (uint, error) {
+	userIdStr, err := r.client.Get(token).Result()
 	if err != nil {
 		return 0, err
 	}
-	age, err := CalculateAge(user.BirthDay)
+
+	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		return 0, err
 	}
-	return age, nil
+
+	return uint(userId), nil
 }

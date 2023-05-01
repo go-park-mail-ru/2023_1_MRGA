@@ -42,12 +42,13 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
+
 	err = h.useCase.AddInfo(uint(userId), infoInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
@@ -87,7 +88,7 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -101,28 +102,32 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.useCase.GetUserHashtags(uint(userId))
+	hashtags, err := h.useCase.GetUserHashtags(uint(userId))
+	var result info_user.HashtagInp
+	result.Hashtag = hashtags
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	mapInfo := structs.Map(&result)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, mapInfo)
 }
 
 func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
-
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
 
-	result, err := h.useCase.GetUserHashtags(uint(userId))
+	hashtags, err := h.useCase.GetUserHashtags(uint(userId))
+	var result info_user.HashtagInp
+	result.Hashtag = hashtags
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -161,7 +166,7 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -175,12 +180,15 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.useCase.GetUserHashtags(uint(userId))
+	hashtags, err := h.useCase.GetUserHashtags(uint(userId))
+	var result info_user.HashtagInp
+	result.Hashtag = hashtags
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	mapInfo := structs.Map(&result)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, mapInfo)
@@ -195,6 +203,7 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	infoBD, err := h.useCase.GetInfo(uint(userId))
 	infoBD.Email = ""
 	if err != nil {
@@ -210,7 +219,7 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetInfo(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -256,7 +265,7 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -275,72 +284,23 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, mapInfo)
 }
 
-func (h *Handler) GetHashtags(w http.ResponseWriter, r *http.Request) {
-	jobs, err := h.useCase.GetHashtags()
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
-	result := make(map[string]interface{})
-	result["hashtags"] = jobs
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, result)
 
-}
-
-func (h *Handler) GetCities(w http.ResponseWriter, r *http.Request) {
-	cities, err := h.useCase.GetCities()
+	user, err := c.useCase.GetUserById(uint(userId))
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	result := make(map[string]interface{})
-	result["cities"] = cities
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, result)
 
-}
-
-func (h *Handler) GetZodiac(w http.ResponseWriter, r *http.Request) {
-	zodiac, err := h.useCase.GetZodiacs()
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
-	result := make(map[string]interface{})
-	result["zodiac"] = zodiac
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, result)
-
-}
-
-func (h *Handler) GetJobs(w http.ResponseWriter, r *http.Request) {
-	jobs, err := h.useCase.GetJobs()
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
-	result := make(map[string]interface{})
-	result["jobs"] = jobs
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, result)
-
-}
-
-func (h *Handler) GetEducation(w http.ResponseWriter, r *http.Request) {
-	education, err := h.useCase.GetEducation()
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
-	result := make(map[string]interface{})
-	result["education"] = education
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
-	writer.Respond(w, r, result)
-
+	mapUser := structs.Map(&user)
+	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
+	writer.Respond(w, r, mapUser)
 }

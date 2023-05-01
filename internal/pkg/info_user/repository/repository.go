@@ -1,12 +1,11 @@
 package repository
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
+	ageCalc "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/age_calculator"
 )
 
 type InfoRepository struct {
@@ -55,180 +54,90 @@ func (r *InfoRepository) ChangeInfo(userInfo *dataStruct.UserInfo) error {
 	if err != nil {
 		return err
 	}
-	if userInfo.CityId != infoDB.CityId {
-		infoDB.CityId = userInfo.CityId
-	}
-	if userInfo.Zodiac != infoDB.Zodiac {
-		infoDB.Zodiac = userInfo.Zodiac
-	}
-	if userInfo.Job != infoDB.Job {
-		infoDB.Job = userInfo.Job
-	}
-	if userInfo.Education != infoDB.Education {
-		infoDB.Education = userInfo.Education
-	}
-
-	if userInfo.Description != "" {
-		infoDB.Description = userInfo.Description
-	}
-
-	if userInfo.Name != "" {
-		infoDB.Name = userInfo.Name
-	}
-
-	if userInfo.Sex != userInfo.Sex {
-		infoDB.Sex = userInfo.Sex
-	}
+	infoDB.CityId = userInfo.CityId
+	infoDB.Zodiac = userInfo.Zodiac
+	infoDB.Job = userInfo.Job
+	infoDB.Education = userInfo.Education
+	infoDB.Description = userInfo.Description
+	infoDB.Name = userInfo.Name
+	infoDB.Sex = userInfo.Sex
 
 	err = r.db.Save(&infoDB).Error
 	return err
 
 }
 
-func (r *InfoRepository) GetHashtags() ([]dataStruct.Hashtag, error) {
-	var hashtags []dataStruct.Hashtag
-	err := r.db.Find(&hashtags).Error
-	if err != nil {
-		return nil, err
-	}
-	return hashtags, nil
-}
-
-func (r *InfoRepository) GetUserHashtags(userId uint) ([]dataStruct.UserHashtag, error) {
-	var hashtags []dataStruct.UserHashtag
-	err := r.db.Table("user_hashtags").Where("user_id = ? ", userId).Find(&hashtags).Error
+func (r *InfoRepository) GetUserHashtags(userId uint) ([]string, error) {
+	var hashtags []string
+	err := r.db.Table("user_hashtags uh").
+		Select("h.hashtag").
+		Joins("Join hashtags h on h.id= uh.hashtag_id").
+		Where("uh.user_id = ? ", userId).Find(&hashtags).Error
 	return hashtags, err
 }
 
-func (r *InfoRepository) AddUserHashtag(hashtag dataStruct.UserHashtag) error {
+func (r *InfoRepository) GetUserHashtagsId(userId uint) ([]uint, error) {
+	var hashtags []uint
+	err := r.db.Table("user_hashtags ").
+		Select("hashtag_id").
+		Where("user_id = ? ", userId).Find(&hashtags).Error
+	return hashtags, err
+}
+
+func (r *InfoRepository) AddUserHashtag(hashtag []dataStruct.UserHashtag) error {
 	err := r.db.Create(&hashtag).Error
 	return err
 }
 
-func (r *InfoRepository) DeleteUserHashtag(userId, hashtagId uint) error {
-	err := r.db.First(&dataStruct.UserHashtag{}, "user_id = ? AND hashtag_id=?", userId, hashtagId).Error
+func (r *InfoRepository) DeleteUserHashtag(userId uint, hashtagId []uint) error {
+	err := r.db.First(&dataStruct.UserHashtag{}, "user_id = ? AND hashtag_id IN?", userId, hashtagId).Error
 	if err != nil {
 		return err
 	}
-	err = r.db.Delete(&dataStruct.UserHashtag{}, "user_id = ? AND hashtag_id=?", userId, hashtagId).Error
+	err = r.db.Delete(&dataStruct.UserHashtag{}, "user_id = ? AND hashtag_id IN ?", userId, hashtagId).Error
 	return err
 }
 
-func (r *InfoRepository) GetHashtagId(nameHashtag string) (uint, error) {
-	hashtag := &dataStruct.Hashtag{}
-	err := r.db.First(hashtag, "hashtag = ?", nameHashtag).Error
-	return hashtag.Id, err
-}
+func (r *InfoRepository) GetUserById(userId uint) (userRes info_user.UserRestTemp, err error) {
 
-func (r *InfoRepository) GetHashtagById(hashtagId uint) (string, error) {
-	hashtagDB := dataStruct.Hashtag{}
-	err := r.db.First(&hashtagDB, "id = ?", hashtagId).Error
-	return hashtagDB.Hashtag, err
-}
-
-func (r *InfoRepository) GetCityId(nameCity string) (uint, error) {
-	city := &dataStruct.City{}
-	err := r.db.First(city, "city = ?", nameCity).Error
-	return city.Id, err
-}
-
-func (r *InfoRepository) GetZodiacId(nameZodiac string) (uint, error) {
-	zodiac := &dataStruct.Zodiac{}
-	err := r.db.First(zodiac, "zodiac = ?", nameZodiac).Error
-	return zodiac.Id, err
-}
-
-func (r *InfoRepository) GetJobId(nameJob string) (uint, error) {
-	job := &dataStruct.Job{}
-	err := r.db.First(job, "job = ?", nameJob).Error
-	return job.Id, err
-}
-
-func (r *InfoRepository) GetEducationId(nameEducation string) (uint, error) {
-	education := &dataStruct.Education{}
-	err := r.db.First(education, "education = ?", nameEducation).Error
-	return education.Id, err
-}
-
-func (r *InfoRepository) GetCities() ([]dataStruct.City, error) {
-	var cities []dataStruct.City
-	err := r.db.Find(&cities).Error
+	user := info_user.UserRestTemp{}
+	err = r.db.Table("users").Select("user_infos.name").
+		Where("users.id =?", userId).
+		Joins("Join user_infos on users.id = user_infos.user_id").
+		Find(&user).Error
 	if err != nil {
-		return nil, err
+		return
 	}
-	return cities, nil
-}
 
-func (r *InfoRepository) GetAvatar(userId uint) (uint, error) {
-	var photo dataStruct.UserPhoto
-	err := r.db.First(&photo, "user_id=? AND avatar = ?", userId, true).Error
-	if err != nil {
-		return 0, err
-	}
-	return photo.Photo, nil
+	return user, nil
 }
 
 func (r *InfoRepository) GetAge(userId uint) (int, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "id=?", userId).Error
+	var birthday string
+	err := r.db.Table("users").
+		Select("birth_day").
+		Where("id=?", userId).
+		Find(&birthday).Error
 	if err != nil {
 		return 0, err
 	}
-	age, err := CalculateAge(user.BirthDay)
+
+	age, err := ageCalc.CalculateAge(birthday)
 	if err != nil {
 		return 0, err
 	}
+
 	return age, nil
 }
 
-func (r *InfoRepository) GetZodiac() ([]dataStruct.Zodiac, error) {
-	var zodiac []dataStruct.Zodiac
-	err := r.db.Find(&zodiac).Error
+func (r *InfoRepository) CheckFilter(userId uint) (bool, error) {
+	var reasons []uint
+	err := r.db.Table("user_reasons").Select("reason_id").Where("user_id = ?", userId).Find(&reasons).Error
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	return zodiac, nil
-}
-
-func (r *InfoRepository) GetJobs() ([]dataStruct.Job, error) {
-	var jobs []dataStruct.Job
-	err := r.db.Find(&jobs).Error
-	if err != nil {
-		return nil, err
+	if len(reasons) == 0 {
+		return false, nil
 	}
-	return jobs, nil
-}
-
-func (r *InfoRepository) GetEducation() ([]dataStruct.Education, error) {
-	var education []dataStruct.Education
-	err := r.db.Find(&education).Error
-	if err != nil {
-		return nil, err
-	}
-	return education, nil
-}
-
-func (r *InfoRepository) GetUserIdByEmail(email string) (uint, error) {
-	var user dataStruct.User
-	err := r.db.First(&user, "email = ?", email).Error
-	if err != nil {
-		return 0, err
-	}
-	return user.Id, err
-}
-
-func CalculateAge(birthDay string) (int, error) {
-	birth, err := time.Parse("2006-01-02", birthDay[:10])
-	if err != nil {
-		return 0, err
-	}
-	now := time.Now()
-	age := now.Year() - birth.Year()
-	if now.Month() > birth.Month() {
-		age -= 1
-	}
-	if now.Month() == birth.Month() && now.Day() < birth.Day() {
-		age -= 1
-	}
-	return age, nil
+	return true, nil
 }

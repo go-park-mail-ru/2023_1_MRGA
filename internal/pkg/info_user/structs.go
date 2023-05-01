@@ -1,5 +1,7 @@
 package info_user
 
+import "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
+
 type InfoStruct struct {
 	Name        string `json:"name" structs:"name"`
 	City        string `json:"city" structs:"city"`
@@ -9,6 +11,16 @@ type InfoStruct struct {
 	Zodiac      string `json:"zodiac" structs:"zodiac"`
 	Job         string `json:"job" structs:"job"`
 	Education   string `json:"education" structs:"education"`
+}
+type UserRestTemp struct {
+	Name string `json:"name"`
+}
+
+type UserRes struct {
+	Name   string         `json:"name" structs:"name"`
+	Age    int            `json:"age" structs:"age"`
+	Avatar uint           `json:"avatarId" structs:"avatarId"`
+	Step   constform.Step `json:"step" structs:"step"`
 }
 
 type InfoStructAnswer struct {
@@ -37,9 +49,4 @@ type InfoChange struct {
 
 type HashtagInp struct {
 	Hashtag []string `json:"hashtag" structs:"hashtag"`
-}
-
-type Photo struct {
-	PhotoId uint `json:"photoId" structs:"photoId"`
-	Avatar  bool `json:"avatar" structs:"avatar"`
 }

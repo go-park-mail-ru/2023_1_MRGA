@@ -3,16 +3,19 @@ package app
 import (
 	"net/http"
 
-	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
-	AuthRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/repository"
-	authUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/usecase"
-	infoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/delivery"
-	InfoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/repository"
-	infoUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/usecase"
+	filterDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/delivery"
+	FilterRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/repository"
+	filterUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/usecase"
+	InfoDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/delivery"
+	InfoRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/repository"
+	infoUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/usecase"
+	infoUserDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/delivery"
+	InfoUserRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/repository"
+	infoUserUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/usecase"
 	matchDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/delivery"
 	MatchRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/repository"
 	matchUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/usecase"
@@ -25,6 +28,7 @@ import (
 
 	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
 	ChatServicePackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/service"
+	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
 )
 
 var frontendHosts = []string{
@@ -39,33 +43,41 @@ var frontendHosts = []string{
 	"http://95.163.180.8:3000",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB, client *redis.Client) {
+func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient) {
+
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.CorsMiddleware(frontendHosts, h)
 	})
 
 	a.Router.Use(func(h http.Handler) http.Handler {
-		return middleware.AuthMiddleware(client, h)
+		return middleware.AuthMiddleware(authServ, h)
 	})
-	authRepo := AuthRepository.NewRepo(db, client)
-	ucAuth := authUC.NewAuthUseCase(authRepo, "0123", 1233)
-	authDel.RegisterHTTPEndpoints(a.Router, ucAuth)
+
+	photoRepo := PhotoRepository.NewPhotoRepo(db)
+	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
+	photoDel.RegisterHTTPEndpoints(a.Router, ucPhoto)
 
 	infoRepo := InfoRepository.NewInfoRepo(db)
 	ucInfo := infoUC.NewInfoUseCase(infoRepo)
-	infoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
+	InfoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
+
+	infoUserRepo := InfoUserRepository.NewInfoRepo(db)
+	ucUser := infoUserUC.NewInfoUseCase(infoUserRepo, ucInfo, ucPhoto)
+	infoUserDel.RegisterHTTPEndpoints(a.Router, ucUser)
+
+	filterRepo := FilterRepository.NewFilterRepo(db)
+	ucFilter := filterUC.NewFilterUseCase(filterRepo, ucInfo, ucUser)
+	filterDel.RegisterHTTPEndpoints(a.Router, ucFilter)
 
 	recRepo := RecRepository.NewRepo(db)
-	ucRec := recUC.NewRecUseCase(recRepo)
+	ucRec := recUC.NewRecUseCase(recRepo, ucFilter, ucPhoto, ucUser)
 	recDel.RegisterHTTPEndpoints(a.Router, ucRec)
 
 	matchRepo := MatchRepository.NewMatchRepo(db)
 	ucMatch := matchUC.NewMatchUseCase(matchRepo)
 	matchDel.RegisterHTTPEndpoints(a.Router, ucMatch)
 
-	photoRepo := PhotoRepository.NewPhotoRepo(db)
-	ucPhoto := photoUC.NewPhotoUseCase(photoRepo)
-	photoDel.RegisterHTTPEndpoints(a.Router, ucPhoto)
+	authDel.RegisterHTTPEndpoints(a.Router, authServ)
 
 	chatServerOptions := ChatServerPackage.ServerOptions{
 		Addr:       "localhost",

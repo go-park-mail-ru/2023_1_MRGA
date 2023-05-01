@@ -17,7 +17,7 @@ import (
 
 func (h *Handler) GetMatches(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -64,7 +64,7 @@ func (h *Handler) AddReaction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
@@ -85,12 +85,13 @@ func (h *Handler) AddReaction(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetChatByUserId(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
+
 	params := mux.Vars(r)
 	matchUserIdStr := params["userId"]
 	matchUserId, err := strconv.Atoi(matchUserIdStr)
@@ -99,12 +100,14 @@ func (h *Handler) GetChatByUserId(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	chat, err := h.useCase.GetChatByEmail(uint(userId), uint(matchUserId))
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
 	result := structs.Map(&chat)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path)
 	writer.Respond(w, r, result)

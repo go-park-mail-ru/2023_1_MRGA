@@ -20,6 +20,8 @@ func RegisterHTTPEndpoints(router *mux.Router, ic info_user.UseCase) {
 	h := NewHandler(ic)
 	router.HandleFunc("/meetme/info-user/{userId}", h.GetInfoById).Methods("GET")
 
+	router.HandleFunc("/meetme/user", h.GetCurrentUser).Methods("GET")
+
 	router.HandleFunc("/meetme/info-user", h.GetInfo).Methods("GET")
 	router.HandleFunc("/meetme/info-user", h.ChangeInfo).Methods("PUT")
 	router.HandleFunc("/meetme/info-user", h.CreateInfo).Methods("POST")
@@ -28,9 +30,4 @@ func RegisterHTTPEndpoints(router *mux.Router, ic info_user.UseCase) {
 	router.HandleFunc("/meetme/hashtags-user", h.GetUserHashtags).Methods("GET")
 	router.HandleFunc("/meetme/hashtags-user", h.ChangeUserHashtags).Methods("PUT")
 
-	router.HandleFunc("/api/hashtags", h.GetHashtags).Methods("GET")
-	router.HandleFunc("/api/cities", h.GetCities).Methods("GET")
-	router.HandleFunc("/api/zodiac", h.GetZodiac).Methods("GET")
-	router.HandleFunc("/api/job", h.GetJobs).Methods("GET")
-	router.HandleFunc("/api/education", h.GetEducation).Methods("GET")
 }
