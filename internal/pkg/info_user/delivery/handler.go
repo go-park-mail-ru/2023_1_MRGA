@@ -311,15 +311,6 @@ func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Banned = banned.Banned
 
-	compInp := &complaintProto.UserId{UserId: userId}
-	banned, err := c.compService.CheckBanned(r.Context(), compInp)
-	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
-		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
-		return
-	}
-	user.Banned = banned.Banned
-
 	mapUser := structs.Map(&user)
 	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path, _default.NameService, false)
 	writer.Respond(w, r, mapUser)
