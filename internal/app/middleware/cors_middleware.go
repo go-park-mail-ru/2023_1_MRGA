@@ -9,9 +9,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
-
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
-
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
