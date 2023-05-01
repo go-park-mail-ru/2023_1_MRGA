@@ -6,45 +6,38 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Log(httpStatus int, message string, method string, url string, service string, errorFlag bool) {
-	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
+var serviceName string
+
+func Init(service string) {
+	serviceName = service
+}
+
+func Log(httpStatus int, message string, method string, url string, errorFlag bool) {
+	fields := log.Fields{
+		"method":      method,
+		"http_status": httpStatus,
+		"service":     serviceName,
+		"url":         url,
+	}
 	if errorFlag {
 		log.SetFormatter(&log.TextFormatter{DisableColors: false, FullTimestamp: true})
 		log.SetOutput(os.Stdout)
-		logError(httpStatus, message, method, url, service)
+		log.WithFields(fields).Error(message)
 
-		fileOut := openFile(service)
+		fileOut := openFile(serviceName)
 		log.SetFormatter(&log.TextFormatter{DisableColors: true, FullTimestamp: true})
 		log.SetOutput(fileOut)
-		logError(httpStatus, message, method, url, service)
+		log.WithFields(fields).Error(message)
 	}
 
 	log.SetFormatter(&log.TextFormatter{DisableColors: false, FullTimestamp: true})
 	log.SetOutput(os.Stdout)
-	logINFO(httpStatus, message, method, url, service)
+	log.WithFields(fields).Info(message)
 
-	fileOut := openFile(service)
+	fileOut := openFile(serviceName)
 	log.SetFormatter(&log.TextFormatter{DisableColors: true, FullTimestamp: true})
 	log.SetOutput(fileOut)
-	logINFO(httpStatus, message, method, url, service)
-}
-
-func logINFO(httpStatus int, message string, method string, url string, service string) {
-	log.WithFields(log.Fields{
-		"method":      method,
-		"http_status": httpStatus,
-		"service":     service,
-		"url":         url,
-	}).Info(message)
-}
-
-func logError(httpStatus int, message string, method string, url string, service string) {
-	log.WithFields(log.Fields{
-		"method":      method,
-		"http_status": httpStatus,
-		"service":     service,
-		"url":         url,
-	}).Error(message)
+	log.WithFields(fields).Info(message)
 }
 
 func openFile(service string) *os.File {

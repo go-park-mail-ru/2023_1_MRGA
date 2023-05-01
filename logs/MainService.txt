@@ -21,3 +21,4 @@ time="2023-05-01T18:18:45+03:00" level=error msg="rpc error: code = Unknown desc
 time="2023-05-01T18:18:45+03:00" level=info msg="rpc error: code = Unknown desc = ERROR: relation \"complaint\" does not exist (SQLSTATE 42P01)" http_status=400 method=POST service=MainService url=/meetme/complain
 time="2023-05-01T18:19:12+03:00" level=info msg=Success http_status=200 method=POST service=MainService url=/meetme/complain
 time="2023-05-01T18:19:24+03:00" level=info msg="give user information" http_status=200 method=GET service=MainService url=/meetme/user
+time="2023-05-01T22:37:25+03:00" level=info msg=Success http_status=200 method=GET service=MainService url=/api/cities

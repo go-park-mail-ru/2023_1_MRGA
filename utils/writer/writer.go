@@ -27,10 +27,10 @@ func Respond(w http.ResponseWriter, r *http.Request, data map[string]interface{}
 	err := encoder.Encode(result)
 
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "err": "%s"}`, http.StatusInternalServerError, err.Error())))
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			return
 		}
 		return
@@ -54,10 +54,10 @@ func ErrorRespond(w http.ResponseWriter, r *http.Request, servarErr error, statu
 	err := encoder.Encode(result)
 
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())))
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, NameServise, true)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			return
 		}
 		return

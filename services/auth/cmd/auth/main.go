@@ -13,11 +13,7 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg/server"
-<<<<<<< HEAD
-	api "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/auth"
-=======
 	api "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
->>>>>>> 244f467 (add logger)
 )
 
 func main() {

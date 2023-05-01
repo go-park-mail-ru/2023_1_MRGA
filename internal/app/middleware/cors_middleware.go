@@ -43,7 +43,7 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 		}
 		token, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
 		if err != nil {
-			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
 			return
 		}
@@ -53,7 +53,7 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 		}
 		userResp, err := authServ.CheckSession(r.Context(), &reqBody)
 		if err != nil {
-			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
 			return
 		}

@@ -12,7 +12,6 @@ import (
 
 	"github.com/gorilla/mux"
 
-	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
@@ -22,7 +21,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
@@ -30,7 +29,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
@@ -39,7 +38,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
@@ -47,7 +46,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	for idx, fileHeader := range files {
 		file, err := fileHeader.Open()
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
@@ -55,7 +54,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			err := file.Close()
 			if err != nil {
-				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 				writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 				return
 			}
@@ -63,7 +62,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 
 		photoId, err := SendPhoto(file, fileHeader.Filename, uint(userId))
 		if err != nil {
-			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 			err = fmt.Errorf("cant parse json")
 			writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 			return
@@ -78,13 +77,13 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 
 		err = h.useCase.SavePhoto(uint(userId), photoId, avatar)
 		if err != nil {
-			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 			return
 		}
 	}
 
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, false)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
@@ -92,13 +91,13 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	photoId, ok := params["photo"]
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
 	bodyBytes, err := SendRequest(photoId)
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
@@ -107,31 +106,31 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	writerFile := multipart.NewWriter(body)
 	fileField, err := writerFile.CreateFormFile("file", "filename")
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
 	_, err = fileField.Write(bodyBytes)
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
 	err = writerFile.Close()
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, false)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	w.Header().Set("Content-Type", writerFile.FormDataContentType())
 	w.Header().Set("Content-Disposition", "attachment")
 	_, err = w.Write(body.Bytes())
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
@@ -141,31 +140,31 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	photoIdStr, ok := params["photo"]
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
 	photoId, err := strconv.Atoi(photoIdStr)
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
 
 	err = h.useCase.DeletePhoto(uint(userId), photoId)
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, false)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
 	return
 }
@@ -174,27 +173,27 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
 	}()
 	err := r.ParseMultipartForm(32 << 20) // 32MB is the default size limit for a request
 	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 	file, _, err := r.FormFile("file")
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
@@ -202,7 +201,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err = file.Close()
 		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
@@ -211,26 +210,26 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 	photoNumStr := params["photo"]
 	photoNum, err := strconv.Atoi(photoNumStr)
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
 	photoId, err := SendPhoto(file, "file", uint(userId))
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
 	err = h.useCase.ChangePhoto(photoNum, photoId, uint(userId))
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, _default.NameService, true)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, _default.NameService, false)
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
 }
 

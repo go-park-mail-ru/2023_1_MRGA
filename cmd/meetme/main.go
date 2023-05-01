@@ -9,11 +9,13 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	_default "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 )
 
 // @title MRGA
@@ -30,7 +32,7 @@ import (
 // @schemes http
 // @BasePath /meetme/
 func main() {
-
+	logger.Init(_default.NameService)
 	log.Println("Application is starting")
 
 	a := app.New()
