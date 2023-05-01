@@ -61,6 +61,16 @@ func openFile(service string) *os.File {
 }
 
 func createINotExist(service string) {
+	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
+		err = os.Mkdir("./logs", os.ModePerm)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"http_status": 0,
+				"service":     "logger",
+			}).Error(err.Error())
+			return
+		}
+	}
 	filepath := "./logs/" + service + ".txt"
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
