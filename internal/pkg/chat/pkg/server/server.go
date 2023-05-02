@@ -11,7 +11,6 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
@@ -23,13 +22,13 @@ func (server *Server) InitRouter(pathPrefix string) {
 	server.router = mux.NewRouter().PathPrefix(pathPrefix).Subrouter()
 
 	// С префиксом /meetme/chats все ниже
-	server.router.HandleFunc("/create", server.CreateChatHander).Methods("POST")
-	server.router.HandleFunc("/{chat_id}/send", server.SendMessageHander).Methods("POST")
-	server.router.HandleFunc("/list", server.GetChatsListHander).Methods("GET")
-	server.router.HandleFunc("/{chat_id}/messages", server.GetChatHander).Methods("GET")
+	server.router.HandleFunc("/create", server.CreateChatHandler).Methods("POST")
+	server.router.HandleFunc("/{chat_id}/send", server.SendMessageHandler).Methods("POST")
+	server.router.HandleFunc("/list", server.GetChatsListHandler).Methods("GET")
+	server.router.HandleFunc("/{chat_id}/messages", server.GetChatHandler).Methods("GET")
 }
 
-func (server Server) CreateChatHander(w http.ResponseWriter, r *http.Request) {
+func (server Server) CreateChatHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var initialChatData app.CreateChatRequest
@@ -64,7 +63,7 @@ func (server Server) CreateChatHander(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, structs.Map(createdChatData))
 }
 
-func (server Server) SendMessageHander(w http.ResponseWriter, r *http.Request) {
+func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var msgData app.SendMessageRequest
@@ -122,7 +121,7 @@ func (server Server) SendMessageHander(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
-func (server Server) GetChatsListHander(w http.ResponseWriter, r *http.Request) {
+func (server Server) GetChatsListHandler(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(int)
 	if !ok {
@@ -132,7 +131,7 @@ func (server Server) GetChatsListHander(w http.ResponseWriter, r *http.Request) 
 	}
 
 	grpcChatsListRequest := chatpc.GetChatsListRequest{
-		UserId: wrapperspb.UInt32(uint32(userId)),
+		UserId: uint32(userId),
 	}
 
 	client, conn, err := server.InitClient()
@@ -172,7 +171,7 @@ func (server Server) GetChatsListHander(w http.ResponseWriter, r *http.Request) 
 	}))
 }
 
-func (server Server) GetChatHander(w http.ResponseWriter, r *http.Request) {
+func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	strChatId := vars["chat_id"]
 	uint64ChatId, err := strconv.ParseUint(strChatId, 10, 64)
@@ -191,8 +190,8 @@ func (server Server) GetChatHander(w http.ResponseWriter, r *http.Request) {
 	}
 
 	grpcChatRequest := chatpc.GetChatRequest{
-		ChatId: wrapperspb.UInt32(uint32(uint64ChatId)),
-		UserId: wrapperspb.UInt32(uint32(userId)),
+		ChatId: uint32(uint64ChatId),
+		UserId: uint32(userId),
 	}
 
 	client, conn, err := server.InitClient()

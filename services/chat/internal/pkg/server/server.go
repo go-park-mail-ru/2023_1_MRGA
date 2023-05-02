@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
@@ -15,7 +15,7 @@ import (
 func (server Server) CreateChat(ctx context.Context, initialChatData *chatpc.CreateChatRequest) (outputChatData *chatpc.CreateChatResponse, err error) {
 	var userIds []app.ChatUser
 	for _, grpcUserId := range initialChatData.GetUserIds() {
-		userId := uint(grpcUserId.GetValue())
+		userId := uint(grpcUserId)
 		userIds = append(userIds, app.ChatUser{UserId: userId})
 	}
 

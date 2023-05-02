@@ -4,47 +4,46 @@ package proto_chat;
 
 option go_package = "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat";
 
-import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 message Message {
-    google.protobuf.UInt32Value sender_id = 1;
+    uint32 sender_id = 1;
     string content = 2;
     google.protobuf.Timestamp sent_at = 3;
     bool read_status = 4;
 }
 
 message CreateChatRequest {
-    repeated google.protobuf.UInt32Value user_ids = 1;
+    repeated uint32 user_ids = 1;
 }
 
 message CreateChatResponse {
-    google.protobuf.UInt32Value chat_id = 1;
+    uint32 chat_id = 1;
 }
 
 message SendMessageRequest {
     Message msg = 1;
-    google.protobuf.UInt32Value chat_id = 2;
+    uint32 chat_id = 2;
 }
 
 message GetChatsListRequest {
-    google.protobuf.UInt32Value user_id = 1;
+    uint32 user_id = 1;
 }
 
 message GetChatsListResponse {
     Message msg = 1;
-    google.protobuf.UInt32Value chat_id = 2;
+    uint32 chat_id = 2;
 }
 
 message GetChatRequest {
-    google.protobuf.UInt32Value chat_id = 1;
-    google.protobuf.UInt32Value user_id = 2;
+    uint32 chat_id = 1;
+    uint32 user_id = 2;
 }
 
 message GetChatResponse {
     Message msg = 1;
-    google.protobuf.UInt32Value msg_id = 2;
+    uint32 msg_id = 2;
 }
 
 service ChatService {

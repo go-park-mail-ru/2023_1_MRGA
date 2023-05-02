@@ -27,7 +27,6 @@ import (
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
 
 	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
-	ChatServicePackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/service"
 	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
 )
 
@@ -84,8 +83,7 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient) {
 		Port:       3000,
 		PathPrefix: "/meetme/chats",
 	}
-	chatService := ChatServicePackage.InitService()
-	chatRouter := ChatServerPackage.InitServer(chatService, chatServerOptions)
+	chatRouter := ChatServerPackage.InitServer(chatServerOptions)
 
 	a.Router.PathPrefix(chatServerOptions.PathPrefix).Handler(chatRouter)
 }

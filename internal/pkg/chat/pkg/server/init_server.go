@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
 )
 
@@ -19,7 +18,6 @@ type ServerOptions struct {
 type Server struct {
 	clientConn *grpc.ClientConn
 	router     *mux.Router
-	service    app.IService
 
 	clientTarget string
 }
@@ -35,10 +33,8 @@ func (server Server) InitClient() (chatClient chatpc.ChatServiceClient, chatClie
 	return
 }
 
-func InitServer(service app.IService, opts ServerOptions) *mux.Router {
-	server := Server{
-		service: service,
-	}
+func InitServer(opts ServerOptions) *mux.Router {
+	var server Server
 
 	server.clientTarget = fmt.Sprintf("%s:%d", opts.Addr, opts.Port)
 
