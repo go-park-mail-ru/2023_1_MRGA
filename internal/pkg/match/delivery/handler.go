@@ -112,3 +112,32 @@ func (h *Handler) GetChatByUserId(w http.ResponseWriter, r *http.Request) {
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, result)
 }
+
+func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	params := mux.Vars(r)
+	matchUserIdStr := params["userId"]
+	matchUserId, err := strconv.Atoi(matchUserIdStr)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	err = h.useCase.DeleteMatch(uint(userId), uint(matchUserId))
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	writer.Respond(w, r, map[string]interface{}{})
+}
