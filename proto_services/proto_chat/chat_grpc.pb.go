@@ -127,7 +127,7 @@ type ChatServiceServer interface {
 	SendMessage(context.Context, *SendMessageRequest) (*emptypb.Empty, error)
 	GetChatsList(*GetChatsListRequest, ChatService_GetChatsListServer) error
 	GetChat(*GetChatRequest, ChatService_GetChatServer) error
-	mustEmbedUnimplementedChatServiceServer()
+	//mustEmbedUnimplementedChatServiceServer()
 }
 
 // UnimplementedChatServiceServer must be embedded to have forward compatible implementations.
