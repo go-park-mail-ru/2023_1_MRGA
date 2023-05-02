@@ -34,6 +34,7 @@ message GetChatsListRequest {
 message GetChatsListResponse {
     Message msg = 1;
     uint32 chat_id = 2;
+    repeated uint32 chat_user_ids = 3;
 }
 
 message GetChatRequest {

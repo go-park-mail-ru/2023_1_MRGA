@@ -28,12 +28,33 @@ func (repo Repository) SendMessage(ctx context.Context, newMsg app.Message) (err
 	return
 }
 
-func (repo Repository) GetChatsList(userData app.GetChatsListRequest) (recentMsgs []app.Message, err error) {
+func (repo Repository) GetChatsList(userData app.GetChatsListRequest) (recentMsgs []app.MessageWithChatUsers, err error) {
+	var msgs []app.Message
 	subQuery := repo.db.Select("MAX(sent_at) as max_sent_at, chat_id").Table("messages").Group("chat_id")
-	err = repo.db.Joins("INNER JOIN chat_users ON chat_users.user_id = ? AND chat_users.chat_id = messages.chat_id", userData.UserId).
+	err = repo.db.
+		Joins("INNER JOIN chat_users ON chat_users.user_id = ? AND chat_users.chat_id = messages.chat_id", userData.UserId).
 		Joins("INNER JOIN (?) AS m ON messages.chat_id = m.chat_id AND messages.sent_at = m.max_sent_at", subQuery).
+		Select("messages.*").
 		Order("m.max_sent_at DESC").
-		Find(&recentMsgs).Error
+		Find(&msgs).Error
+	if err != nil {
+		return
+	}
+
+	for _, recentMsg := range msgs {
+		chatId := recentMsg.ChatId
+		var chatUsers []uint
+		repo.db.Table("chat_users").
+			Select("user_id").
+			Where("chat_id = ? AND user_id <> ?", chatId, userData.UserId).
+			Find(&chatUsers)
+
+		recentMsgs = append(recentMsgs, app.MessageWithChatUsers{
+			Message:     recentMsg,
+			ChatUserIds: chatUsers,
+		})
+	}
+
 	return
 }
 
@@ -44,4 +65,18 @@ func (repo Repository) GetChat(chatData app.GetChatRequest) (chatMsgs []app.Mess
 
 	err = repo.db.Where("chat_id = ?", chatData.ChatId).Order("sent_at DESC, id DESC").Find(&chatMsgs).Error
 	return
+}
+
+func (repo Repository) IsMemberOfChat(userId uint, chatId uint) (result bool, err error) {
+	var count int64
+
+	err = repo.db.Model(&app.ChatUser{}).
+		Where("user_id = ? AND chat_id = ?", userId, chatId).
+		Count(&count).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return uint(count) > 0, nil
 }

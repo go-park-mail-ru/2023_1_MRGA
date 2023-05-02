@@ -1,7 +1,7 @@
 package app
 
 import (
-	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
+	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -20,7 +20,12 @@ func GetInitialUserStruct(data *chatpc.GetChatsListRequest) GetChatsListRequest 
 	}
 }
 
-func GetGrpcChatMessage(data Message) *chatpc.GetChatsListResponse {
+func GetGrpcChatMessage(data MessageWithChatUsers) *chatpc.GetChatsListResponse {
+	var uint32ChatUserIds []uint32
+	for _, uintUserId := range data.ChatUserIds {
+		uint32ChatUserIds = append(uint32ChatUserIds, uint32(uintUserId))
+	}
+
 	return &chatpc.GetChatsListResponse{
 		Msg: &chatpc.Message{
 			SenderId:   uint32(data.SenderId),
@@ -28,7 +33,8 @@ func GetGrpcChatMessage(data Message) *chatpc.GetChatsListResponse {
 			SentAt:     timestamppb.New(data.SentAt),
 			ReadStatus: data.ReadStatus,
 		},
-		ChatId: uint32(data.ChatId),
+		ChatId:      uint32(data.ChatId),
+		ChatUserIds: uint32ChatUserIds,
 	}
 }
 

@@ -13,9 +13,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	myMocks "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+
+	myMocks "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/mocks"
 )
 
 type uploadFileResp struct {

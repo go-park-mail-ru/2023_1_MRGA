@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
-	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
+	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 )
 
 type ServerOptions struct {

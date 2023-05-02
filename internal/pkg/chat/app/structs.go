@@ -17,8 +17,9 @@ type MessageResponse struct {
 }
 
 type ChatMessage struct {
-	Msg    MessageResponse `structs:"msg"`
-	ChatId uint            `structs:"chatId"`
+	Msg         MessageResponse `structs:"msg"`
+	ChatId      uint            `structs:"chatId"`
+	ChatUserIds []uint          `structs:"chatUserIds"`
 }
 
 type MessageData struct {

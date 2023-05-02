@@ -3,7 +3,7 @@ package app
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
+	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 )
 
 func GetGRPCInitialChatData(data CreateChatRequest) *chatpc.CreateChatRequest {
@@ -36,14 +36,20 @@ func GetGRPCChatMessage(data Message, chatId uint) *chatpc.SendMessageRequest {
 }
 
 func GetChatMessageStruct(data *chatpc.GetChatsListResponse) ChatMessage {
+	var chatUserIds []uint
+	for _, chatUserId := range data.GetChatUserIds() {
+		chatUserIds = append(chatUserIds, uint(chatUserId))
+	}
+
 	return ChatMessage{
 		Msg: MessageResponse{
 			SenderId:   uint(data.GetMsg().GetSenderId()),
 			Content:    data.GetMsg().GetContent(),
-			SentAt:     data.GetMsg().GetSentAt().AsTime().Local().Format("15:04 02.01.2006"),
+			SentAt:     data.GetMsg().GetSentAt().AsTime().Format("15:04 02.01.2006"),
 			ReadStatus: data.GetMsg().GetReadStatus(),
 		},
-		ChatId: uint(data.GetChatId()),
+		ChatId:      uint(data.GetChatId()),
+		ChatUserIds: chatUserIds,
 	}
 }
 

@@ -5,8 +5,8 @@ import (
 	"log"
 	"net"
 
-	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
+	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 	"google.golang.org/grpc"
 )
 
@@ -24,7 +24,7 @@ type Server struct {
 func InitServer(opts ServerOptions, repository app.IRepository) Server {
 	var server = Server{
 		repository: repository,
-		opts: opts,
+		opts:       opts,
 	}
 
 	return server
