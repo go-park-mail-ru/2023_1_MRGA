@@ -87,7 +87,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	userId, ok := userIdDB.(int)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, errors.New("Нет кук пользователя"), http.StatusBadRequest)
+		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
 		return
 	}
 
@@ -126,7 +126,7 @@ func (server Server) GetChatsListHandler(w http.ResponseWriter, r *http.Request)
 	userId, ok := userIdDB.(int)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, errors.New("Нет кук пользователя"), http.StatusBadRequest)
+		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
 		return
 	}
 
@@ -185,7 +185,7 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 	userId, ok := userIdDB.(int)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
-		writer.ErrorRespond(w, r, errors.New("Нет кук пользователя"), http.StatusBadRequest)
+		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
 		return
 	}
 

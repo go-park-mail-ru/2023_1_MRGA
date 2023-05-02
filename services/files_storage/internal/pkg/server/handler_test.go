@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	mocks "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/mocks"
+	myMocks "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -29,8 +29,8 @@ func TestUploadFile(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockRepository := mocks.NewMockIRepository(mockCtrl)
-	mockService := mocks.NewMockIService(mockCtrl)
+	mockRepository := myMocks.NewMockIRepository(mockCtrl)
+	mockService := myMocks.NewMockIService(mockCtrl)
 
 	// Создаем временный файл и записываем в него некоторые данные
 	tmpfile, err := ioutil.TempFile("", "example*.txt")
