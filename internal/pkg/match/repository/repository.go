@@ -120,3 +120,21 @@ func CalculateAge(birthDay string) (int, error) {
 	}
 	return age, nil
 }
+
+func (r *MatchRepository) DeleteMatch(userId, userMatchId uint) error {
+	var match dataStruct.Match
+	err := r.db.First(&match, "user_first_id =? AND user_second_id", userId, userMatchId).Error
+	if err != nil {
+		return err
+	}
+	err = r.db.Delete(&dataStruct.UserReaction{}, "id=?", match.Id).Error
+	if err != nil {
+		return err
+	}
+	err = r.db.First(&match, "user_first_id =? AND user_second_id", userMatchId, userId).Error
+	if err != nil {
+		return err
+	}
+	err = r.db.Delete(&dataStruct.UserReaction{}, "id=?", match.Id).Error
+	return err
+}
