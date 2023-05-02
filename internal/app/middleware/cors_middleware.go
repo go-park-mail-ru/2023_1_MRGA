@@ -8,8 +8,8 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/default"
-	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -20,6 +20,11 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 		if slices.Contains(allowedHosts, origin) {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
+		}
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
 		}
 		next.ServeHTTP(w, r)
 	})
@@ -34,9 +39,9 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 			next.ServeHTTP(w, r)
 			return
 		}
-		token, err := cookie.GetValueCookie(r, _default.SessionTokenCookieName)
+		token, err := cookie.GetValueCookie(r, servicedefault.SessionTokenCookieName)
 		if err != nil {
-			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
 			return
 		}
@@ -46,7 +51,7 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 		}
 		userResp, err := authServ.CheckSession(r.Context(), &reqBody)
 		if err != nil {
-			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path)
+			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
 			return
 		}

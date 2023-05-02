@@ -10,6 +10,7 @@ type IRepositoryMatch interface {
 	GetUserReaction(userId, userToId uint) (dataStruct.UserReaction, error)
 	AddUserReaction(row dataStruct.UserReaction) error
 	DeleteUserReaction(rowId uint) error
+	DeleteMatch(userId, userMatchId uint) error
 	AddMatchRow(row dataStruct.Match) error
 	ChangeStatusMatch(userId, profileId uint) error
 	GetChat(userId uint) (ChatAnswer, error)

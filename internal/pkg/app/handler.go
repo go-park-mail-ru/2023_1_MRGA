@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
+	compDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/complaints/delivery"
 	filterDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/delivery"
 	FilterRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/repository"
 	filterUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/usecase"
@@ -26,8 +27,11 @@ import (
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
 
+
 	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
-	authProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
+
 )
 
 var frontendHosts = []string{
@@ -42,7 +46,7 @@ var frontendHosts = []string{
 	"http://95.163.180.8:3000",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient) {
+func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient) {
 
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.CorsMiddleware(frontendHosts, h)
@@ -62,7 +66,7 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient) {
 
 	infoUserRepo := InfoUserRepository.NewInfoRepo(db)
 	ucUser := infoUserUC.NewInfoUseCase(infoUserRepo, ucInfo, ucPhoto)
-	infoUserDel.RegisterHTTPEndpoints(a.Router, ucUser)
+	infoUserDel.RegisterHTTPEndpoints(a.Router, ucUser, compServ)
 
 	filterRepo := FilterRepository.NewFilterRepo(db)
 	ucFilter := filterUC.NewFilterUseCase(filterRepo, ucInfo, ucUser)
@@ -77,6 +81,7 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient) {
 	matchDel.RegisterHTTPEndpoints(a.Router, ucMatch)
 
 	authDel.RegisterHTTPEndpoints(a.Router, authServ)
+	compDel.RegisterHTTPEndpoints(a.Router, compServ)
 
 	chatServerOptions := ChatServerPackage.ServerOptions{
 		Addr:       "localhost",
