@@ -4,9 +4,10 @@ import (
 	"log"
 	"net"
 
+	"google.golang.org/grpc"
+
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
-	"google.golang.org/grpc"
 )
 
 type Server struct {
@@ -25,7 +26,7 @@ func InitServer(repository app.IRepository, service app.IService) Server {
 }
 
 func (server *Server) RunServer() error {
-	lis, err := net.Listen("tcp", ":3000")
+	lis, err := net.Listen("tcp", ":3005")
 	if err != nil {
 		log.Fatalf("Ошибка в создании tpc-соединения сервера: %v", err)
 	}
