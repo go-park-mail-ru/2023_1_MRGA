@@ -84,7 +84,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
@@ -123,7 +123,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 
 func (server Server) GetChatsListHandler(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
@@ -131,7 +131,7 @@ func (server Server) GetChatsListHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	grpcChatsListRequest := chatpc.GetChatsListRequest{
-		UserId: uint32(userId),
+		UserId: userId,
 	}
 
 	client, conn, err := server.InitClient()
@@ -182,7 +182,7 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(int)
+	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
@@ -191,7 +191,7 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 
 	grpcChatRequest := chatpc.GetChatRequest{
 		ChatId: uint32(uint64ChatId),
-		UserId: uint32(userId),
+		UserId: userId,
 	}
 
 	client, conn, err := server.InitClient()
