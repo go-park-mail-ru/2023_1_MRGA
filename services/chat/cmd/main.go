@@ -5,7 +5,6 @@ import (
 
 	repositoryPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/pkg/repository"
 	serverPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/pkg/server"
-	servicePackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/pkg/service"
 )
 
 func main() {
@@ -14,10 +13,12 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	service := servicePackage.InitService()
+	serverOpts := serverPackage.ServerOptions{
+		Port:       3030,
+	}
 
-	server := serverPackage.InitServer(repo, service)
-
+	server := serverPackage.InitServer(serverOpts, repo)
+	
 	if err = server.RunServer(); err != nil {
 		log.Fatal("Не удалось запустить сервер: " + err.Error())
 	}

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -9,23 +10,28 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Server struct {
-	repository app.IRepository
-	service    app.IService
-	chatpc.UnimplementedChatServiceServer
+type ServerOptions struct {
+	Port int
 }
 
-func InitServer(repository app.IRepository, service app.IService) Server {
+type Server struct {
+	repository app.IRepository
+	chatpc.UnimplementedChatServiceServer
+
+	opts ServerOptions
+}
+
+func InitServer(opts ServerOptions, repository app.IRepository) Server {
 	var server = Server{
 		repository: repository,
-		service:    service,
+		opts: opts,
 	}
 
 	return server
 }
 
 func (server *Server) RunServer() error {
-	lis, err := net.Listen("tcp", ":3000")
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server.opts.Port))
 	if err != nil {
 		log.Fatalf("Ошибка в создании tpc-соединения сервера: %v", err)
 	}

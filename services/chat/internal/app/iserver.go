@@ -11,6 +11,6 @@ type IServer interface {
 	CreateChat(context.Context, *chatpc.CreateChatRequest) (*chatpc.CreateChatResponse, error)
 	SendMessage(context.Context, *chatpc.SendMessageRequest) (*emptypb.Empty, error)
 	GetChatsList(*chatpc.GetChatsListRequest, chatpc.ChatService_GetChatsListServer) error
-	GetConversationMessages(*chatpc.GetChatRequest, chatpc.ChatService_GetChatServer) error
+	GetChat(chatData *chatpc.GetChatRequest, streamChatMsgs chatpc.ChatService_GetChatServer) (err error)
 	mustEmbedUnimplementedChatServiceServer()
 }
