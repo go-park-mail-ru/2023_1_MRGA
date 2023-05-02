@@ -10,9 +10,12 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
-	auth "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 )
 
 // @title MRGA
@@ -29,7 +32,7 @@ import (
 // @schemes http
 // @BasePath /meetme/
 func main() {
-
+	logger.Init(servicedefault.NameService)
 	log.Println("Application is starting")
 
 	a := app.New()
@@ -43,17 +46,24 @@ func main() {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
 
-	conn, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connAuth, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
 
-	authClient := auth.NewAuthClient(conn)
+	defer connAuth.Close()
+	authClient := authProto.NewAuthClient(connAuth)
+
+	connComp, err := grpc.Dial(":8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer connComp.Close()
+	compClient := complaintProto.NewComplaintsClient(connComp)
 
 	serv := new(server.Server)
 	opts := server.GetServerOptions()
-	a.InitRoutes(db, authClient)
+	a.InitRoutes(db, authClient, compClient)
 	err = serv.Run(opts, a.Router)
 	if err != nil {
 		log.Fatalf("error occured while server starting: %v", err)

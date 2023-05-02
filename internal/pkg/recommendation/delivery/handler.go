@@ -11,20 +11,20 @@ func (h *Handler) GetRecommendations(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
 
 	recs, err := h.useCase.GetRecommendations(uint(userId))
 	if err != nil {
-		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path)
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
 	mapResp := make(map[string]interface{})
 	mapResp["recommendations"] = recs
-	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path)
+	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, mapResp)
 }

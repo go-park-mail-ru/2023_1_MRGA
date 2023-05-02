@@ -111,3 +111,12 @@ func (m *MatchUseCase) GetChatByEmail(userId uint, matchUserId uint) (result mat
 	result, err = m.userRepo.GetChat(matchUserId)
 	return
 }
+
+func (m *MatchUseCase) DeleteMatch(userId uint, matchUserId uint) error {
+	err := m.userRepo.DeleteMatch(userId, matchUserId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

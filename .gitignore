@@ -96,3 +96,4 @@ cover.out
 services/files_storage/saved_files/
 
 **/.DS_Store
+/logs/*.txt

@@ -3,7 +3,7 @@ package delivery
 import (
 	"github.com/gorilla/mux"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 )
 
 type Handler struct {
