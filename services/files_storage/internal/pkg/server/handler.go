@@ -4,27 +4,23 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
-	"path"
 	"strconv"
 	"time"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/repository"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/service"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 	"github.com/gorilla/mux"
 )
 
-func getRouter() *mux.Router {
+func (server Server) getRouter() *mux.Router {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/files/upload", uploadFile).Methods("POST")
-	router.HandleFunc("/api/files/{id}", getFile).Methods("GET")
+	router.HandleFunc("/api/files/upload", server.UploadFile).Methods("POST")
+	router.HandleFunc("/api/files/{id}", server.GetFile).Methods("GET")
 	return router
 }
 
-func uploadFile(w http.ResponseWriter, r *http.Request) {
-	file, handler, err := r.FormFile("file")
+func (server Server) UploadFile(w http.ResponseWriter, r *http.Request) {
+	file, fileHandler, err := r.FormFile("file")
 	if err != nil {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
@@ -43,13 +39,13 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath, err := service.UploadFile(file, handler, uint(userIDUInt64))
+	filePath, err := server.service.UploadFile(file, fileHandler.Filename, uint(userIDUInt64))
 	if err != nil {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	fileID, err := repository.UploadFile(filePath, uint(userIDUInt64))
+	fileID, err := server.repository.UploadFile(filePath, uint(userIDUInt64))
 	if err != nil {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
@@ -60,7 +56,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func getFile(w http.ResponseWriter, r *http.Request) {
+func (server Server) GetFile(w http.ResponseWriter, r *http.Request) {
 	// Получаем ID файла из параметра запроса
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -72,20 +68,19 @@ func getFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Получаем содержимое файла из БД
-	var file repository.File
-	if file, err = repository.GetFile(uint(idUInt64)); err != nil {
+	var filePath string
+	if filePath, err = server.repository.GetFile(uint(idUInt64)); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	gotFile, err := os.Open(file.Path)
+	gotFile, filename, err := server.service.GetFile(filePath)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer gotFile.Close()
 
-	filename := path.Base(gotFile.Name())
 	// Устанавливаем заголовки для ответа
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 

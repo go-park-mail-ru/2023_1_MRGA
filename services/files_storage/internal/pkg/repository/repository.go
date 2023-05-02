@@ -1,6 +1,6 @@
 package repository
 
-func UploadFile(filePath string, userID uint) (uint, error) {
+func (repository Repository) UploadFile(filePath string, userID uint) (uint, error) {
 	file := &File{
 		Path:   filePath,
 		UserID: userID,
@@ -16,8 +16,8 @@ func UploadFile(filePath string, userID uint) (uint, error) {
 	return 0, result.Error
 }
 
-func GetFile(id uint) (File, error) {
+func (repository Repository) GetFile(id uint) (string, error) {
 	var file File
 	err := repository.db.First(&file, id).Error
-	return file, err
+	return file.Path, err
 }
