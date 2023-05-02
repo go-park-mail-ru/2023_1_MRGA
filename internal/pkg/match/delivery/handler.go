@@ -132,5 +132,12 @@ func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.useCase.DeleteMatch(uint(userId), uint(matchUserId))
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
 
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	writer.Respond(w, r, map[string]interface{}{})
 }
