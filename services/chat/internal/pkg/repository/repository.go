@@ -63,7 +63,7 @@ func (repo Repository) GetChat(chatData app.GetChatRequest) (chatMsgs []app.Mess
 		Where("chat_id = ? AND sender_id <> ? AND read_status = ?", chatData.ChatId, chatData.UserId, false).
 		Update("read_status", true)
 
-	err = repo.db.Where("chat_id = ?", chatData.ChatId).Order("sent_at DESC, id DESC").Find(&chatMsgs).Error
+	err = repo.db.Where("chat_id = ?", chatData.ChatId).Order("sent_at ASC, id DESC").Find(&chatMsgs).Error
 	return
 }
 
