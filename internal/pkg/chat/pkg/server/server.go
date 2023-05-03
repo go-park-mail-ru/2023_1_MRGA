@@ -29,6 +29,14 @@ func (server *Server) InitRouter(pathPrefix string) {
 }
 
 func (server Server) CreateChatHandler(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
+		return
+	}
+
 	defer r.Body.Close()
 
 	var initialChatData app.CreateChatRequest
@@ -38,6 +46,8 @@ func (server Server) CreateChatHandler(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
+
+	initialChatData.UserIds = append(initialChatData.UserIds, uint(userId))
 
 	grpcInitialChatData := app.GetGRPCInitialChatData(initialChatData)
 
