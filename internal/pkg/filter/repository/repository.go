@@ -78,6 +78,6 @@ func (r *FilterRepository) AddUserReason(reason []dataStruct.UserReason) error {
 }
 
 func (r *FilterRepository) DeleteUserReason(userId uint, reactionId []uint) error {
-	err := r.db.Delete(&dataStruct.UserReason{}, "user_id = ? AND reason_id= IN ?", userId, reactionId).Error
+	err := r.db.Delete(&dataStruct.UserReason{}, "user_id = ? AND reason_id IN ?", userId, reactionId).Error
 	return err
 }
