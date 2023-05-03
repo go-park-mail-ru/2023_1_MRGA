@@ -45,7 +45,7 @@ func GetChatMessageStruct(data *chatpc.GetChatsListResponse) ChatMessage {
 		Msg: MessageResponse{
 			SenderId:   uint(data.GetMsg().GetSenderId()),
 			Content:    data.GetMsg().GetContent(),
-			SentAt:     data.GetMsg().GetSentAt().AsTime().Format("15:04 02.01.2006"),
+			SentAt:     data.GetMsg().GetSentAt().AsTime().Local().Format("15:04 02.01.2006"),
 			ReadStatus: data.GetMsg().GetReadStatus(),
 		},
 		ChatId:      uint(data.GetChatId()),
