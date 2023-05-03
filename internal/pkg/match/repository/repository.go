@@ -20,7 +20,7 @@ func NewMatchRepo(db *gorm.DB) *MatchRepository {
 }
 
 func (r *MatchRepository) GetMatches(userId uint) (users []dataStruct.Match, err error) {
-	err = r.db.Table("matches").Find(&users, "user_first_id=?", userId).Error
+	err = r.db.Table("matches").Order("shown").Find(&users, "user_first_id=?", userId).Error
 	return
 }
 
