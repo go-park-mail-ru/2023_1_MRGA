@@ -17,6 +17,7 @@ type UserRestTemp struct {
 }
 
 type UserRes struct {
+	UserId uint           `json:"userId" structs:"userId"`
 	Name   string         `json:"name" structs:"name"`
 	Age    int            `json:"age" structs:"age"`
 	Avatar uint           `json:"avatarId" structs:"avatarId"`
