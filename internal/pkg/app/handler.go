@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
+	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
 	compDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/complaints/delivery"
 	filterDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/delivery"
 	FilterRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/repository"
@@ -80,4 +81,12 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	authDel.RegisterHTTPEndpoints(a.Router, authServ)
 	compDel.RegisterHTTPEndpoints(a.Router, compServ)
 
+	chatServerOptions := ChatServerPackage.ServerOptions{
+		Addr:       "localhost",
+		Port:       3030,
+		PathPrefix: "/meetme/chats",
+	}
+	chatRouter := ChatServerPackage.InitServer(chatServerOptions)
+
+	a.Router.PathPrefix(chatServerOptions.PathPrefix).Handler(chatRouter)
 }

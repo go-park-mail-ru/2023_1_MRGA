@@ -33,6 +33,19 @@ services: # имеджи, которые запустятся по вашему 
       POSTGRES_PASSWORD: "mrga_password"
     ports:
       - "5433:5432"
+  db-chat:
+    image: postgres:latest
+    volumes:
+      - type: volume
+        source: postgreschat-data
+        target: /var/lib/postgresql/data
+
+    environment:
+      POSTGRES_DB: "mrga_chat"
+      POSTGRES_USER: "mrga_user"
+      POSTGRES_PASSWORD: "mrga_password"
+    ports:
+      - "5434:5432"
 
 volumes: # часть настроек для хранения данных
   postgresdb-data:
@@ -41,5 +54,5 @@ volumes: # часть настроек для хранения данных
     driver: local
   postgresstore-data:
     driver: local
-
-
+  postgreschat-data:
+    driver: local
