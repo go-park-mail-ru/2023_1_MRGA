@@ -10,7 +10,7 @@ func GetMessageStruct(data *chatpc.SendMessageRequest) Message {
 		ChatId:   uint(data.GetChatId()),
 		SenderId: uint(data.GetMsg().GetSenderId()),
 		Content:  data.GetMsg().GetContent(),
-		SentAt:   data.GetMsg().GetSentAt().AsTime().Local(),
+		SentAt:   data.GetMsg().GetSentAt().AsTime(),
 	}
 }
 

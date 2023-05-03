@@ -301,6 +301,7 @@ func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user.UserId = uint(userId)
 	compInp := &complaintProto.UserId{UserId: userId}
 	banned, err := c.compService.CheckBanned(r.Context(), compInp)
 	if err != nil {

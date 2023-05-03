@@ -21,11 +21,16 @@ func NewMatchUseCase(userRepo match.IRepositoryMatch) *MatchUseCase {
 
 func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 	users, err := m.userRepo.GetMatches(userId)
+
 	if err != nil {
 		return nil, err
 	}
 	var result []match.UserRes
 	for _, user := range users {
+		err = m.userRepo.ChangeStatusMatch(user.UserFirstId, user.UserSecondId)
+		if err != nil {
+			return nil, err
+		}
 		matchUser, err := m.userRepo.GetUser(user.UserSecondId)
 		if err != nil {
 			return nil, err
