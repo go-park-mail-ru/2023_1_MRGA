@@ -82,7 +82,7 @@ func (server Server) GetFile(w http.ResponseWriter, r *http.Request) {
 	defer gotFile.Close()
 
 	// Устанавливаем заголовки для ответа
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
 
 	// Автоматически ставит заголовок image/jpg или image/png
 	http.ServeContent(w, r, filename, time.Now(), gotFile)
