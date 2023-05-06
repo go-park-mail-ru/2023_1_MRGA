@@ -106,8 +106,6 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Устанавливаем заголовки для ответа
-	contentType := http.DetectContentType(bodyBytes)
-	w.Header().Set("Content-Type", contentType)
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
 
 	// Автоматически ставит заголовок image/jpg или image/png
