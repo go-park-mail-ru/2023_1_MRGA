@@ -6,12 +6,13 @@ services: # имеджи, которые запустятся по вашему 
       - type: volume
         source: postgresdb-data
         target: /var/lib/postgresql/data
+      - "./config/postgres/postgresMainDB/postgres.conf:/var/lib/postgresql/data/postgresql.conf"
+      - "./config/postgres/postgresDBInit.sql:/docker-entrypoint-initdb.d/mrga_init.sql"
     ports: # порты
       - "5432:5432"
-    environment: # переменные окружения, меняйте их если хотите поменять пароль, логин или название стартовой базы данных
-      POSTGRES_USER: mrga_user
-      POSTGRES_DB: mrga
-      POSTGRES_PASSWORD: marga_password
+    networks:
+      - service-network
+
   redis:
     image: redis:6.2-alpine
     restart: always
@@ -26,26 +27,25 @@ services: # имеджи, которые запустятся по вашему 
       - type: volume
         source: postgresstore-data
         target: /var/lib/postgresql/data
-
-    environment:
-      POSTGRES_DB: "mrga_storage"
-      POSTGRES_USER: "mrga_user"
-      POSTGRES_PASSWORD: "mrga_password"
+      - "./config/postgres/postgresFileStorageServiceDB/postgres.conf:/var/lib/postgresql/data/postgresql.conf"
+      - "./config/postgres/postgresDBInit.sql:/docker-entrypoint-initdb.d/mrga_init.sql"
     ports:
-      - "5433:5432"
+      - "5433:5433"
+    networks:
+      - service-network
   db-chat:
     image: postgres:latest
     volumes:
       - type: volume
         source: postgreschat-data
         target: /var/lib/postgresql/data
+      - "./config/postgres/postgresChatServiceDB/postgres.conf:/var/lib/postgresql/data/postgresql.conf"
+      - "./config/postgres/postgresDBInit.sql:/docker-entrypoint-initdb.d/mrga_init.sql"
 
-    environment:
-      POSTGRES_DB: "mrga_chat"
-      POSTGRES_USER: "mrga_user"
-      POSTGRES_PASSWORD: "mrga_password"
     ports:
-      - "5434:5432"
+      - "5434:5434"
+    networks:
+      - service-network
 
 volumes: # часть настроек для хранения данных
   postgresdb-data:
@@ -56,3 +56,12 @@ volumes: # часть настроек для хранения данных
     driver: local
   postgreschat-data:
     driver: local
+
+networks:
+  service-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 11.0.0.0/24
+          gateway: 11.0.0.1
