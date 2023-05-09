@@ -237,7 +237,7 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 		return 0, err
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", requestBody)
+	req, err := http.NewRequest("POST", "http://file-storage-service:8081/api/files/upload", requestBody)
 	if err != nil {
 		return 0, err
 	}
@@ -276,7 +276,7 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 
 func SendRequest(photoId string) ([]byte, string, error) {
 	// Создаем HTTP-запрос на другой микросервис
-	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+photoId, nil)
+	req, err := http.NewRequest("GET", "http://file-storage-service:8081/api/files/"+photoId, nil)
 	if err != nil {
 		return nil, "", err
 	}

@@ -88,7 +88,7 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	compDel.RegisterHTTPEndpoints(a.Router, compServ)
 
 	chatServerOptions := ChatServerPackage.ServerOptions{
-		Addr:       "localhost",
+		Addr:       "chat-service",
 		Port:       3030,
 		PathPrefix: "/meetme/chats",
 	}

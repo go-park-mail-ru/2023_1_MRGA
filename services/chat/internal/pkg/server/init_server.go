@@ -31,7 +31,7 @@ func InitServer(opts ServerOptions, repository app.IRepository) Server {
 }
 
 func (server *Server) RunServer() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server.opts.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", server.opts.Port))
 	if err != nil {
 		log.Fatalf("Ошибка в создании tpc-соединения сервера: %v", err)
 	}
