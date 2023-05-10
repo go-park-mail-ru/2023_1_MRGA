@@ -1,7 +1,6 @@
-CREATE ROLE mrga WITH LOGIN PASSWORD 'mrga_password';
+-- ALTER USER postgres WITH PASSWORD 'mrga_password';
+-- CREATE ROLE mrga WITH LOGIN PASSWORD 'mrga_password';
 
--- Переименовать существующую базу данных
-ALTER DATABASE mrga RENAME TO mrgaDB;
+-- CREATE DATABASE mrgadb;
 
--- Изменить владельца базы данных на нового пользователя
-ALTER DATABASE mrgaDB OWNER TO <new_user>;
+-- ALTER DATABASE mrgadb OWNER TO mrga_user;

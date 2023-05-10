@@ -48,6 +48,21 @@ var frontendHosts = []string{
 	"http://localhost",
 	"http://localhost:8080",
 	"http://localhost:80",
+	"https://localhost:8080",
+	"https://localhost:3000",
+	"https://5.159.100.59:3000",
+	"https://5.159.100.59:8080",
+	"https://192.168.0.2:3000",
+	"https://192.168.0.2:8080",
+	"https://5.159.100.59:8080",
+	"https://192.168.0.45:3000",
+	"https://95.163.180.8:3000",
+	"https://meetme-app.ru:3000",
+	"https://meetme-app.ru:80",
+	"https://meetme-app.ru",
+	"https://localhost",
+	"https://localhost:8080",
+	"https://localhost:80",
 }
 
 func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient) {
