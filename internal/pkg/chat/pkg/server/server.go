@@ -13,27 +13,18 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app/constants"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
-func (server *Server) InitRouter(pathPrefix string) {
-	server.router = mux.NewRouter().PathPrefix(pathPrefix).Subrouter()
-
-	// С префиксом /meetme/chats все ниже
-	server.router.HandleFunc("/create", server.CreateChatHandler).Methods("POST")
-	server.router.HandleFunc("/{chat_id}/send", server.SendMessageHandler).Methods("POST")
-	server.router.HandleFunc("/list", server.GetChatsListHandler).Methods("GET")
-	server.router.HandleFunc("/{chat_id}/messages", server.GetChatHandler).Methods("GET")
-}
-
 func (server Server) CreateChatHandler(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
+		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, errors.New(constants.ErrSessionExpired), http.StatusBadRequest)
 		return
 	}
 
@@ -69,7 +60,7 @@ func (server Server) CreateChatHandler(w http.ResponseWriter, r *http.Request) {
 
 	createdChatData := app.GetCreatedChatDataStruct(grpcCreatedChatData)
 
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	logger.Log(http.StatusOK, constants.LogSuccess, r.Method, r.URL.Path, false)
 	writer.Respond(w, r, structs.Map(createdChatData))
 }
 
@@ -96,8 +87,8 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
+		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, errors.New(constants.ErrSessionExpired), http.StatusBadRequest)
 		return
 	}
 
@@ -125,9 +116,36 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	msgContent := msgData.Content
+	userIds := msgData.UserIds
+	chatId := uint64ChatId
+	formatSentAt := msg.SentAt.Format(constants.FormatData)
+	senderId := uint64(userId)
+
+	for _, receiverUserId := range userIds {
+		server.mutex.Lock()
+		clientsByUser, found := server.userIdClients[receiverUserId]
+		server.mutex.Unlock()
+		if !found {
+			continue
+		}
+
+		err = sendToClients(clientsByUser, senderId, chatId, msgContent, formatSentAt)
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
+			return
+		}
+	}
+
+	err = sendToClients(server.userIdClients[senderId], senderId, chatId, msgContent, formatSentAt)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
+		return
+	}
+
+	logger.Log(http.StatusOK, constants.LogSuccess, r.Method, r.URL.Path, false)
 	writer.Respond(w, r, structs.Map(app.SendMessageResponse{
-		SentAt: msg.SentAt.Format("15:04 02.01.2006"),
+		SentAt: formatSentAt,
 	}))
 }
 
@@ -135,8 +153,8 @@ func (server Server) GetChatsListHandler(w http.ResponseWriter, r *http.Request)
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
+		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, errors.New(constants.ErrSessionExpired), http.StatusBadRequest)
 		return
 	}
 
@@ -175,7 +193,7 @@ func (server Server) GetChatsListHandler(w http.ResponseWriter, r *http.Request)
 		chatsMessages = append(chatsMessages, chatMsg)
 	}
 
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	logger.Log(http.StatusOK, constants.LogSuccess, r.Method, r.URL.Path, false)
 	writer.Respond(w, r, structs.Map(app.GetChatsListResponse{
 		ChatsList: chatsMessages,
 	}))
@@ -194,8 +212,8 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 	userIdDB := r.Context().Value("userId")
 	userId, ok := userIdDB.(uint32)
 	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, errors.New("Срок сессии пользователя истек"), http.StatusBadRequest)
+		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, errors.New(constants.ErrSessionExpired), http.StatusBadRequest)
 		return
 	}
 
@@ -235,7 +253,7 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 		messagesData = append(messagesData, msgData)
 	}
 
-	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	logger.Log(http.StatusOK, constants.LogSuccess, r.Method, r.URL.Path, false)
 	writer.Respond(w, r, structs.Map(app.GetChatResponse{
 		Chat: messagesData,
 	}))

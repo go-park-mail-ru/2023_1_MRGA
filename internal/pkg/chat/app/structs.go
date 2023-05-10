@@ -37,6 +37,7 @@ type CreateChatResponse struct {
 
 type SendMessageRequest struct {
 	Content string
+	UserIds []uint64
 }
 
 type SendMessageResponse struct {
@@ -49,4 +50,23 @@ type GetChatsListResponse struct {
 
 type GetChatResponse struct {
 	Chat []MessageData `structs:"chat"`
+}
+
+type WSMessageRequest struct {
+	SentAt  string   `json:"sentAt"`
+	ChatId  uint64   `json:"chatId"`
+	UserIds []uint64 `json:"userIds"`
+	Msg     string   `json:"msg"`
+}
+
+type WSMessageResponse struct {
+	SentAt   string `json:"sentAt"`
+	ChatId   uint64 `json:"chatId"`
+	SenderId uint64 `json:"senderId"`
+	Msg      string `json:"msg"`
+}
+
+type WSSendResponse struct {
+	Flag string            `json:"flag"`
+	Body WSMessageResponse `json:"body"`
 }
