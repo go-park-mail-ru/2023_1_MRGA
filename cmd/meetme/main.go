@@ -47,7 +47,7 @@ func main() {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
 
-	connAuth, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()), middleware.WithClientUnaryInterceptor())
+	connAuth, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()), middleware.AuthWithClientUnaryInterceptor())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -55,7 +55,7 @@ func main() {
 	defer connAuth.Close()
 	authClient := authProto.NewAuthClient(connAuth)
 
-	connComp, err := grpc.Dial(":8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connComp, err := grpc.Dial(":8083", grpc.WithTransportCredentials(insecure.NewCredentials()), middleware.CompWithClientUnaryInterceptor())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

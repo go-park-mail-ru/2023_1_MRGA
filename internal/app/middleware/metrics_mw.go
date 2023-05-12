@@ -50,6 +50,15 @@ var authHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Help: "Duration of HTTP requests.",
 }, []string{"path"})
 
+var compHints = prometheus.NewCounterVec(prometheus.CounterOpts{
+	Name: "comp_hits",
+}, []string{"error", "path"})
+
+var compHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+	Name: "comp_http_response_time_seconds",
+	Help: "Duration of HTTP requests.",
+}, []string{"path"})
+
 func init() {
 	prometheus.Register(fooCount)
 	prometheus.Register(hits)
@@ -75,7 +84,7 @@ func MetricsMW(next http.Handler) http.Handler {
 	})
 }
 
-func clientInterceptor(
+func authClientInterceptor(
 	ctx context.Context,
 	method string,
 	req interface{},
@@ -100,6 +109,35 @@ func clientInterceptor(
 	return err
 }
 
-func WithClientUnaryInterceptor() grpc.DialOption {
-	return grpc.WithUnaryInterceptor(clientInterceptor)
+func CompWithClientUnaryInterceptor() grpc.DialOption {
+	return grpc.WithUnaryInterceptor(authClientInterceptor)
+}
+
+func compClientInterceptor(
+	ctx context.Context,
+	method string,
+	req interface{},
+	reply interface{},
+	cc *grpc.ClientConn,
+	invoker grpc.UnaryInvoker,
+	opts ...grpc.CallOption,
+) error {
+	start := time.Now()
+	// Calls the invoker to execute RPC
+	err := invoker(ctx, method, req, reply, cc, opts...)
+	duration := time.Since(start)
+	compHttpDuration.WithLabelValues(method).Observe(duration.Seconds())
+	// Logic after invoking the invoker
+	log.Println("hi",
+		time.Since(start), err)
+	message := ""
+	if err != nil {
+		message = err.Error()
+	}
+	compHints.WithLabelValues(message, method).Inc()
+	return err
+}
+
+func AuthWithClientUnaryInterceptor() grpc.DialOption {
+	return grpc.WithUnaryInterceptor(authClientInterceptor)
 }
