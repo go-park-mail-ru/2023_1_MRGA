@@ -6,8 +6,6 @@ services: # имеджи, которые запустятся по вашему 
       - type: volume
         source: postgresdb-data
         target: /var/lib/postgresql/data
-      - "./config/postgres/postgresMainDB/postgres.conf:/var/lib/postgresql/data/postgresql.conf"
-      - "./config/postgres/postgresDBInit.sql:/docker-entrypoint-initdb.d/mrga_init.sql"
     ports: # порты
       - "5432:5432"
     networks:
@@ -16,7 +14,38 @@ services: # имеджи, которые запустятся по вашему 
       POSTGRES_PASSWORD: "mrga_password"
       POSTGRES_DB: "mrgadb"
       POSTGRES_USER: "mrga_user"
+      PGPORT: 5432
+  db-storage:
+    image: postgres:latest
+    volumes:
+      - type: volume
+        source: postgresstore-data
+        target: /var/lib/postgresql/data
+    ports:
+      - "5433:5433"
+    networks:
+      - service-network
+    environment:
+      POSTGRES_PASSWORD: "mrga_password"
+      POSTGRES_DB: "mrgadb"
+      POSTGRES_USER: "mrga_user"
+      PGPORT: 5433
+  db-chat:
+    image: postgres:latest
+    volumes:
+      - type: volume
+        source: postgreschat-data
+        target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "mrga_password"
+      POSTGRES_DB: "mrgadb"
+      POSTGRES_USER: "mrga_user"
+      PGPORT: 5434
 
+    ports:
+      - "5434:5434"
+    networks:
+      - service-network
   redis:
     image: redis:6.2-alpine
     restart: always
@@ -27,40 +56,6 @@ services: # имеджи, которые запустятся по вашему 
       - redis-data:/data
     networks:
       - service-network
-  db-storage:
-    image: postgres:latest
-    volumes:
-      - type: volume
-        source: postgresstore-data
-        target: /var/lib/postgresql/data
-      - "./config/postgres/postgresFileStorageServiceDB/postgres.conf:/var/lib/postgresql/data/postgresql.conf"
-      - "./config/postgres/postgresDBInit.sql:/docker-entrypoint-initdb.d/mrga_init.sql"
-    ports:
-      - "5433:5433"
-    networks:
-      - service-network
-    environment:
-      POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
-      POSTGRES_USER: "mrga_user"
-  db-chat:
-    image: postgres:latest
-    volumes:
-      - type: volume
-        source: postgreschat-data
-        target: /var/lib/postgresql/data
-      - "./config/postgres/postgresChatServiceDB/postgres.conf:/var/lib/postgresql/data/postgresql.conf"
-      - "./config/postgres/postgresDBInit.sql:/docker-entrypoint-initdb.d/mrga_init.sql"
-    environment:
-      POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
-      POSTGRES_USER: "mrga_user"
-
-    ports:
-      - "5434:5434"
-    networks:
-      - service-network
-
 
   server-backend:
       image: golang:1.20.4-alpine3.16
@@ -87,6 +82,8 @@ services: # имеджи, которые запустятся по вашему 
     command: sh -c "go run ./services/files_storage/cmd/main.go"
     networks:
       - service-network
+    ports:
+        - "8081:8081"
   auth-service:
     image: golang:1.20.4-alpine3.16
     volumes:
