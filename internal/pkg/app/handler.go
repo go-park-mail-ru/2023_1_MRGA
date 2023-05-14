@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
-	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
+	chatServer "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
 	compDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/complaints/delivery"
 	filterDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/delivery"
 	FilterRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/repository"
@@ -104,6 +104,5 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	compDel.RegisterHTTPEndpoints(a.Router, compServ)
 
 	chatRouter := ChatServerPackage.InitServer(chatOptions)
-
 	a.Router.PathPrefix(chatOptions.PathPrefix).Handler(chatRouter)
 }

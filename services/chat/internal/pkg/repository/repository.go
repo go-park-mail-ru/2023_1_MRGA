@@ -2,12 +2,41 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
+	"gorm.io/gorm"
 )
 
+func (repo Repository) GetDialogIfExists(ctx context.Context, initialDialogData []app.ChatUser) (outputChatData app.CreateChatResponse, found bool, err error) {
+	if len(initialDialogData) != 2 {
+		err = errors.New("Для инициализации диалога отправлены не два учатсника")
+		return
+	}
+
+	err = repo.db.WithContext(ctx).
+		Table("chat_users").
+		Select("chat_id").
+		Where("user_id = ? OR user_id = ?", initialDialogData[0].UserId, initialDialogData[1].UserId).
+		Group("chat_id").
+		Having("COUNT(user_id) = 2").
+		First(&outputChatData).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = nil
+		return
+	}
+
+	if err != nil {
+		return
+	}
+
+	found = true
+	return
+}
+
 func (repo Repository) CreateChat(ctx context.Context, initialChatData []app.ChatUser) (outputChatData app.CreateChatResponse, err error) {
-	newChat := app.Chat{}
+	var newChat app.ChatUser
 	err = repo.db.WithContext(ctx).Create(&newChat).Error
 	if err != nil {
 		return
