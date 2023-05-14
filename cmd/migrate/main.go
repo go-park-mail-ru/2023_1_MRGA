@@ -121,4 +121,11 @@ func main() {
 		log.Println("cant migrate db match")
 		os.Exit(2)
 	}
+
+	err = db.AutoMigrate(&dataStruct.Status{})
+	if err != nil {
+		log.Println("cant migrate db status")
+		os.Exit(2)
+	}
+
 }

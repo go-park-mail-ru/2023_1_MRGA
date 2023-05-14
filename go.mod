@@ -22,6 +22,12 @@ require (
 require github.com/gorilla/websocket v1.5.0
 
 require (
+	github.com/go-co-op/gocron v1.27.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
+)
+
+require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect

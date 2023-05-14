@@ -5,6 +5,15 @@ type User struct {
 	Email    string `json:"email" gorm:"unique"`
 	Password string `json:"password"`
 	BirthDay string `json:"birthDay" sql:"type:date" gorm:"type:date"`
+	Status   uint   `json:"status" sql:"not null;DEFAULT:1" gorm:"not null;DEFAULT:1"`
+	Count    int    `json:"count" gorm:"not null;DEFAULT:0"`
+}
+
+type Status struct {
+	Id          uint   `sql:"unique;type:uuid;primary_key;servicedefault:" json:"statusId" gorm:"primaryKey;unique"`
+	Status      string `json:"ststus"`
+	MaxLike     int    `json:"maxLike"`
+	Advertising bool   `json:"advertising"`
 }
 
 ///Info
