@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
@@ -23,7 +24,7 @@ type Server struct {
 }
 
 func (server Server) InitClient() (chatClient chatpc.ChatServiceClient, chatClientConn *grpc.ClientConn, err error) {
-	chatClientConn, err = grpc.Dial(server.clientTarget, grpc.WithInsecure())
+	chatClientConn, err = grpc.Dial(server.clientTarget, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return
 	}

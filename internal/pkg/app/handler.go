@@ -66,7 +66,7 @@ var frontendHosts = []string{
 	"meetme-app.ru",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient) {
+func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient, chatOptions ChatServerPackage.ServerOptions) {
 
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.CorsMiddleware(frontendHosts, h)
@@ -103,12 +103,7 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	authDel.RegisterHTTPEndpoints(a.Router, authServ)
 	compDel.RegisterHTTPEndpoints(a.Router, compServ)
 
-	chatServerOptions := ChatServerPackage.ServerOptions{
-		Addr:       "chat-service",
-		Port:       3030,
-		PathPrefix: "/meetme/chats",
-	}
-	chatRouter := ChatServerPackage.InitServer(chatServerOptions)
+	chatRouter := ChatServerPackage.InitServer(chatOptions)
 
-	a.Router.PathPrefix(chatServerOptions.PathPrefix).Handler(chatRouter)
+	a.Router.PathPrefix(chatOptions.PathPrefix).Handler(chatRouter)
 }
