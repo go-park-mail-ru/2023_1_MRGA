@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
-	"log"
 
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"

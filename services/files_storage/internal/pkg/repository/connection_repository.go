@@ -3,9 +3,10 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 	"log"
 	"os"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"

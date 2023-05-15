@@ -1,8 +1,9 @@
 package delivery
 
 import (
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 	"github.com/gorilla/mux"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 )

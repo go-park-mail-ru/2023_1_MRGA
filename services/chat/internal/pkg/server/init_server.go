@@ -5,9 +5,10 @@ import (
 	"log"
 	"net"
 
+	"google.golang.org/grpc"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
-	"google.golang.org/grpc"
 )
 
 type ServerOptions struct {

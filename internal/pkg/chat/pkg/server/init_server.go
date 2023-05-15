@@ -2,12 +2,13 @@ package server
 
 import (
 	"fmt"
-	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
 	"sync"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 )

@@ -2,8 +2,9 @@ package dsn
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 	"os"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 )
 
 func FromEnv() string {
