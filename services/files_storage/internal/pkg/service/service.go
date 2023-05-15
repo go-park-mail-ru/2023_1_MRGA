@@ -10,19 +10,12 @@ import (
 	"time"
 )
 
-type Service struct {
-}
-
-func InitService() Service {
-	return Service{}
-}
-
-func (service Service) UploadFile(file multipart.File, filename string, userID uint) (string, error) {
+func (service Service) UploadFile(file multipart.File, filename string, userID uint) (fileID uint, err error) {
 	dir := filepath.Join("services", "files_storage", "saved_files", fmt.Sprintf("%d", userID))
 
-	err := os.MkdirAll(dir, os.ModePerm)
+	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
-		return "", err
+		return
 	}
 
 	ext := filepath.Ext(filename)
@@ -33,28 +26,56 @@ func (service Service) UploadFile(file multipart.File, filename string, userID u
 
 	newFile, err := os.Create(filePath)
 	if err != nil {
-		return "", err
+		return
 	}
 	defer newFile.Close()
 
-	if _, err := file.Seek(0, 0); err != nil {
-		return "", err
+	if _, err = file.Seek(0, 0); err != nil {
+		return
 	}
 
-	if _, err := io.Copy(newFile, file); err != nil {
-		return "", err
+	if _, err = io.Copy(newFile, file); err != nil {
+		return
 	}
 
-	return filePath, nil
+	fileID, err = service.repository.UploadFile(filePath, userID)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
-func (service Service) GetFile(filePath string) (*os.File, string, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, "", err
+func (service Service) GetFile(userID uint) (file *os.File, filename string, err error) {
+	var filePath string
+	if filePath, err = service.repository.GetFile(userID); err != nil {
+		return
 	}
 
-	filename := path.Base(file.Name())
+	file, filename, err = openFileByPath(filePath)
+	if err != nil {
+		return
+	}
 
-	return file, filename, nil
+	return
+}
+
+func (service Service) GetFileByPath(filePath string) (file *os.File, filename string, err error) {
+	file, filename, err = openFileByPath(filePath)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func openFileByPath(pathToFile string) (file *os.File, filename string, err error) {
+	file, err = os.Open(pathToFile)
+	if err != nil {
+		return
+	}
+
+	filename = path.Base(file.Name())
+
+	return
 }

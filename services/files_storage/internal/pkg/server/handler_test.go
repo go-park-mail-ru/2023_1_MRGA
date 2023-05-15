@@ -30,7 +30,6 @@ func TestUploadFile(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockRepository := myMocks.NewMockIRepository(mockCtrl)
 	mockService := myMocks.NewMockIService(mockCtrl)
 
 	// Создаем временный файл и записываем в него некоторые данные
@@ -50,12 +49,11 @@ func TestUploadFile(t *testing.T) {
 
 	var userID uint = 1
 
-	mockRepository.EXPECT().UploadFile(tmpfile.Name(), userID).Return(uint(1), nil)
-	mockService.EXPECT().UploadFile(gomock.Any(), filepath.Base(tmpfile.Name()), userID).Return(tmpfile.Name(), nil)
+	const futurePhotoID uint = 1
+	mockService.EXPECT().UploadFile(gomock.Any(), filepath.Base(tmpfile.Name()), userID).Return(futurePhotoID, nil)
 
 	server := Server{
-		repository: mockRepository,
-		service:    mockService,
+		service: mockService,
 	}
 
 	// Создание *multipart.Writer
@@ -97,6 +95,6 @@ func TestUploadFile(t *testing.T) {
 
 	assert.Equal(t, uploadFileResp{Status: 200, Body: struct {
 		PhotoID uint `json:"photoID"`
-	}{1}}, uploadFileAnswer)
+	}{futurePhotoID}}, uploadFileAnswer)
 
 }

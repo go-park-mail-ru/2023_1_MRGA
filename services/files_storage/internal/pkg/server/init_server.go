@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/app"
+	"github.com/gorilla/mux"
 )
 
 type ServerOptions struct {
@@ -18,15 +19,22 @@ type ServerOptions struct {
 }
 
 type Server struct {
-	repository app.IRepository
 	service    app.IService
 	httpServer *http.Server
 }
 
-func InitServer(opts ServerOptions, repository app.IRepository, service app.IService) Server {
+func (server Server) getRouter() *mux.Router {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/api/files/upload", server.UploadFile).Methods("POST")
+	router.HandleFunc("/api/files/{id}", server.GetFile).Methods("GET")
+	router.HandleFunc("/api/files/{pathToFile:.*}", server.GetFileByPath).Methods("GET")
+	return router
+}
+
+func InitServer(opts ServerOptions, service app.IService) Server {
 	var server = Server{
-		repository: repository,
-		service:    service,
+		service: service,
 	}
 	return Server{
 		httpServer: &http.Server{

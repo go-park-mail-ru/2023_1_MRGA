@@ -33,9 +33,12 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	service := servicePackage.InitService()
+	service, err := servicePackage.InitService(repo)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
-	server := serverPackage.InitServer(getServerOptions(), repo, service)
+	server := serverPackage.InitServer(getServerOptions(), service)
 	err = server.RunServer()
 	if err != nil {
 		log.Fatal("Не удалось запустить сервер: " + err.Error())
