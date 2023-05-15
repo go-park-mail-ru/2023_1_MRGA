@@ -26,19 +26,37 @@ func writeMessage(ws *websocket.Conn, flag string, body app.WSMessageResponse) e
 	return ws.WriteMessage(websocket.TextMessage, responseJSON)
 }
 
-func sendToClients(clients []*websocket.Conn, senderId, chatId uint64, msg, sentAt string) (err error) {
+func sendToClients(clients []*websocket.Conn, msgData app.WSMessageResponse) (err error) {
 	for _, receiverWsClient := range clients {
-		msgData := app.WSMessageResponse{
-			ChatId:   chatId,
-			SenderId: senderId,
-			Msg:      msg,
-			SentAt:   sentAt,
-		}
-
 		if currErr := writeMessage(receiverWsClient, "SEND", msgData); currErr != nil {
 			err = currErr
 		}
 	}
+	return
+}
+
+func (server *Server) sendAll(wsMsgData app.WSMsgData) (err error) {
+	for _, receiverUserId := range wsMsgData.UserIds {
+		server.mutex.Lock()
+		clientsByUser, found := server.userIdClients[receiverUserId]
+		server.mutex.Unlock()
+		if !found {
+			continue
+		}
+
+		err = sendToClients(clientsByUser, wsMsgData.MsgData)
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
+			return
+		}
+	}
+
+	err = sendToClients(server.userIdClients[wsMsgData.MsgData.SenderId], wsMsgData.MsgData)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
+		return
+	}
+
 	return
 }
 

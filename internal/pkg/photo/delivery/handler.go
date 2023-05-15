@@ -3,6 +3,7 @@ package delivery
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -89,6 +90,70 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
+func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		err := r.Body.Close()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+	}()
+
+	err := r.ParseMultipartForm(512 << 20) // 512MB is the servicedefault size limit for a request
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	files := r.MultipartForm.File["files[]"]
+
+	userIdDB := r.Context().Value("userId")
+	userIdUint32, ok := userIdDB.(uint32)
+	if !ok {
+		err := errors.New("Пользователь не авторизирован")
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userId := uint(userIdUint32)
+
+	var pathToFiles []string
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		defer func() {
+			err := file.Close()
+			if err != nil {
+				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+				writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+				return
+			}
+		}()
+
+		pathToFile, err := uploadFile(file, fileHeader.Filename, userId)
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		pathToFiles = append(pathToFiles, pathToFile)
+	}
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	writer.Respond(w, r, map[string]interface{}{
+		"pathToFiles": pathToFiles,
+	})
+}
+
 func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	photoId, ok := params["photo"]
@@ -99,6 +164,31 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bodyBytes, filename, err := SendRequest(photoId)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	// Устанавливаем заголовки для ответа
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
+
+	// Автоматически ставит заголовок image/jpg или image/png
+	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(bodyBytes))
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+}
+
+func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pathToFile, ok := vars["pathToFile"]
+	if !ok {
+		err := errors.New("Не указан путь в запросе на получение файла")
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	bodyBytes, filename, err := getFileByPath(pathToFile)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -237,7 +327,7 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 		return 0, err
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", requestBody)
+	req, err := http.NewRequest("POST", "http://localhost:8081/api/v1/files/upload", requestBody)
 	if err != nil {
 		return 0, err
 	}
@@ -274,6 +364,70 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 	return answer.Body.PhotoID, nil
 }
 
+func uploadFile(file multipart.File, filename string, userID uint) (pathToFile string, err error) {
+
+	requestBody := &bytes.Buffer{}
+	writerFile := multipart.NewWriter(requestBody)
+	userIdField, err := writerFile.CreateFormField("userID")
+	if err != nil {
+		return
+	}
+	_, err = io.WriteString(userIdField, fmt.Sprintf("%d", userID))
+	if err != nil {
+		return
+	}
+
+	fileField, err := writerFile.CreateFormFile("file", filename)
+	if err != nil {
+		return
+	}
+	_, err = io.Copy(fileField, file)
+	if err != nil {
+		return
+	}
+
+	err = writerFile.Close()
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequest("POST", "http://localhost:8081/api/v2/files/upload", requestBody)
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", writerFile.FormDataContentType())
+
+	// Отправляем запрос и проверяем статус ответа
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		err = fmt.Errorf("status %d", resp.StatusCode)
+		return
+	}
+
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			return
+		}
+	}()
+
+	answerBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	var answer photo.ResponseUploadFile
+	err = json.Unmarshal(answerBody, &answer)
+	if err != nil {
+		return
+	}
+	return answer.Body.PathToFile, nil
+}
+
 func SendRequest(photoId string) ([]byte, string, error) {
 	// Создаем HTTP-запрос на другой микросервис
 	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+photoId, nil)
@@ -303,6 +457,39 @@ func SendRequest(photoId string) ([]byte, string, error) {
 
 	contentDisposition := resp.Header.Get("Content-Disposition")
 	filename := extractFilenameFromContentDisposition(contentDisposition)
+
+	return bodyBytes, filename, err
+}
+
+func getFileByPath(pathToFile string) (file []byte, filename string, err error) {
+	// Создаем HTTP-запрос на другой микросервис
+	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+pathToFile, nil)
+	if err != nil {
+		return
+	}
+
+	// Отправляем запрос и проверяем статус ответа
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		return
+	}
+	defer func() {
+		err = resp.Body.Close()
+		if err != nil {
+			return
+		}
+	}()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	contentDisposition := resp.Header.Get("Content-Disposition")
+	filename = extractFilenameFromContentDisposition(contentDisposition)
 
 	return bodyBytes, filename, err
 }

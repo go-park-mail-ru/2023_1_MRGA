@@ -26,7 +26,8 @@ type Server struct {
 func (server Server) getRouter() *mux.Router {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/files/upload", server.UploadFile).Methods("POST")
+	router.HandleFunc("/api/v1/files/upload", server.UploadFileV1).Methods("POST")
+	router.HandleFunc("/api/v2/files/upload", server.UploadFile).Methods("POST")
 	router.HandleFunc("/api/files/{id}", server.GetFile).Methods("GET")
 	router.HandleFunc("/api/files/{pathToFile:.*}", server.GetFileByPath).Methods("GET")
 	return router

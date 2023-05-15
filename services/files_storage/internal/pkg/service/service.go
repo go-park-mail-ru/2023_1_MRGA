@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (service Service) UploadFile(file multipart.File, filename string, userID uint) (fileID uint, err error) {
+func (service Service) UploadFileV1(file multipart.File, filename string, userID uint) (fileID uint, err error) {
 	dir := filepath.Join("services", "files_storage", "saved_files", fmt.Sprintf("%d", userID))
 
 	err = os.MkdirAll(dir, os.ModePerm)
@@ -38,7 +38,43 @@ func (service Service) UploadFile(file multipart.File, filename string, userID u
 		return
 	}
 
-	fileID, err = service.repository.UploadFile(filePath, userID)
+	fileID, err = service.repository.UploadFileV1(filePath, userID)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (service Service) UploadFile(file multipart.File, filename string, userID uint) (pathToFile string, err error) {
+	dir := filepath.Join("services", "files_storage", "saved_files", fmt.Sprintf("%d", userID))
+
+	err = os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		return
+	}
+
+	ext := filepath.Ext(filename)
+	baseName := filename[0 : len(filename)-len(ext)]
+	newFileName := fmt.Sprintf("%s_%d%s", baseName, time.Now().UnixNano(), ext)
+
+	pathToFile = filepath.Join(dir, newFileName)
+
+	newFile, err := os.Create(pathToFile)
+	if err != nil {
+		return
+	}
+	defer newFile.Close()
+
+	if _, err = file.Seek(0, 0); err != nil {
+		return
+	}
+
+	if _, err = io.Copy(newFile, file); err != nil {
+		return
+	}
+
+	err = service.repository.UploadFile(pathToFile, userID)
 	if err != nil {
 		return
 	}

@@ -3,6 +3,7 @@ package app
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app/constants"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 )
 
@@ -23,7 +24,7 @@ func GetCreatedChatDataStruct(data *chatpc.CreateChatResponse) CreateChatRespons
 	}
 }
 
-func GetGRPCChatMessage(data Message, chatId uint) *chatpc.SendMessageRequest {
+func GetGRPCChatMessage(data InitialMessageData, chatId uint) *chatpc.SendMessageRequest {
 	return &chatpc.SendMessageRequest{
 		Msg: &chatpc.Message{
 			SenderId:   uint32(data.SenderId),
@@ -31,7 +32,9 @@ func GetGRPCChatMessage(data Message, chatId uint) *chatpc.SendMessageRequest {
 			SentAt:     timestamppb.New(data.SentAt),
 			ReadStatus: data.ReadStatus,
 		},
-		ChatId: uint32(chatId),
+		ChatId:      uint32(chatId),
+		MessageType: string(data.MessageType),
+		Path:        data.Path,
 	}
 }
 
@@ -43,10 +46,12 @@ func GetChatMessageStruct(data *chatpc.GetChatsListResponse) ChatMessage {
 
 	return ChatMessage{
 		Msg: MessageResponse{
-			SenderId:   uint(data.GetMsg().GetSenderId()),
-			Content:    data.GetMsg().GetContent(),
-			SentAt:     data.GetMsg().GetSentAt().AsTime().Local().Format("15:04 02.01.2006"),
-			ReadStatus: data.GetMsg().GetReadStatus(),
+			SenderId:    uint(data.GetMsg().GetSenderId()),
+			Content:     data.GetMsg().GetContent(),
+			SentAt:      data.GetMsg().GetSentAt().AsTime().Local().Format("15:04 02.01.2006"),
+			ReadStatus:  data.GetMsg().GetReadStatus(),
+			MessageType: constants.MessageType(data.GetMessageType()),
+			Path:        data.GetPath(),
 		},
 		ChatId:      uint(data.GetChatId()),
 		ChatUserIds: chatUserIds,
@@ -56,10 +61,12 @@ func GetChatMessageStruct(data *chatpc.GetChatsListResponse) ChatMessage {
 func GetMessageDataStruct(data *chatpc.GetChatResponse) MessageData {
 	return MessageData{
 		Msg: MessageResponse{
-			SenderId:   uint(data.GetMsg().GetSenderId()),
-			Content:    data.GetMsg().GetContent(),
-			SentAt:     data.GetMsg().GetSentAt().AsTime().Local().Format("15:04 02.01.2006"),
-			ReadStatus: data.GetMsg().GetReadStatus(),
+			SenderId:    uint(data.GetMsg().GetSenderId()),
+			Content:     data.GetMsg().GetContent(),
+			SentAt:      data.GetMsg().GetSentAt().AsTime().Local().Format("15:04 02.01.2006"),
+			ReadStatus:  data.GetMsg().GetReadStatus(),
+			MessageType: constants.MessageType(data.GetMessageType()),
+			Path:        data.GetPath(),
 		},
 		MsgId: uint(data.GetMsgId()),
 	}

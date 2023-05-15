@@ -15,3 +15,10 @@ const (
 	LogWSUnexpectedClose   = "WebSocket is unexpected close"
 	LogWSClose             = "WebSocket is closed"
 )
+
+type MessageType string
+
+const (
+	TextMessage  MessageType = "text"
+	AudioMessage MessageType = "audio"
+)

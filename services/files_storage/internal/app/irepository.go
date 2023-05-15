@@ -1,6 +1,7 @@
 package app
 
 type IRepository interface {
-	UploadFile(string, uint) (uint, error)
+	UploadFileV1(string, uint) (uint, error)
+	UploadFile(string, uint) (error)
 	GetFile(uint) (string, error)
 }

@@ -92,11 +92,15 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	msg := app.Message{
-		SenderId:   uint(userId),
-		Content:    msgData.Content,
-		SentAt:     time.Now(),
-		ReadStatus: false,
+	msg := app.InitialMessageData{
+		Message: app.Message{
+			SenderId:   uint(userId),
+			Content:    msgData.Content,
+			SentAt:     time.Now(),
+			ReadStatus: false,
+		},
+		MessageType: msgData.MessageType,
+		Path:        msgData.Path,
 	}
 
 	grpcMsg := app.GetGRPCChatMessage(msg, uint(uint64ChatId))
@@ -109,35 +113,27 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	defer conn.Close()
 
-	_, err = client.SendMessage(context.Background(), grpcMsg)
+	response, err := client.SendMessage(context.Background(), grpcMsg)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	msgContent := msgData.Content
-	userIds := msgData.UserIds
-	chatId := uint64ChatId
-	formatSentAt := msg.SentAt.Format(constants.FormatData)
-	senderId := uint64(userId)
-
-	for _, receiverUserId := range userIds {
-		server.mutex.Lock()
-		clientsByUser, found := server.userIdClients[receiverUserId]
-		server.mutex.Unlock()
-		if !found {
-			continue
-		}
-
-		err = sendToClients(clientsByUser, senderId, chatId, msgContent, formatSentAt)
-		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
-			return
-		}
+	wsMsgData := app.WSMsgData{
+		UserIds: msgData.UserIds,
+		MsgData: app.WSMessageResponse{
+			Msg:         msgData.Content,
+			ChatId:      uint64ChatId,
+			SentAt:      msg.SentAt.Format(constants.FormatData),
+			SenderId:    uint64(userId),
+			MsgId:       uint64(response.GetMsgId()),
+			MessageType: string(msgData.MessageType),
+			Path:        msgData.Path,
+		},
 	}
 
-	err = sendToClients(server.userIdClients[senderId], senderId, chatId, msgContent, formatSentAt)
+	err = server.sendAll(wsMsgData)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
 		return
@@ -145,7 +141,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 
 	logger.Log(http.StatusOK, constants.LogSuccess, r.Method, r.URL.Path, false)
 	writer.Respond(w, r, structs.Map(app.SendMessageResponse{
-		SentAt: formatSentAt,
+		SentAt: wsMsgData.MsgData.SentAt,
 	}))
 }
 
