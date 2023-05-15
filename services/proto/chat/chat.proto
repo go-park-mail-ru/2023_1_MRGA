@@ -5,7 +5,6 @@ package proto_chat;
 option go_package = "github.com/go-park-mail-ru/2023_1_MRGA.git/proto_services/proto_chat";
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 message Message {
     uint32 sender_id = 1;
@@ -25,6 +24,12 @@ message CreateChatResponse {
 message SendMessageRequest {
     Message msg = 1;
     uint32 chat_id = 2;
+    string message_type = 3;
+    string path = 4;
+}
+
+message SendMessageResponse {
+    uint32 msg_id = 1;
 }
 
 message GetChatsListRequest {
@@ -34,7 +39,9 @@ message GetChatsListRequest {
 message GetChatsListResponse {
     Message msg = 1;
     uint32 chat_id = 2;
-    repeated uint32 chat_user_ids = 3;
+    string message_type = 3;
+    string path = 4;
+    repeated uint32 chat_user_ids = 5;
 }
 
 message GetChatRequest {
@@ -45,11 +52,13 @@ message GetChatRequest {
 message GetChatResponse {
     Message msg = 1;
     uint32 msg_id = 2;
+    string message_type = 3;
+    string path = 4;
 }
 
 service ChatService {
     rpc CreateChat(CreateChatRequest) returns (CreateChatResponse) {}
-    rpc SendMessage(SendMessageRequest) returns (google.protobuf.Empty) {}
+    rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {}
     rpc GetChatsList(GetChatsListRequest) returns (stream GetChatsListResponse) {}
     rpc GetChat(GetChatRequest) returns (stream GetChatResponse) {}
 }
