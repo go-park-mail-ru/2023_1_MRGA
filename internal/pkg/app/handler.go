@@ -3,7 +3,6 @@ package app
 import (
 	"net/http"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gorm.io/gorm"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
@@ -28,6 +27,7 @@ import (
 	recDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/delivery"
 	RecRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/repository"
 	recUC "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/usecase"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 )
@@ -42,23 +42,12 @@ var frontendHosts = []string{
 	"http://5.159.100.59:8080",
 	"http://192.168.0.45:3000",
 	"http://95.163.180.8:3000",
-	"http://meetme-app.ru:3000",
-	"http://meetme-app.ru:80",
-	"http://meetme-app.ru",
-	"http://localhost",
-	"http://localhost:8080",
-	"http://localhost:80",
 }
 
 func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient) {
-	//a.Router.Path("/metrics").Handle(promhttp.Handler())
-	a.Router.Handle("/metrics", promhttp.Handler())
-	a.Router.Use(func(h http.Handler) http.Handler {
-		return middleware.CorsMiddleware(frontendHosts, h)
-	})
 
 	a.Router.Use(func(h http.Handler) http.Handler {
-		return middleware.MetricsMW(h)
+		return middleware.CorsMiddleware(frontendHosts, h)
 	})
 
 	a.Router.Use(func(h http.Handler) http.Handler {
@@ -73,10 +62,6 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	ucInfo := infoUC.NewInfoUseCase(infoRepo)
 	InfoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
 
-	a.Router.Path("/500").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(500)
-		//writer.ErrorRespond(w, r, fmt.Errorf("Oops"), http.StatusInternalServerError)
-	})
 	infoUserRepo := InfoUserRepository.NewInfoRepo(db)
 	ucUser := infoUserUC.NewInfoUseCase(infoUserRepo, ucInfo, ucPhoto)
 	infoUserDel.RegisterHTTPEndpoints(a.Router, ucUser, compServ)

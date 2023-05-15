@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
@@ -47,7 +46,7 @@ func main() {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
 
-	connAuth, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()), middleware.AuthWithClientUnaryInterceptor())
+	connAuth, err := grpc.Dial(":8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -55,7 +54,7 @@ func main() {
 	defer connAuth.Close()
 	authClient := authProto.NewAuthClient(connAuth)
 
-	connComp, err := grpc.Dial(":8083", grpc.WithTransportCredentials(insecure.NewCredentials()), middleware.CompWithClientUnaryInterceptor())
+	connComp, err := grpc.Dial(":8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
