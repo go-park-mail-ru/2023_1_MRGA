@@ -65,6 +65,8 @@ func init() {
 	prometheus.Register(httpDuration)
 	prometheus.Register(authHints)
 	prometheus.Register(authHttpDuration)
+	prometheus.Register(compHints)
+	prometheus.Register(compHttpDuration)
 }
 
 func MetricsMW(next http.Handler) http.Handler {
@@ -109,7 +111,7 @@ func authClientInterceptor(
 	return err
 }
 
-func CompWithClientUnaryInterceptor() grpc.DialOption {
+func AuthWithClientUnaryInterceptor() grpc.DialOption {
 	return grpc.WithUnaryInterceptor(authClientInterceptor)
 }
 
@@ -138,6 +140,6 @@ func compClientInterceptor(
 	return err
 }
 
-func AuthWithClientUnaryInterceptor() grpc.DialOption {
-	return grpc.WithUnaryInterceptor(authClientInterceptor)
+func CompWithClientUnaryInterceptor() grpc.DialOption {
+	return grpc.WithUnaryInterceptor(compClientInterceptor)
 }
