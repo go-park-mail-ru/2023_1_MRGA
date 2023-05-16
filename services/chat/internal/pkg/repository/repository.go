@@ -78,10 +78,10 @@ func (repo Repository) SendMessage(ctx context.Context, newMsg app.ChatMessage) 
 func (repo Repository) GetChatsList(userData app.GetChatsListRequest) (recentMsgs []app.MessageWithChatUsers, err error) {
 	var msgs []app.ChatMessage
 	subQuery := repo.db.Select("MAX(sent_at) as max_sent_at, chat_id").Table("messages").Group("chat_id")
-	err = repo.db.
+	err = repo.db.Table("messages").
 		Joins("INNER JOIN chat_users ON chat_users.user_id = ? AND chat_users.chat_id = messages.chat_id", userData.UserId).
 		Joins("INNER JOIN (?) AS m ON messages.chat_id = m.chat_id AND messages.sent_at = m.max_sent_at", subQuery).
-		Joins("INNER JOIN media ON messages.id = media.message_id").
+		Joins("LEFT JOIN media ON messages.id = media.message_id").
 		Select("messages.*, media.message_type, media.path").
 		Order("m.max_sent_at DESC").
 		Find(&msgs).Error

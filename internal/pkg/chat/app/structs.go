@@ -57,6 +57,7 @@ type InitialMessageData struct {
 
 type SendMessageResponse struct {
 	SentAt string `structs:"sentAt"`
+	MsgId  uint64 `structs:"msgId"`
 }
 
 type GetChatsListResponse struct {

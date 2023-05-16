@@ -120,6 +120,8 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	msgId := uint64(response.GetMsgId())
+
 	wsMsgData := app.WSMsgData{
 		UserIds: msgData.UserIds,
 		MsgData: app.WSMessageResponse{
@@ -127,7 +129,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 			ChatId:      uint64ChatId,
 			SentAt:      msg.SentAt.Format(constants.FormatData),
 			SenderId:    uint64(userId),
-			MsgId:       uint64(response.GetMsgId()),
+			MsgId:       msgId,
 			MessageType: string(msgData.MessageType),
 			Path:        msgData.Path,
 		},
@@ -142,6 +144,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	logger.Log(http.StatusOK, constants.LogSuccess, r.Method, r.URL.Path, false)
 	writer.Respond(w, r, structs.Map(app.SendMessageResponse{
 		SentAt: wsMsgData.MsgData.SentAt,
+		MsgId:  msgId,
 	}))
 }
 
