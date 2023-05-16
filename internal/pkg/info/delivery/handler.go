@@ -90,3 +90,17 @@ func (h *Handler) GetReasons(w http.ResponseWriter, r *http.Request) {
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, result)
 }
+
+func (h *Handler) GetStatuses(w http.ResponseWriter, r *http.Request) {
+	statuses, err := h.useCase.GetStatuses()
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	result := make(map[string]interface{})
+	result["statuses"] = statuses
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	writer.Respond(w, r, result)
+}

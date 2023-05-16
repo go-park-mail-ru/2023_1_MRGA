@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -49,6 +50,17 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 }
 
 func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) error {
+	if reaction.Reaction == "like" {
+		ok, err := m.userRepo.CheckCountReaction(userId)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("you cant like people today. Try tomorrow")
+		}
+		err = m.userRepo.IncrementLikeCount(userId)
+	}
+
 	userToId := reaction.EvaluatedUserId
 
 	reactionId, err := m.userRepo.GetIdReaction(reaction.Reaction)

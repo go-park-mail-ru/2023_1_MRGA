@@ -15,4 +15,6 @@ type IRepositoryMatch interface {
 	ChangeStatusMatch(userId, profileId uint) error
 	GetChat(userId uint) (ChatAnswer, error)
 	GetAge(userId uint) (int, error) //user_info
+	CheckCountReaction(userId uint) (ok bool, err error)
+	IncrementLikeCount(userId uint) error
 }

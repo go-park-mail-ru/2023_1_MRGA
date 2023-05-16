@@ -15,4 +15,7 @@ type IRepositoryInfo interface {
 	GetUserHashtags(userId uint) ([]string, error)
 	AddUserHashtag(hashtag []dataStruct.UserHashtag) error
 	DeleteUserHashtag(userId uint, hashtagId []uint) error
+
+	GetUserStatus(userId uint) (string, error)
+	ChangeUserStatus(userId, statusId uint) error
 }
