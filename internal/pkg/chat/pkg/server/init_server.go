@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 )
@@ -30,7 +31,7 @@ type Server struct {
 }
 
 func (server Server) InitClient() (chatClient chatpc.ChatServiceClient, chatClientConn *grpc.ClientConn, err error) {
-	chatClientConn, err = grpc.Dial(server.clientTarget, grpc.WithInsecure())
+	chatClientConn, err = grpc.Dial(server.clientTarget, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return
 	}

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = 	"./";
+option go_package = "./";
 
 package authProto;
 
@@ -13,33 +13,33 @@ service Auth{
 }
 
 message UserRegisterInfo{
-  string email=1;
-  string password=2;
-  string birthday=3;
+  string email = 1;
+  string password = 2;
+  string birthday = 3;
 }
 
 message UserChangeInfo{
-  uint32 userId=1;
-  string email=2;
-  string password=3;
-  string birthday=4;
+  uint32 userId = 1;
+  string email = 2;
+  string password = 3;
+  string birthday = 4;
 }
 
 message UserLoginInfo{
-  string email=1;
-  string password=2;
+  string email = 1;
+  string password = 2;
 }
 
 message UserResponse{
-  uint32 userId=1;
-  string token=2;
-  bool ok=3;
+  uint32 userId = 1;
+  string token = 2;
+  bool ok = 3;
 }
 
 message UserToken{
-  string token=1;
+  string token = 1;
 }
 
 message Response{
-  bool ok=1;
+  bool ok = 1;
 }

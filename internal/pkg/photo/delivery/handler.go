@@ -62,7 +62,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		photoId, err := SendPhoto(file, fileHeader.Filename, uint(userId))
+		photoId, err := h.SendPhoto(file, fileHeader.Filename, uint(userId))
 		if err != nil {
 			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 			err = fmt.Errorf("cant parse json")
@@ -98,7 +98,7 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyBytes, filename, err := SendRequest(photoId)
+	bodyBytes, filename, err := h.SendRequest(photoId)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -192,7 +192,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	photoId, err := SendPhoto(file, "file", uint(userId))
+	photoId, err := h.SendPhoto(file, "file", uint(userId))
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -210,7 +210,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
-func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) {
+func (h *Handler) SendPhoto(file multipart.File, filename string, userID uint) (uint, error) {
 
 	requestBody := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(requestBody)
@@ -236,8 +236,8 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 	if err != nil {
 		return 0, err
 	}
-
-	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", requestBody)
+	requestUrl := fmt.Sprintf("http://%s:8081/api/files/upload", h.serverHost)
+	req, err := http.NewRequest("POST", requestUrl, requestBody)
 	if err != nil {
 		return 0, err
 	}
@@ -274,9 +274,10 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 	return answer.Body.PhotoID, nil
 }
 
-func SendRequest(photoId string) ([]byte, string, error) {
+func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
 	// Создаем HTTP-запрос на другой микросервис
-	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+photoId, nil)
+	requestUrl := fmt.Sprintf("http://%s:8081/api/files/%s", h.serverHost, photoId)
+	req, err := http.NewRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, "", err
 	}
