@@ -51,7 +51,6 @@ var frontendHosts = []string{
 }
 
 func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient) {
-	//a.Router.Path("/metrics").Handle(promhttp.Handler())
 	a.Router.Handle("/metrics", promhttp.Handler())
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.CorsMiddleware(frontendHosts, h)
@@ -73,10 +72,6 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	ucInfo := infoUC.NewInfoUseCase(infoRepo)
 	InfoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
 
-	a.Router.Path("/500").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(500)
-		//writer.ErrorRespond(w, r, fmt.Errorf("Oops"), http.StatusInternalServerError)
-	})
 	infoUserRepo := InfoUserRepository.NewInfoRepo(db)
 	ucUser := infoUserUC.NewInfoUseCase(infoUserRepo, ucInfo, ucPhoto)
 	infoUserDel.RegisterHTTPEndpoints(a.Router, ucUser, compServ)
