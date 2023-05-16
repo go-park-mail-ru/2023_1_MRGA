@@ -60,14 +60,14 @@ func GetChatMessageStruct(data *chatpc.GetChatsListResponse) ChatMessage {
 
 func GetMessageDataStruct(data *chatpc.GetChatResponse) MessageData {
 	return MessageData{
-		Msg: MessageResponse{
+		Msg: MessageResponseWithId{
 			SenderId:    uint(data.GetMsg().GetSenderId()),
 			Content:     data.GetMsg().GetContent(),
 			SentAt:      data.GetMsg().GetSentAt().AsTime().Local().Format("15:04 02.01.2006"),
 			ReadStatus:  data.GetMsg().GetReadStatus(),
 			MessageType: constants.MessageType(data.GetMessageType()),
 			Path:        data.GetPath(),
+			MsgId:       uint(data.GetMsgId()),
 		},
-		MsgId: uint(data.GetMsgId()),
 	}
 }

@@ -7,14 +7,15 @@ import (
 )
 
 type Message struct {
-	SenderId   uint      `structs:"senderId"`
-	Content    string    `structs:"content"`
-	SentAt     time.Time `structs:"sentAt"`
-	ReadStatus bool      `structs:"readStatus"`
+	SenderId    uint                  `structs:"senderId"`
+	Content     string                `structs:"content"`
+	SentAt      time.Time             `structs:"sentAt"`
+	ReadStatus  bool                  `structs:"readStatus"`
+	MessageType constants.MessageType `structs:"messageType"`
+	Path        string                `structs:"path"`
 }
 
 type MessageResponse struct {
-	MsgId       uint                  `structs:"msgId"`
 	SenderId    uint                  `structs:"senderId"`
 	Content     string                `structs:"content"`
 	SentAt      string                `structs:"sentAt"`
@@ -29,9 +30,18 @@ type ChatMessage struct {
 	ChatUserIds []uint          `structs:"chatUserIds"`
 }
 
+type MessageResponseWithId struct {
+	MsgId       uint                  `structs:"msgId"`
+	SenderId    uint                  `structs:"senderId"`
+	Content     string                `structs:"content"`
+	SentAt      string                `structs:"sentAt"`
+	ReadStatus  bool                  `structs:"readStatus"`
+	MessageType constants.MessageType `structs:"messageType"`
+	Path        string                `structs:"path"`
+}
+
 type MessageData struct {
-	Msg   MessageResponse `structs:"msg"`
-	MsgId uint            `structs:"msgId"`
+	Msg MessageResponseWithId `structs:"msg"`
 }
 
 type CreateChatRequest struct {
@@ -51,8 +61,6 @@ type SendMessageRequest struct {
 
 type InitialMessageData struct {
 	Message
-	MessageType constants.MessageType
-	Path        string
 }
 
 type SendMessageResponse struct {

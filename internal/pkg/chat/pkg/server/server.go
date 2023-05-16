@@ -94,13 +94,13 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 
 	msg := app.InitialMessageData{
 		Message: app.Message{
-			SenderId:   uint(userId),
-			Content:    msgData.Content,
-			SentAt:     time.Now(),
-			ReadStatus: false,
+			SenderId:    uint(userId),
+			Content:     msgData.Content,
+			SentAt:      time.Now(),
+			ReadStatus:  false,
+			MessageType: msgData.MessageType,
+			Path:        msgData.Path,
 		},
-		MessageType: msgData.MessageType,
-		Path:        msgData.Path,
 	}
 
 	grpcMsg := app.GetGRPCChatMessage(msg, uint(uint64ChatId))
