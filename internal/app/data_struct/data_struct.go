@@ -11,7 +11,7 @@ type User struct {
 
 type Status struct {
 	Id          uint   `sql:"unique;type:uuid;primary_key;servicedefault:" json:"statusId" gorm:"primaryKey;unique"`
-	Status      string `json:"ststus"`
+	Status      string `json:"status"`
 	MaxLike     int    `json:"maxLike"`
 	Advertising bool   `json:"advertising"`
 }

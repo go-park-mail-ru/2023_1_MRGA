@@ -50,7 +50,6 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 }
 
 func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) error {
-
 	if reaction.Reaction == "like" {
 		ok, err := m.userRepo.CheckCountReaction(userId)
 		if err != nil {

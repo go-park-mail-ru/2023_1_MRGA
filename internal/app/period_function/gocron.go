@@ -11,15 +11,10 @@ import (
 )
 
 func RunCronJobs(db *gorm.DB) {
-	// 3
 	s := gocron.NewScheduler(time.UTC)
-
-	// 4
 	s.Every(1).Day().Do(func() {
 		repository.CleanCount(db)
 		log.Println("count is cleaned")
 	})
-
-	// 5
 	s.StartBlocking()
 }
