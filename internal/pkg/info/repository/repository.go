@@ -61,6 +61,15 @@ func (r *InfoRepository) GetReasons() ([]string, error) {
 	return reasons, nil
 }
 
+func (r *InfoRepository) GetStatuses() ([]string, error) {
+	var statuses []string
+	err := r.db.Table("statuses").Select("name").Find(&statuses).Error
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 func (r *InfoRepository) GetHashtags() ([]string, error) {
 	var hashtags []string
 	err := r.db.Table("hashtags").Select("hashtag").Find(&hashtags).Error
@@ -101,4 +110,10 @@ func (r *InfoRepository) GetEducationId(nameEducation string) (uint, error) {
 	education := &dataStruct.Education{}
 	err := r.db.First(education, "education = ?", nameEducation).Error
 	return education.Id, err
+}
+
+func (r *InfoRepository) GetStatusId(status string) (uint, error) {
+	statusDB := &dataStruct.Status{}
+	err := r.db.First(statusDB, "name = ?", status).Error
+	return statusDB.Id, err
 }

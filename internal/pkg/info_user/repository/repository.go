@@ -141,3 +141,23 @@ func (r *InfoRepository) CheckFilter(userId uint) (bool, error) {
 	}
 	return true, nil
 }
+
+func (r *InfoRepository) GetUserStatus(userId uint) (string, error) {
+	var status string
+	err := r.db.Table("users u").Select("s.name").
+		Where("u.id=?", userId).
+		Joins("Join statuses s on u.status=s.id").
+		Find(&status).Error
+	return status, err
+}
+
+func (r *InfoRepository) ChangeUserStatus(userId, statusId uint) error {
+	var user dataStruct.User
+	err := r.db.First(&user, "id=?", userId).Error
+	if err != nil {
+		return err
+	}
+	user.Status = statusId
+	err = r.db.Save(&user).Error
+	return err
+}

@@ -6,8 +6,10 @@ type IRepositoryInfo interface {
 	GetJobId(nameJob string) (uint, error)
 	GetZodiacId(nameZodiac string) (uint, error)
 	GetCityId(nameCity string) (uint, error)
+	GetStatusId(status string) (uint, error)
 
 	GetHashtags() ([]string, error)
+	GetStatuses() ([]string, error)
 	GetReasons() ([]string, error)
 	GetCities() ([]string, error)
 	GetJobs() ([]string, error)

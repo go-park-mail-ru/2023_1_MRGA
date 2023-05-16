@@ -24,4 +24,5 @@ func RegisterHTTPEndpoints(router *mux.Router, ic info.UseCase) {
 	router.HandleFunc("/api/job", h.GetJobs).Methods("GET")
 	router.HandleFunc("/api/education", h.GetEducation).Methods("GET")
 	router.HandleFunc("/api/reason", h.GetReasons).Methods("GET")
+	router.HandleFunc("/api/status", h.GetStatuses).Methods("GET")
 }
