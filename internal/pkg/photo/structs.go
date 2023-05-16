@@ -1,15 +1,17 @@
 package photo
 
 type AnswerPhoto struct {
-	Status int `json:"status"`
+	Status int
+	Error string
 	Body   struct {
-		PhotoID uint `json:"photoID"`
-	} `json:"body"`
+		PhotoID uint
+	}
 }
 
 type ResponseUploadFile struct {
-	Status int `json:"status"`
+	Status int
+	Error string 
 	Body   struct {
-		PathToFile string `json:"pathToFile"`
-	} `json:"body"`
+		PathToFile string
+	}
 }

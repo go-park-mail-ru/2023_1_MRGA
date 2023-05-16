@@ -339,10 +339,6 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 	if err != nil {
 		return 0, err
 	}
-	if resp.StatusCode != http.StatusOK {
-		err = fmt.Errorf("status %v", resp.StatusCode)
-		return 0, err
-	}
 
 	defer func() {
 		err := resp.Body.Close()
@@ -351,21 +347,21 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 		}
 	}()
 
-	answerBody, err := ioutil.ReadAll(resp.Body)
+	var answer photo.AnswerPhoto
+	err = json.NewDecoder(resp.Body).Decode(&answer)
 	if err != nil {
 		return 0, err
 	}
 
-	var answer photo.AnswerPhoto
-	err = json.Unmarshal(answerBody, &answer)
-	if err != nil {
+	if answer.Status != 200 {
+		err = fmt.Errorf("status: %d, error: %s", answer.Status, answer.Error)
 		return 0, err
 	}
+
 	return answer.Body.PhotoID, nil
 }
 
 func uploadFile(file multipart.File, filename string, userID uint) (pathToFile string, err error) {
-
 	requestBody := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(requestBody)
 	userIdField, err := writerFile.CreateFormField("userID")
@@ -403,10 +399,6 @@ func uploadFile(file multipart.File, filename string, userID uint) (pathToFile s
 	if err != nil {
 		return
 	}
-	if resp.StatusCode != http.StatusOK {
-		err = fmt.Errorf("status %d", resp.StatusCode)
-		return
-	}
 
 	defer func() {
 		err := resp.Body.Close()
@@ -415,14 +407,14 @@ func uploadFile(file multipart.File, filename string, userID uint) (pathToFile s
 		}
 	}()
 
-	answerBody, err := ioutil.ReadAll(resp.Body)
+	var answer photo.ResponseUploadFile
+	err = json.NewDecoder(resp.Body).Decode(&answer)
 	if err != nil {
 		return
 	}
 
-	var answer photo.ResponseUploadFile
-	err = json.Unmarshal(answerBody, &answer)
-	if err != nil {
+	if answer.Status != 200 {
+		err = fmt.Errorf("status: %d, error: %s", answer.Status, answer.Error)
 		return
 	}
 	return answer.Body.PathToFile, nil
