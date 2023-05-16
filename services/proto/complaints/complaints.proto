@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = 	"./";
+option go_package = "./";
 
 package complaints;
 
@@ -10,10 +10,10 @@ service Complaints{
 }
 
 message UserId{
-  uint32 UserId=1;
+  uint32 UserId = 1;
 }
 
 
 message Response{
-  bool Banned=1;
+  bool Banned = 1;
 }

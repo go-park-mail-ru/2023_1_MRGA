@@ -71,17 +71,17 @@ paths:
             type: object
       summary: get list of cities for registration
       tags:
-      - info_user
+        - info_user
   /meetme/login:
     post:
       description: authorise existing user with username/email and password
       parameters:
-      - description: nickname/email password
-        in: body
-        name: Body
-        required: true
-        schema:
-          $ref: '#/definitions/app.LoginInput'
+        - description: nickname/email password
+          in: body
+          name: Body
+          required: true
+          schema:
+            $ref: '#/definitions/app.LoginInput'
       responses:
         "200":
           description: OK
@@ -90,7 +90,7 @@ paths:
             type: object
       summary: authorise user
       tags:
-      - Registration
+        - Registration
   /meetme/logout:
     post:
       description: user can log out and end session
@@ -102,7 +102,7 @@ paths:
             type: object
       summary: Logout authorised user
       tags:
-      - Registration
+        - Registration
   /meetme/recommendations:
     get:
       description: now just return info_user 10 or fewer users
@@ -115,17 +115,17 @@ paths:
             type: object
       summary: return recommendations for user
       tags:
-      - Recommendations
+        - Recommendations
   /meetme/register:
     post:
       description: create new account with unique username and email
       parameters:
-      - description: info_user about user
-        in: body
-        name: Body
-        required: true
-        schema:
-          $ref: '#/definitions/dataStruct.User'
+        - description: info_user about user
+          in: body
+          name: Body
+          required: true
+          schema:
+            $ref: '#/definitions/dataStruct.User'
       responses:
         "200":
           description: OK
@@ -134,12 +134,12 @@ paths:
             type: object
       summary: Register new user
       tags:
-      - Registration
+        - Registration
   /meetme/user:
     get:
       description: you can get info_user about current user
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -147,7 +147,7 @@ paths:
             $ref: '#/definitions/app.UserRes'
       summary: get info_user about current user
       tags:
-      - info_user
+        - info_user
 schemes:
-- http
+  - http
 swagger: "2.0"
