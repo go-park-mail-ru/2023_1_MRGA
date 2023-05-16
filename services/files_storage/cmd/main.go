@@ -11,7 +11,7 @@ import (
 )
 
 func getServerOptions() (opts serverPackage.ServerOptions) {
-	opts.Host = "localhost"
+	opts.Host = "0.0.0.0"
 	flag.StringVar(&opts.Port, "p", "8081", "set the server's port")
 	flag.IntVar(&opts.MaxHeaderBytes, "m", 1, "set the server's max header bytes in MB")
 

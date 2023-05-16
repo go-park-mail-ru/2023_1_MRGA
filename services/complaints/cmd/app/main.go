@@ -34,7 +34,7 @@ func main() {
 	srv := server.NewGPRCServer(compRepo)
 	complaintProto.RegisterComplaintsServer(s, srv)
 
-	l, err := net.Listen("tcp", ":8083")
+	l, err := net.Listen("tcp", "0.0.0.0:8083")
 	if err != nil {
 		log.Fatalf("listener failed " + err.Error())
 	}

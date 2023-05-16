@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	authDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/auth/delivery"
-	chatServer "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
+	ChatServerPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/pkg/server"
 	compDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/complaints/delivery"
 	filterDel "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/delivery"
 	FilterRepository "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/repository"
@@ -33,26 +33,27 @@ import (
 )
 
 var frontendHosts = []string{
-	"http://localhost:8080",
-	"http://localhost:3000",
-	"http://5.159.100.59:3000",
-	"http://5.159.100.59:8080",
-	"http://192.168.0.2:3000",
-	"http://192.168.0.2:8080",
-	"http://5.159.100.59:8080",
-	"http://192.168.0.45:3000",
-	"http://95.163.180.8:3000",
-	"http://meetme-app.ru:3000",
-	"http://meetme-app.ru:80",
-	"http://meetme-app.ru",
-	"http://localhost",
-	"http://localhost:8080",
-	"http://localhost:80",
+	"https://localhost:8080",
+	"https://localhost:3000",
+	"https://5.159.100.59:3000",
+	"https://5.159.100.59:8080",
+	"https://192.168.0.2:3000",
+	"https://192.168.0.2:8080",
+	"https://5.159.100.59:8080",
+	"https://192.168.0.45:3000",
+	"https://95.163.180.8:3000",
+	"https://meetme-app.ru:3000",
+	"https://meetme-app.ru:80",
+	"https://meetme-app.ru",
+	"https://localhost",
+	"https://localhost:8080",
+	"https://localhost:80",
+	"meetme-app.ru",
 }
 
-func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient) {
-	//a.Router.Path("/metrics").Handle(promhttp.Handler())
+func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient, chatOptions ChatServerPackage.ServerOptions) {
 	a.Router.Handle("/metrics", promhttp.Handler())
+
 	a.Router.Use(func(h http.Handler) http.Handler {
 		return middleware.CorsMiddleware(frontendHosts, h)
 	})
@@ -73,10 +74,6 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	ucInfo := infoUC.NewInfoUseCase(infoRepo)
 	InfoDel.RegisterHTTPEndpoints(a.Router, ucInfo)
 
-	a.Router.Path("/500").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(500)
-		//writer.ErrorRespond(w, r, fmt.Errorf("Oops"), http.StatusInternalServerError)
-	})
 	infoUserRepo := InfoUserRepository.NewInfoRepo(db)
 	ucUser := infoUserUC.NewInfoUseCase(infoUserRepo, ucInfo, ucPhoto)
 	infoUserDel.RegisterHTTPEndpoints(a.Router, ucUser, compServ)
@@ -96,11 +93,6 @@ func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, com
 	authDel.RegisterHTTPEndpoints(a.Router, authServ)
 	compDel.RegisterHTTPEndpoints(a.Router, compServ)
 
-	chatServerOptions := chatServer.ServerOptions{
-		Addr:       "localhost",
-		Port:       3030,
-		PathPrefix: "/meetme/chats",
-	}
-	chatRouter := chatServer.InitServer(chatServerOptions)
-	a.Router.PathPrefix(chatServerOptions.PathPrefix).Handler(chatRouter)
+	chatRouter := ChatServerPackage.InitServer(chatOptions)
+	a.Router.PathPrefix(chatOptions.PathPrefix).Handler(chatRouter)
 }

@@ -5,11 +5,12 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/gorilla/websocket"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app/constants"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
-	"github.com/gorilla/websocket"
 )
 
 func writeMessage(ws *websocket.Conn, flag string, body app.WSMessageResponse) error {
