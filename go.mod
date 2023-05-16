@@ -19,6 +19,8 @@ require (
 	gorm.io/gorm v1.25.0
 )
 
+require github.com/gorilla/websocket v1.5.0
+
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect

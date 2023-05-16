@@ -7,4 +7,5 @@ type IServer interface {
 	SendMessageHandler(http.ResponseWriter, *http.Request)
 	GetChatsListHandler(http.ResponseWriter, *http.Request)
 	GetChatHandler(http.ResponseWriter, *http.Request)
+	ConnectionHandler(http.ResponseWriter, *http.Request)
 }

@@ -7,8 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 	"github.com/gorilla/mux"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (server Server) getRouter() *mux.Router {
@@ -82,7 +83,7 @@ func (server Server) GetFile(w http.ResponseWriter, r *http.Request) {
 	defer gotFile.Close()
 
 	// Устанавливаем заголовки для ответа
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
 
 	// Автоматически ставит заголовок image/jpg или image/png
 	http.ServeContent(w, r, filename, time.Now(), gotFile)

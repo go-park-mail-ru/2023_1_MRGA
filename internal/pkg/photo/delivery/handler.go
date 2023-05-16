@@ -9,6 +9,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -60,7 +62,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		photoId, err := SendPhoto(file, fileHeader.Filename, uint(userId))
+		photoId, err := h.SendPhoto(file, fileHeader.Filename, uint(userId))
 		if err != nil {
 			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 			err = fmt.Errorf("cant parse json")
@@ -95,45 +97,20 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
-	bodyBytes, err := SendRequest(photoId)
+
+	bodyBytes, filename, err := h.SendRequest(photoId)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
 
-	body := &bytes.Buffer{}
-	writerFile := multipart.NewWriter(body)
-	fileField, err := writerFile.CreateFormFile("file", "filename")
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
+	// Устанавливаем заголовки для ответа
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
 
-	_, err = fileField.Write(bodyBytes)
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
-
-	err = writerFile.Close()
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
-
+	// Автоматически ставит заголовок image/jpg или image/png
+	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(bodyBytes))
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
-	w.Header().Set("Content-Type", writerFile.FormDataContentType())
-	w.Header().Set("Content-Disposition", "attachment")
-	_, err = w.Write(body.Bytes())
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-		return
-	}
 }
 
 func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
@@ -215,7 +192,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	photoId, err := SendPhoto(file, "file", uint(userId))
+	photoId, err := h.SendPhoto(file, "file", uint(userId))
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -233,7 +210,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
-func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) {
+func (h *Handler) SendPhoto(file multipart.File, filename string, userID uint) (uint, error) {
 
 	requestBody := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(requestBody)
@@ -259,8 +236,8 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 	if err != nil {
 		return 0, err
 	}
-
-	req, err := http.NewRequest("POST", "http://localhost:8081/api/files/upload", requestBody)
+	requestUrl := fmt.Sprintf("http://%s:8081/api/files/upload", h.serverHost)
+	req, err := http.NewRequest("POST", requestUrl, requestBody)
 	if err != nil {
 		return 0, err
 	}
@@ -294,25 +271,25 @@ func SendPhoto(file multipart.File, filename string, userID uint) (uint, error) 
 	if err != nil {
 		return 0, err
 	}
-
 	return answer.Body.PhotoID, nil
 }
 
-func SendRequest(photoId string) ([]byte, error) {
+func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
 	// Создаем HTTP-запрос на другой микросервис
-	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+photoId, nil)
+	requestUrl := fmt.Sprintf("http://%s:8081/api/files/%s", h.serverHost, photoId)
+	req, err := http.NewRequest("GET", requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Отправляем запрос и проверяем статус ответа
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, err
+		return nil, "", err
 	}
 	defer func() {
 		err := resp.Body.Close()
@@ -322,7 +299,18 @@ func SendRequest(photoId string) ([]byte, error) {
 	}()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	return bodyBytes, err
+
+	contentDisposition := resp.Header.Get("Content-Disposition")
+	filename := extractFilenameFromContentDisposition(contentDisposition)
+
+	return bodyBytes, filename, err
+}
+
+func extractFilenameFromContentDisposition(contentDisposition string) string {
+	if strings.Contains(contentDisposition, "filename=") {
+		return strings.Trim(strings.Split(contentDisposition, "filename=")[1], "\"")
+	}
+	return ""
 }

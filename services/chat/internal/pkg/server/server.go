@@ -20,11 +20,32 @@ func (server Server) CreateChat(ctx context.Context, initialChatData *chatpc.Cre
 		userIds = append(userIds, app.ChatUser{UserId: userId})
 	}
 
-	var createdChat app.CreateChatResponse
-	createdChat, err = server.repository.CreateChat(ctx, userIds)
-	if err != nil {
-		logger.Log(http.StatusInternalServerError, err.Error(), "POST", "CreateChat", true)
+	var countUsers int = len(userIds)
+
+	if countUsers == 1 {
+		err = errors.New("Чат должен состоять, как минимум, из двух участников")
+		logger.Log(http.StatusBadRequest, err.Error(), "POST", "CreateChat", true)
 		return
+	}
+
+	var (
+		createdChat app.CreateChatResponse
+		found       = false
+	)
+	if countUsers == 2 {
+		createdChat, found, err = server.repository.GetDialogIfExists(ctx, userIds)
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), "POST", "CreateChat", true)
+			return
+		}
+	}
+
+	if !found {
+		createdChat, err = server.repository.CreateChat(ctx, userIds)
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), "POST", "CreateChat", true)
+			return
+		}
 	}
 
 	outputChatData = app.GetGrpcInitialChatData(createdChat)
