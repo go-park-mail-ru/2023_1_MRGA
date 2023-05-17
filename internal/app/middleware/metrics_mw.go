@@ -14,6 +14,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 )
 
 type ResponseWriter struct {
@@ -81,11 +83,34 @@ var compHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
 }, []string{"path"})
 
 func init() {
-	prometheus.Register(fooCount)
-	prometheus.Register(hits)
-	prometheus.Register(httpDuration)
-	prometheus.Register(authHints)
-	prometheus.Register(authHttpDuration)
+	err := prometheus.Register(fooCount)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(hits)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(httpDuration)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(authHints)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(authHttpDuration)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(compHints)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(compHttpDuration)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
 }
 
 func MetricsMW(next http.Handler) http.Handler {
@@ -115,13 +140,11 @@ func authClientInterceptor(
 	opts ...grpc.CallOption,
 ) error {
 	start := time.Now()
-	// Calls the invoker to execute RPC
+
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	duration := time.Since(start)
 	authHttpDuration.WithLabelValues(method).Observe(duration.Seconds())
-	// Logic after invoking the invoker
-	log.Println("hi",
-		time.Since(start), err)
+
 	message := ""
 	if err != nil {
 		message = err.Error()
@@ -130,7 +153,7 @@ func authClientInterceptor(
 	return err
 }
 
-func CompWithClientUnaryInterceptor() grpc.DialOption {
+func AuthWithClientUnaryInterceptor() grpc.DialOption {
 	return grpc.WithUnaryInterceptor(authClientInterceptor)
 }
 
@@ -144,13 +167,10 @@ func compClientInterceptor(
 	opts ...grpc.CallOption,
 ) error {
 	start := time.Now()
-	// Calls the invoker to execute RPC
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	duration := time.Since(start)
 	compHttpDuration.WithLabelValues(method).Observe(duration.Seconds())
-	// Logic after invoking the invoker
-	log.Println("hi",
-		time.Since(start), err)
+
 	message := ""
 	if err != nil {
 		message = err.Error()
@@ -159,6 +179,6 @@ func compClientInterceptor(
 	return err
 }
 
-func AuthWithClientUnaryInterceptor() grpc.DialOption {
-	return grpc.WithUnaryInterceptor(authClientInterceptor)
+func CompWithClientUnaryInterceptor() grpc.DialOption {
+	return grpc.WithUnaryInterceptor(compClientInterceptor)
 }

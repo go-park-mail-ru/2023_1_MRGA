@@ -51,6 +51,7 @@ var frontendHosts = []string{
 	"meetme-app.ru",
 }
 
+
 func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient, chatOptions ChatServerPackage.ServerOptions) {
 	a.Router.Handle("/metrics", promhttp.Handler())
 
