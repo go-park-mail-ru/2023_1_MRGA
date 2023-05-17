@@ -87,7 +87,7 @@ type WSMessageResponse struct {
 	MsgId       uint64 `json:"msgId"`
 	SenderId    uint64 `json:"senderId"`
 	Msg         string `json:"msg"`
-	MessageType string `json:"msgType"`
+	MessageType string `json:"messageType"`
 	Path        string `json:"path"`
 }
 

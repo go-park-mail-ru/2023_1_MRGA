@@ -100,7 +100,7 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	err := r.ParseMultipartForm(512 << 20) // 512MB is the servicedefault size limit for a request
+	err := r.ParseMultipartForm(1024 << 20) // 512MB is the servicedefault size limit for a request
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
