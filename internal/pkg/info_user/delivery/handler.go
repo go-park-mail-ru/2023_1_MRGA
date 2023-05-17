@@ -140,6 +140,27 @@ func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, mapInfo)
 }
 
+func (h *Handler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	statuses, err := h.useCase.GetUserStatus(uint(userId))
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+	result := make(map[string]interface{})
+	result["status"] = statuses
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	writer.Respond(w, r, result)
+}
+
 func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
@@ -193,6 +214,51 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 	mapInfo := structs.Map(&result)
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, mapInfo)
+}
+
+func (h *Handler) ChangeUserStatus(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		err := r.Body.Close()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+	}()
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	var statusInp info_user.StatusInp
+	err = json.Unmarshal(reqBody, &statusInp)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		err = fmt.Errorf("cant parse json")
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	err = h.useCase.ChangeUserStatus(uint(userId), statusInp)
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
+	writer.Respond(w, r, map[string]interface{}{})
 }
 
 func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {

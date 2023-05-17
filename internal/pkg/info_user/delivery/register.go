@@ -33,4 +33,6 @@ func RegisterHTTPEndpoints(router *mux.Router, ic info_user.UseCase, compServ co
 	router.HandleFunc("/meetme/hashtags-user", h.GetUserHashtags).Methods("GET")
 	router.HandleFunc("/meetme/hashtags-user", h.ChangeUserHashtags).Methods("PUT", "OPTIONS")
 
+	router.HandleFunc("/meetme/status-user", h.GetUserStatus).Methods("GET")
+	router.HandleFunc("/meetme/status-user", h.ChangeUserStatus).Methods("PUT", "OPTIONS")
 }

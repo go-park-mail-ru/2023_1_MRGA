@@ -259,12 +259,33 @@ func (iu *InfoUseCase) ChangeUserHashtags(userId uint, hashtagInp info_user.Hash
 	return nil
 }
 
+func (iu *InfoUseCase) GetUserStatus(userId uint) (string, error) {
+	status, err := iu.userRepo.GetUserStatus(userId)
+	if err != nil {
+		return "", err
+	}
+	return status, nil
+}
+
 func (iu *InfoUseCase) GetUserHashtagsId(userId uint) ([]uint, error) {
 	hashtags, err := iu.userRepo.GetUserHashtagsId(userId)
 	if err != nil {
 		return nil, err
 	}
 	return hashtags, nil
+}
+
+func (iu *InfoUseCase) ChangeUserStatus(userId uint, statusInp info_user.StatusInp) error {
+	statusId, err := iu.infoUseCase.GetStatusId(statusInp.Status)
+	if err != nil {
+		return err
+	}
+
+	err = iu.userRepo.ChangeUserStatus(userId, statusId)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func Contains(s []uint, elem uint) bool {

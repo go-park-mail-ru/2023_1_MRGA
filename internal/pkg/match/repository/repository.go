@@ -139,3 +139,35 @@ func (r *MatchRepository) DeleteMatch(userId, userMatchId uint) error {
 	err = r.db.Delete(&dataStruct.Match{}, "id=?", match.Id).Error
 	return err
 }
+
+func (r *MatchRepository) CheckCountReaction(userId uint) (ok bool, err error) {
+	var count int
+	err = r.db.Table("users").Select("count").Where("id = ?", userId).Find(&count).Error
+	if err != nil {
+		return false, err
+	}
+	var maxCount int
+	err = r.db.Table("users u").Select("s.max_like").
+		Joins("Join statuses s on u.status=s.id").
+		Where("u.id = ?", userId).Find(&maxCount).Error
+	if err != nil {
+		return false, err
+	}
+	if count < maxCount {
+		return true, nil
+	}
+	return false, nil
+}
+func (r *MatchRepository) IncrementLikeCount(userId uint) error {
+	var user dataStruct.User
+	err := r.db.First(&user, "id = ?", userId).Error
+	if err != nil {
+		return err
+	}
+	user.Count += 1
+	err = r.db.Save(&user).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

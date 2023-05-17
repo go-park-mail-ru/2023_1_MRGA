@@ -22,6 +22,9 @@ require (
 require github.com/gorilla/websocket v1.5.0
 
 require (
+	github.com/go-co-op/gocron v1.27.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect

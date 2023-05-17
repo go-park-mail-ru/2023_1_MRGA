@@ -66,6 +66,15 @@ func (iu *InfoUseCase) GetReasons() ([]string, error) {
 	return reasons, nil
 }
 
+func (iu *InfoUseCase) GetStatuses() ([]string, error) {
+	statuses, err := iu.userRepo.GetStatuses()
+	if err != nil {
+		return nil, err
+	}
+
+	return statuses, nil
+}
+
 func (iu *InfoUseCase) GetCityId(city string) (uint, error) {
 	cityId, err := iu.userRepo.GetCityId(city)
 	if err != nil {
@@ -104,4 +113,12 @@ func (iu *InfoUseCase) GetHashtagId(hashtagId []string) ([]uint, error) {
 		return nil, err
 	}
 	return hashtags, nil
+}
+
+func (iu *InfoUseCase) GetStatusId(status string) (uint, error) {
+	statusId, err := iu.userRepo.GetStatusId(status)
+	if err != nil {
+		return 0, err
+	}
+	return statusId, nil
 }

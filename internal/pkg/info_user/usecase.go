@@ -11,5 +11,8 @@ type UseCase interface {
 	GetUserHashtags(userId uint) ([]string, error)
 	ChangeUserHashtags(userId uint, inp HashtagInp) error
 
+	GetUserStatus(userId uint) (string, error)
+	ChangeUserStatus(userId uint, statusInp StatusInp) error
+
 	GetUserHashtagsId(userId uint) ([]uint, error)
 }
