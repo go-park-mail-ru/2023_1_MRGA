@@ -1,7 +1,10 @@
 package middleware
 
 import (
+	"bufio"
+	"errors"
 	"log"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,18 +16,36 @@ import (
 	"google.golang.org/grpc"
 )
 
-type responseWriter struct {
+type ResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
 }
 
-func NewResponseWriter(w http.ResponseWriter) *responseWriter {
-	return &responseWriter{w, http.StatusOK}
+func NewResponseWriter(w http.ResponseWriter) *ResponseWriter {
+	return &ResponseWriter{
+		ResponseWriter: w,
+		statusCode:     0,
+	}
+
 }
 
-func (rw *responseWriter) WriteHeader(code int) {
+func (rw *ResponseWriter) WriteHeader(code int) {
+	if rw.statusCode != 0 {
+		return
+	}
 	rw.statusCode = code
 	rw.ResponseWriter.WriteHeader(code)
+}
+
+func (rw *ResponseWriter) Write(data []byte) (int, error) {
+	return rw.ResponseWriter.Write(data)
+}
+func (rw *ResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := rw.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("hijack not supported")
+	}
+	return h.Hijack()
 }
 
 var fooCount = prometheus.NewCounter(prometheus.CounterOpts{
