@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/period_function"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/app/server"
@@ -50,6 +51,7 @@ func main() {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
 
+	go period_function.RunCronJobs(db)
 	isLocal := env_getter.GetEnvAsBool("IS_LOCAL", true)
 	authServiceHost := "0.0.0.0"
 	if !isLocal {

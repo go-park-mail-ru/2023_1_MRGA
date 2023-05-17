@@ -1,7 +1,10 @@
 package middleware
 
 import (
+	"bufio"
+	"errors"
 	"log"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,20 +14,40 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 )
 
-type responseWriter struct {
+type ResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
 }
 
-func NewResponseWriter(w http.ResponseWriter) *responseWriter {
-	return &responseWriter{w, http.StatusOK}
+func NewResponseWriter(w http.ResponseWriter) *ResponseWriter {
+	return &ResponseWriter{
+		ResponseWriter: w,
+		statusCode:     0,
+	}
+
 }
 
-func (rw *responseWriter) WriteHeader(code int) {
+func (rw *ResponseWriter) WriteHeader(code int) {
+	if rw.statusCode != 0 {
+		return
+	}
 	rw.statusCode = code
 	rw.ResponseWriter.WriteHeader(code)
+}
+
+func (rw *ResponseWriter) Write(data []byte) (int, error) {
+	return rw.ResponseWriter.Write(data)
+}
+func (rw *ResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := rw.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("hijack not supported")
+	}
+	return h.Hijack()
 }
 
 var fooCount = prometheus.NewCounter(prometheus.CounterOpts{
@@ -60,11 +83,34 @@ var compHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
 }, []string{"path"})
 
 func init() {
-	prometheus.Register(fooCount)
-	prometheus.Register(hits)
-	prometheus.Register(httpDuration)
-	prometheus.Register(authHints)
-	prometheus.Register(authHttpDuration)
+	err := prometheus.Register(fooCount)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(hits)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(httpDuration)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(authHints)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(authHttpDuration)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(compHints)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
+	err = prometheus.Register(compHttpDuration)
+	if err != nil {
+		logger.Log(0, err.Error(), "init metrics", "/", true)
+	}
 }
 
 func MetricsMW(next http.Handler) http.Handler {
@@ -94,13 +140,11 @@ func authClientInterceptor(
 	opts ...grpc.CallOption,
 ) error {
 	start := time.Now()
-	// Calls the invoker to execute RPC
+
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	duration := time.Since(start)
 	authHttpDuration.WithLabelValues(method).Observe(duration.Seconds())
-	// Logic after invoking the invoker
-	log.Println("hi",
-		time.Since(start), err)
+
 	message := ""
 	if err != nil {
 		message = err.Error()
@@ -109,7 +153,7 @@ func authClientInterceptor(
 	return err
 }
 
-func CompWithClientUnaryInterceptor() grpc.DialOption {
+func AuthWithClientUnaryInterceptor() grpc.DialOption {
 	return grpc.WithUnaryInterceptor(authClientInterceptor)
 }
 
@@ -123,13 +167,10 @@ func compClientInterceptor(
 	opts ...grpc.CallOption,
 ) error {
 	start := time.Now()
-	// Calls the invoker to execute RPC
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	duration := time.Since(start)
 	compHttpDuration.WithLabelValues(method).Observe(duration.Seconds())
-	// Logic after invoking the invoker
-	log.Println("hi",
-		time.Since(start), err)
+
 	message := ""
 	if err != nil {
 		message = err.Error()
@@ -138,6 +179,6 @@ func compClientInterceptor(
 	return err
 }
 
-func AuthWithClientUnaryInterceptor() grpc.DialOption {
-	return grpc.WithUnaryInterceptor(authClientInterceptor)
+func CompWithClientUnaryInterceptor() grpc.DialOption {
+	return grpc.WithUnaryInterceptor(compClientInterceptor)
 }
