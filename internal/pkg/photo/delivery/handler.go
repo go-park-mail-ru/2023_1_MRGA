@@ -15,6 +15,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/face_finder"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
@@ -42,6 +43,42 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+	var photoWithoutFace []int
+
+	for idx, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		defer func() {
+			err := file.Close()
+			if err != nil {
+				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+				writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+				return
+			}
+		}()
+
+		ok, err = face_finder.IsPhotoWithFace(file)
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		if !ok {
+			photoWithoutFace = append(photoWithoutFace, idx)
+		}
+	}
+
+	if len(photoWithoutFace) > 0 {
+		logger.Log(http.StatusBadRequest, fmt.Errorf("there is not face").Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespondWithData(w, r, fmt.Errorf("there is not face"), http.StatusBadRequest, map[string]interface{}{"problemPhoto": photoWithoutFace})
 		return
 	}
 
