@@ -423,7 +423,7 @@ func (h *Handler) SendPhoto(file multipart.File, filename string, userID uint) (
 	if err != nil {
 		return 0, err
 	}
-	requestUrl := fmt.Sprintf("http://%s:8081/api/files/upload", h.serverHost)
+	requestUrl := fmt.Sprintf("http://%s:8081/api/v1/files/upload", h.serverHost)
 	req, err := http.NewRequest("POST", requestUrl, requestBody)
 	if err != nil {
 		return 0, err
