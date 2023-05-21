@@ -70,14 +70,14 @@ func (mr *MockIServerMockRecorder) UploadFile(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockIServer)(nil).UploadFile), arg0, arg1)
 }
 
-// UploadFileV1 mocks base method.
-func (m *MockIServer) UploadFileV1(arg0 http.ResponseWriter, arg1 *http.Request) {
+// UploadPhoto mocks base method.
+func (m *MockIServer) UploadPhoto(arg0 http.ResponseWriter, arg1 *http.Request) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "UploadFileV1", arg0, arg1)
+	m.ctrl.Call(m, "UploadPhoto", arg0, arg1)
 }
 
-// UploadFileV1 indicates an expected call of UploadFileV1.
-func (mr *MockIServerMockRecorder) UploadFileV1(arg0, arg1 interface{}) *gomock.Call {
+// UploadPhoto indicates an expected call of UploadPhoto.
+func (mr *MockIServerMockRecorder) UploadPhoto(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFileV1", reflect.TypeOf((*MockIServer)(nil).UploadFileV1), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadPhoto", reflect.TypeOf((*MockIServer)(nil).UploadPhoto), arg0, arg1)
 }

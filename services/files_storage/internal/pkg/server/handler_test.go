@@ -19,16 +19,16 @@ import (
 	myMocks "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/mocks"
 )
 
-type uploadFileV1 struct {
+type UploadPhoto struct {
 	PhotoID uint `json:"photoID"`
 }
 
-type uploadFileV1Resp struct {
-	Status int          `json:"status"`
-	Body   uploadFileV1 `json:"body"`
+type UploadPhotoResp struct {
+	Status int         `json:"status"`
+	Body   UploadPhoto `json:"body"`
 }
 
-func TestUploadFileV1(t *testing.T) {
+func TestUploadPhoto(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -52,7 +52,7 @@ func TestUploadFileV1(t *testing.T) {
 	var userID uint = 1
 
 	const futurePhotoID uint = 1
-	mockService.EXPECT().UploadFileV1(gomock.Any(), filepath.Base(tmpfile.Name()), userID).Return(futurePhotoID, nil)
+	mockService.EXPECT().UploadPhoto(gomock.Any(), filepath.Base(tmpfile.Name()), userID).Return(futurePhotoID, nil)
 
 	server := Server{
 		service: mockService,
@@ -92,14 +92,14 @@ func TestUploadFileV1(t *testing.T) {
 	// Создаем запись ответа
 	recorder := httptest.NewRecorder()
 
-	server.UploadFileV1(recorder, request)
+	server.UploadPhoto(recorder, request)
 
 	body := recorder.Body
 
-	var uploadFileAnswer uploadFileV1Resp
+	var uploadFileAnswer UploadPhotoResp
 	err = json.NewDecoder(body).Decode(&uploadFileAnswer)
 
-	assert.Equal(t, uploadFileV1Resp{Status: 200, Body: uploadFileV1{
+	assert.Equal(t, UploadPhotoResp{Status: 200, Body: UploadPhoto{
 		PhotoID: futurePhotoID}}, uploadFileAnswer)
 
 }

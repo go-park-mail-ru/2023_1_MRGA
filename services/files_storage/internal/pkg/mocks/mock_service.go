@@ -82,17 +82,17 @@ func (mr *MockIServiceMockRecorder) UploadFile(arg0, arg1, arg2 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockIService)(nil).UploadFile), arg0, arg1, arg2)
 }
 
-// UploadFileV1 mocks base method.
-func (m *MockIService) UploadFileV1(arg0 multipart.File, arg1 string, arg2 uint) (uint, error) {
+// UploadPhoto mocks base method.
+func (m *MockIService) UploadPhoto(arg0 multipart.File, arg1 string, arg2 uint) (uint, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UploadFileV1", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "UploadPhoto", arg0, arg1, arg2)
 	ret0, _ := ret[0].(uint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UploadFileV1 indicates an expected call of UploadFileV1.
-func (mr *MockIServiceMockRecorder) UploadFileV1(arg0, arg1, arg2 interface{}) *gomock.Call {
+// UploadPhoto indicates an expected call of UploadPhoto.
+func (mr *MockIServiceMockRecorder) UploadPhoto(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFileV1", reflect.TypeOf((*MockIService)(nil).UploadFileV1), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadPhoto", reflect.TypeOf((*MockIService)(nil).UploadPhoto), arg0, arg1, arg2)
 }

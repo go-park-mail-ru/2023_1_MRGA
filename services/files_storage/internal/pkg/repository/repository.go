@@ -1,6 +1,6 @@
 package repository
 
-func (repository Repository) UploadFileV1(filePath string, userID uint) (uint, error) {
+func (repository Repository) UploadPhoto(filePath string, userID uint) (uint, error) {
 	file := &File{
 		Path:   filePath,
 		UserID: userID,

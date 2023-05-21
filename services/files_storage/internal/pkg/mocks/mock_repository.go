@@ -62,17 +62,17 @@ func (mr *MockIRepositoryMockRecorder) UploadFile(arg0, arg1 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockIRepository)(nil).UploadFile), arg0, arg1)
 }
 
-// UploadFileV1 mocks base method.
-func (m *MockIRepository) UploadFileV1(arg0 string, arg1 uint) (uint, error) {
+// UploadPhoto mocks base method.
+func (m *MockIRepository) UploadPhoto(arg0 string, arg1 uint) (uint, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UploadFileV1", arg0, arg1)
+	ret := m.ctrl.Call(m, "UploadPhoto", arg0, arg1)
 	ret0, _ := ret[0].(uint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UploadFileV1 indicates an expected call of UploadFileV1.
-func (mr *MockIRepositoryMockRecorder) UploadFileV1(arg0, arg1 interface{}) *gomock.Call {
+// UploadPhoto indicates an expected call of UploadPhoto.
+func (mr *MockIRepositoryMockRecorder) UploadPhoto(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFileV1", reflect.TypeOf((*MockIRepository)(nil).UploadFileV1), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadPhoto", reflect.TypeOf((*MockIRepository)(nil).UploadPhoto), arg0, arg1)
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
-func (server Server) UploadFileV1(w http.ResponseWriter, r *http.Request) {
+func (server Server) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 	file, fileHandler, err := r.FormFile("file")
 	if err != nil {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -32,7 +32,7 @@ func (server Server) UploadFileV1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileID, err := server.service.UploadFileV1(file, fileHandler.Filename, uint(userIDUInt64))
+	fileID, err := server.service.UploadPhoto(file, fileHandler.Filename, uint(userIDUInt64))
 	if err != nil {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return

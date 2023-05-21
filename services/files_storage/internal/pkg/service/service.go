@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (service Service) UploadFileV1(file multipart.File, filename string, userID uint) (fileID uint, err error) {
+func (service Service) UploadPhoto(file multipart.File, filename string, userID uint) (fileID uint, err error) {
 	dir := filepath.Join("services", "files_storage", "saved_files", fmt.Sprintf("%d", userID))
 
 	err = os.MkdirAll(dir, os.ModePerm)
@@ -38,7 +38,7 @@ func (service Service) UploadFileV1(file multipart.File, filename string, userID
 		return
 	}
 
-	fileID, err = service.repository.UploadFileV1(filePath, userID)
+	fileID, err = service.repository.UploadPhoto(filePath, userID)
 	if err != nil {
 		return
 	}
