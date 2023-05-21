@@ -653,3 +653,49 @@ func TestInfoUseCase_GetUserStatus_GetError(t *testing.T) {
 
 	require.EqualError(t, err, errRepo.Error())
 }
+
+func TestInfoUseCase_ChangeUserStatus(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	infoRepoMock := mock.NewMockIRepositoryInfo(ctrl)
+	photoUseCase := photoMock.NewMockUseCase(ctrl)
+	infoUseCase := infoMock.NewMockUseCase(ctrl)
+	infoUserUseCase := NewInfoUseCase(infoRepoMock, infoUseCase, photoUseCase)
+
+	newStatus := info_user.StatusInp{Status: "test2"}
+	statusId := uint(1)
+	userId := uint(1)
+	infoUseCase.EXPECT().GetStatusId(newStatus.Status).Return(statusId, nil)
+	infoRepoMock.EXPECT().ChangeUserStatus(userId, statusId).Return(nil)
+
+	err := infoUserUseCase.ChangeUserStatus(userId, newStatus)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+}
+
+func TestInfoUseCase_ChangeUserStatus_GetError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	infoRepoMock := mock.NewMockIRepositoryInfo(ctrl)
+	photoUseCase := photoMock.NewMockUseCase(ctrl)
+	infoUseCase := infoMock.NewMockUseCase(ctrl)
+	infoUserUseCase := NewInfoUseCase(infoRepoMock, infoUseCase, photoUseCase)
+
+	errRepo := fmt.Errorf("something wrong")
+
+	newStatus := info_user.StatusInp{Status: "test2"}
+	statusId := uint(1)
+	userId := uint(1)
+	infoUseCase.EXPECT().GetStatusId(newStatus.Status).Return(statusId, nil)
+	infoRepoMock.EXPECT().ChangeUserStatus(userId, statusId).Return(errRepo)
+
+	err := infoUserUseCase.ChangeUserStatus(userId, newStatus)
+	if err == nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+
+	require.EqualError(t, err, errRepo.Error())
+}

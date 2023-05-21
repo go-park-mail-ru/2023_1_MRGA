@@ -2,7 +2,7 @@ package match
 
 import dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 
-//go:generate mockgen -source=usecase.go -destination=mocks/usecase.go -package=mock
+//go:generate mockgen -source=repository.go -destination=mocks/repo.go -package=mock
 type IRepositoryMatch interface {
 	GetMatches(userId uint) ([]dataStruct.Match, error)
 	GetUser(userId uint) (user UserRes, err error) //user_info
@@ -14,7 +14,6 @@ type IRepositoryMatch interface {
 	DeleteMatch(userId, userMatchId uint) error
 	AddMatchRow(row dataStruct.Match) error
 	ChangeStatusMatch(userId, profileId uint) error
-	GetChat(userId uint) (ChatAnswer, error)
 	GetAge(userId uint) (int, error) //user_info
 	CheckCountReaction(userId uint) (ok bool, err error)
 	IncrementLikeCount(userId uint) error
