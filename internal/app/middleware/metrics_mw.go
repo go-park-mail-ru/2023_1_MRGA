@@ -3,7 +3,6 @@ package middleware
 import (
 	"bufio"
 	"errors"
-	"log"
 	"net"
 	"net/http"
 	"strconv"
