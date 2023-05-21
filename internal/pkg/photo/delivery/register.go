@@ -3,16 +3,20 @@ package delivery
 import (
 	"github.com/gorilla/mux"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 )
 
 type Handler struct {
-	useCase photo.UseCase
+	useCase    photo.UseCase
+	serverHost string
 }
 
 func NewHandler(useCase photo.UseCase) *Handler {
 	return &Handler{
-		useCase: useCase,
+		useCase:    useCase,
+		serverHost: env_getter.GetHostFromEnv("FILE_STORAGE_SERVER_HOST"),
 	}
 }
 

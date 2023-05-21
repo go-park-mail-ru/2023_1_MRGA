@@ -118,6 +118,7 @@ func (f *FilterUseCase) ChangeFilters(userId uint, filterInp filter.FilterInput)
 	var newFilter dataStruct.UserFilter
 	newFilter.UserId = userId
 	newFilter.MaxAge = filterInp.MaxAge
+	newFilter.MinAge = filterInp.MinAge
 	newFilter.SearchSex = filterInp.SearchSex
 
 	err = f.Repo.ChangeFilter(newFilter)

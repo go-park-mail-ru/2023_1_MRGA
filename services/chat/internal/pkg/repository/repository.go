@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
 	"gorm.io/gorm"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
 )
 
 func (repo Repository) GetDialogIfExists(ctx context.Context, initialDialogData []app.ChatUser) (outputChatData app.CreateChatResponse, found bool, err error) {

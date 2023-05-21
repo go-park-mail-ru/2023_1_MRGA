@@ -1,8 +1,9 @@
 package app
 
 import (
-	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 )
 
 func GetMessageStruct(data *chatpc.SendMessageRequest) ChatMessage {

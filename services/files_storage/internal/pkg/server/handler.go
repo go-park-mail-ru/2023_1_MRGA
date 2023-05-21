@@ -7,8 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 	"github.com/gorilla/mux"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (server Server) UploadFileV1(w http.ResponseWriter, r *http.Request) {

@@ -51,3 +51,7 @@ type InfoChange struct {
 type HashtagInp struct {
 	Hashtag []string `json:"hashtag" structs:"hashtag"`
 }
+
+type StatusInp struct {
+	Status string `json:"status" structs:"status"`
+}

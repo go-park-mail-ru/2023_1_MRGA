@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
+
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -23,7 +25,7 @@ func getDialector() (string, error) {
 		return "", errors.New("Не удалось найти файл окружения")
 	}
 
-	host := os.Getenv("CHAT_HOST")
+	host := env_getter.GetHostFromEnv("CHAT_HOST")
 	port := os.Getenv("CHAT_PORT")
 	user := os.Getenv("CHAT_USER")
 	password := os.Getenv("CHAT_PASSWORD")

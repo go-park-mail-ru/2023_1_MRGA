@@ -10,6 +10,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
+
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg/server"
@@ -28,9 +30,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
+	redisHost := env_getter.GetHostFromEnv("REDIS_HOST")
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     redisHost + ":6379",
 		Password: "password",
 		DB:       0,
 	})
