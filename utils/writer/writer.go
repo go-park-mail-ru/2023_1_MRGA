@@ -25,7 +25,6 @@ func Respond(w http.ResponseWriter, r *http.Request, data map[string]interface{}
 
 	encoder := json.NewEncoder(w)
 	err := encoder.Encode(result)
-
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())))

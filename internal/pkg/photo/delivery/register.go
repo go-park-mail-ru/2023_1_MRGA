@@ -22,6 +22,7 @@ func RegisterHTTPEndpoints(router *mux.Router, uc photo.UseCase) {
 	router.HandleFunc("/meetme/files/upload", h.AddFiles).Methods("POST")
 	router.HandleFunc("/meetme/photo/{photo}", h.GetPhoto).Methods("GET")
 	router.HandleFunc("/meetme/file/{pathToFile:.*}", h.GetFile).Methods("GET")
+	router.HandleFunc("/meetme/audio/transcribe/{pathToFile:.*}", h.GetTranscription).Methods("GET")
 	router.HandleFunc("/meetme/photo/{photo}", h.DeletePhoto).Methods("DELETE")
 	router.HandleFunc("/meetme/photo/{photo}", h.ChangePhoto).Methods("PUT", "OPTIONS")
 }
