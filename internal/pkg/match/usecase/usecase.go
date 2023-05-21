@@ -49,23 +49,23 @@ func (m *MatchUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 
 }
 
-func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) error {
+func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) (result match.ReactionResult, err error) {
 	if reaction.Reaction == "like" {
 		ok, err := m.userRepo.CheckCountReaction(userId)
 		if err != nil {
-			return err
+			return result, err
 		}
 		if !ok {
-			return fmt.Errorf("you cant like people today. Try tomorrow")
+			return result, fmt.Errorf("you cant like people today. Try tomorrow")
 		}
 		err = m.userRepo.IncrementLikeCount(userId)
 	}
 
 	userToId := reaction.EvaluatedUserId
 
-	reactionId, err := m.userRepo.GetIdReaction(reaction.Reaction)
+	currentUserReactionCode, err := m.userRepo.GetIdReaction(reaction.Reaction)
 	if err != nil {
-		return err
+		return result, err
 	}
 
 	var historyRow dataStruct.UserHistory
@@ -75,45 +75,44 @@ func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) err
 	historyRow.ShowDate = todayData
 	err = m.userRepo.AddHistoryRow(historyRow)
 	if err != nil {
-		return err
+		return result, err
 	}
 
-	reactionUser, err := m.userRepo.GetUserReaction(userToId, userId)
+	sideUserReaction, err := m.userRepo.GetUserReaction(userToId, userId)
 	if err == gorm.ErrRecordNotFound {
 		var reactionRow dataStruct.UserReaction
 		reactionRow.UserId = userId
 		reactionRow.UserFromId = userToId
-		reactionRow.ReactionId = reactionId
+		reactionRow.ReactionId = currentUserReactionCode
 		err = m.userRepo.AddUserReaction(reactionRow)
-		if err != nil {
-			return err
-		}
-	} else {
-		if reactionUser.ReactionId == 1 && reactionId == 1 {
-			var match1 dataStruct.Match
-			match1.Shown = false
-			match1.UserFirstId = userId
-			match1.UserSecondId = userToId
-			err = m.userRepo.AddMatchRow(match1)
-			if err != nil {
-				return err
-			}
-
-			var match2 dataStruct.Match
-			match2.Shown = false
-			match2.UserFirstId = userToId
-			match2.UserSecondId = userId
-			err = m.userRepo.AddMatchRow(match2)
-			if err != nil {
-				return err
-			}
-		}
-		err = m.userRepo.DeleteUserReaction(reactionUser.Id)
-		if err != nil {
-			return err
-		}
+		return match.ReactionResult{ResultCode: match.FirstReaction}, err
 	}
-	return nil
+	var like uint = dataStruct.LikeReaction
+	if sideUserReaction.ReactionId == like && currentUserReactionCode == like {
+		var match1 dataStruct.Match
+		match1.Shown = false
+		match1.UserFirstId = userId
+		match1.UserSecondId = userToId
+		err = m.userRepo.AddMatchRow(match1)
+		if err != nil {
+			return result, err
+		}
+
+		var match2 dataStruct.Match
+		match2.Shown = false
+		match2.UserFirstId = userToId
+		match2.UserSecondId = userId
+		err = m.userRepo.AddMatchRow(match2)
+		if err != nil {
+			return result, err
+		}
+		result.ResultCode = match.NewMatch
+	}
+	if sideUserReaction.ReactionId == like && currentUserReactionCode == like {
+		result.ResultCode = match.MissedMatch
+	}
+	err = m.userRepo.DeleteUserReaction(sideUserReaction.Id)
+	return result, err
 }
 
 func (m *MatchUseCase) GetChatByEmail(userId uint, matchUserId uint) (result match.ChatAnswer, err error) {
