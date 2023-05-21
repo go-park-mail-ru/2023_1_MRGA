@@ -48,29 +48,12 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	var photoWithoutFace []int
 
 	for idx, fileHeader := range files {
-		file, err := fileHeader.Open()
+		ok, err = CheckPhoto(fileHeader)
 		if err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 			return
 		}
-
-		defer func() {
-			err := file.Close()
-			if err != nil {
-				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
-				writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-				return
-			}
-		}()
-
-		ok, err = face_finder.IsPhotoWithFace(file)
-		if err != nil {
-			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
-			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
-			return
-		}
-
 		if !ok {
 			photoWithoutFace = append(photoWithoutFace, idx)
 		}
@@ -363,4 +346,23 @@ func extractFilenameFromContentDisposition(contentDisposition string) string {
 		return strings.Trim(strings.Split(contentDisposition, "filename=")[1], "\"")
 	}
 	return ""
+}
+
+func CheckPhoto(fileHeader *multipart.FileHeader) (bool, error) {
+	file, err := fileHeader.Open()
+	if err != nil {
+		return false, err
+
+	}
+
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			return
+		}
+	}()
+
+	ok, err := face_finder.IsPhotoWithFace(file)
+
+	return ok, err
 }
