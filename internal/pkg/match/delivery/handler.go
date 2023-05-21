@@ -225,12 +225,13 @@ func (h *Handler) handleWebsocketConnection(ws *websocket.Conn, userID UserID) {
 }
 
 func (h *Handler) NotifyClients(id UserID, notification MatchNotification) {
+	h.mutex.RLock()
+	defer h.mutex.RUnlock()
 	if clients, ok := h.WebsocketClients[id]; ok {
-		for _, client := range clients {
+		for connectionID, client := range clients {
 			err := client.WriteJSON(notification)
 			if err != nil {
-				logger.Log(http.StatusInternalServerError, fmt.Sprintf("couldn't write notification message: %v", err), "", "", true)
-				return
+				logger.Log(http.StatusInternalServerError, fmt.Sprintf("couldn't write notification message: %v, userID: %v, connectionID: %v", err, id, connectionID), "", "", true)
 			}
 		}
 	}

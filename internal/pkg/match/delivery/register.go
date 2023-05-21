@@ -25,7 +25,7 @@ type MatchNotification struct {
 type Handler struct {
 	useCase  match.UseCase
 	upgrader websocket.Upgrader
-	mutex    *sync.Mutex
+	mutex    *sync.RWMutex
 	//  ключ – id подписавшегося пользователя,
 	// значение – словарь с уникальным значением для каждого соединения
 	WebsocketClients map[UserID]map[uuid.UUID]*websocket.Conn
