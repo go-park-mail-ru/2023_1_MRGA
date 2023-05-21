@@ -56,9 +56,19 @@ message GetChatResponse {
     string path = 4;
 }
 
+message GetChatParticipantsRequest {
+  uint32 chat_id = 1;
+  uint32 user_id = 2;
+}
+
+message GetChatParticipantsResponse {
+  repeated uint32 chat_user_ids = 1;
+}
+
 service ChatService {
     rpc CreateChat(CreateChatRequest) returns (CreateChatResponse) {}
     rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {}
     rpc GetChatsList(GetChatsListRequest) returns (stream GetChatsListResponse) {}
     rpc GetChat(GetChatRequest) returns (stream GetChatResponse) {}
+    rpc GetChatParticipants(GetChatParticipantsRequest) returns (GetChatParticipantsResponse) {}
 }

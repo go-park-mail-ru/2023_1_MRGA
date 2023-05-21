@@ -121,14 +121,17 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	msgId := uint64(response.GetMsgId())
+	sentAt := msg.SentAt.Format(constants.FormatData)
+	senderId := uint64(userId)
 
 	wsMsgData := app.WSMsgData{
-		UserIds: msgData.UserIds,
+		SenderId: senderId,
+		UserIds:  msgData.UserIds,
 		MsgData: app.WSMessageResponse{
 			Msg:         msgData.Content,
 			ChatId:      uint64ChatId,
-			SentAt:      msg.SentAt.Format(constants.FormatData),
-			SenderId:    uint64(userId),
+			SentAt:      sentAt,
+			SenderId:    senderId,
 			MsgId:       msgId,
 			MessageType: string(msgData.MessageType),
 			Path:        msgData.Path,
@@ -143,7 +146,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 
 	logger.Log(http.StatusOK, constants.LogSuccess, r.Method, r.URL.Path, false)
 	writer.Respond(w, r, structs.Map(app.SendMessageResponse{
-		SentAt: wsMsgData.MsgData.SentAt,
+		SentAt: sentAt,
 		MsgId:  msgId,
 	}))
 }
@@ -256,4 +259,36 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, structs.Map(app.GetChatResponse{
 		Chat: messagesData,
 	}))
+
+	grpcChatParticipantsRequest := chatpc.GetChatParticipantsRequest{
+		ChatId: uint32(uint64ChatId),
+		UserId: userId,
+	}
+
+	grpcChatParticipantsResponse, err := client.GetChatParticipants(context.Background(), &grpcChatParticipantsRequest)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	userIdsUint32 := grpcChatParticipantsResponse.GetChatUserIds()
+	userIds := make([]uint64, len(userIdsUint32))
+
+	for idx, userIdUint32 := range userIdsUint32 {
+		userIds[idx] = uint64(userIdUint32)
+	}
+
+	wsMsgData := app.WSMsgData{
+		SenderId: uint64(userId),
+		UserIds:  userIds,
+		MsgData: app.WSReadDataStruct{
+			ChatId: uint64ChatId,
+		},
+	}
+
+	err = server.sendAll(wsMsgData)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
+	}
 }

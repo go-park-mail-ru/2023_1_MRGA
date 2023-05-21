@@ -93,10 +93,13 @@ func (repo Repository) GetChatsList(userData app.GetChatsListRequest) (recentMsg
 	for _, recentMsg := range msgs {
 		chatId := recentMsg.ChatId
 		var chatUsers []uint
-		repo.db.Table("chat_users").
+		err = repo.db.Table("chat_users").
 			Select("user_id").
 			Where("chat_id = ? AND user_id <> ?", chatId, userData.UserId).
-			Find(&chatUsers)
+			Find(&chatUsers).Error
+		if err != nil {
+			return
+		}
 
 		recentMsgs = append(recentMsgs, app.MessageWithChatUsers{
 			ChatMessage: recentMsg,
@@ -118,6 +121,18 @@ func (repo Repository) GetChat(chatData app.GetChatRequest) (chatMsgs []app.Chat
 		Where("chat_id = ?", chatData.ChatId).
 		Order("sent_at ASC, id DESC").
 		Find(&chatMsgs).Error
+	return
+}
+
+func (repo Repository) GetChatParticipants(ctx context.Context, initialChatData app.GetChatParticipantsRequest) (participants app.GetChatParticipantsResponse, err error) {
+	err = repo.db.WithContext(ctx).Table("chat_users").
+		Select("user_id").
+		Where("chat_id = ? AND user_id <> ?", initialChatData.ChatId, initialChatData.UserId).
+		Find(&participants.ChatUserIds).Error
+	if err != nil {
+		return
+	}
+
 	return
 }
 
