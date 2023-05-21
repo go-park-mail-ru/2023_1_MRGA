@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: proto_services/proto_chat/chat.proto
+// source: services/proto/chat/chat.proto
 
 package proto_chat
 
@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChatServiceClient interface {
 	CreateChat(ctx context.Context, in *CreateChatRequest, opts ...grpc.CallOption) (*CreateChatResponse, error)
-	SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error)
 	GetChatsList(ctx context.Context, in *GetChatsListRequest, opts ...grpc.CallOption) (ChatService_GetChatsListClient, error)
 	GetChat(ctx context.Context, in *GetChatRequest, opts ...grpc.CallOption) (ChatService_GetChatClient, error)
 }
@@ -46,8 +45,8 @@ func (c *chatServiceClient) CreateChat(ctx context.Context, in *CreateChatReques
 	return out, nil
 }
 
-func (c *chatServiceClient) SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *chatServiceClient) SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error) {
+	out := new(SendMessageResponse)
 	err := c.cc.Invoke(ctx, "/proto_chat.ChatService/SendMessage", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -124,7 +123,7 @@ func (x *chatServiceGetChatClient) Recv() (*GetChatResponse, error) {
 // for forward compatibility
 type ChatServiceServer interface {
 	CreateChat(context.Context, *CreateChatRequest) (*CreateChatResponse, error)
-	SendMessage(context.Context, *SendMessageRequest) (*emptypb.Empty, error)
+	SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error)
 	GetChatsList(*GetChatsListRequest, ChatService_GetChatsListServer) error
 	GetChat(*GetChatRequest, ChatService_GetChatServer) error
 	mustEmbedUnimplementedChatServiceServer()
@@ -137,7 +136,7 @@ type UnimplementedChatServiceServer struct {
 func (UnimplementedChatServiceServer) CreateChat(context.Context, *CreateChatRequest) (*CreateChatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateChat not implemented")
 }
-func (UnimplementedChatServiceServer) SendMessage(context.Context, *SendMessageRequest) (*emptypb.Empty, error) {
+func (UnimplementedChatServiceServer) SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
 }
 func (UnimplementedChatServiceServer) GetChatsList(*GetChatsListRequest, ChatService_GetChatsListServer) error {
@@ -265,5 +264,5 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto_services/proto_chat/chat.proto",
+	Metadata: "services/proto/chat/chat.proto",
 }

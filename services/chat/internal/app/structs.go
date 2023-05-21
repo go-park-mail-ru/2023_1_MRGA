@@ -9,6 +9,12 @@ type MessageData struct {
 	ReadStatus bool
 }
 
+type ChatMessage struct {
+	Message
+	MessageType MessageType
+	Path        string
+}
+
 type CreateChatResponse struct {
 	ChatId uint
 }
@@ -23,6 +29,6 @@ type GetChatRequest struct {
 }
 
 type MessageWithChatUsers struct {
-	Message
+	ChatMessage
 	ChatUserIds []uint
 }

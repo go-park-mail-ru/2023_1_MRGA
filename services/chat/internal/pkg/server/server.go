@@ -6,8 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"google.golang.org/protobuf/types/known/emptypb"
-
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
@@ -54,17 +52,19 @@ func (server Server) CreateChat(ctx context.Context, initialChatData *chatpc.Cre
 	return
 }
 
-func (server Server) SendMessage(ctx context.Context, newMsg *chatpc.SendMessageRequest) (outputMsgData *emptypb.Empty, err error) {
+func (server Server) SendMessage(ctx context.Context, newMsg *chatpc.SendMessageRequest) (outputMsgData *chatpc.SendMessageResponse, err error) {
 	msg := app.GetMessageStruct(newMsg)
 
-	err = server.repository.SendMessage(ctx, msg)
+	msgId, err := server.repository.SendMessage(ctx, msg)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), "POST", "SendMessage", true)
-		return &emptypb.Empty{}, err
+		return &chatpc.SendMessageResponse{}, err
 	}
 
 	logger.Log(http.StatusOK, "Success", "POST", "SendMessage", false)
-	return &emptypb.Empty{}, nil
+	return &chatpc.SendMessageResponse{
+		MsgId: uint32(msgId),
+	}, nil
 }
 
 func (server Server) GetChatsList(userData *chatpc.GetChatsListRequest, streamRecentMsgs chatpc.ChatService_GetChatsListServer) (err error) {
@@ -103,7 +103,7 @@ func (server Server) GetChat(chatData *chatpc.GetChatRequest, streamChatMsgs cha
 		return err
 	}
 
-	var chatMsgs []app.Message
+	var chatMsgs []app.ChatMessage
 	chatMsgs, err = server.repository.GetChat(initialChatData)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChat", true)
