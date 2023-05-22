@@ -36,6 +36,7 @@ func NewHandler(useCase match.UseCase) *Handler {
 		useCase:          useCase,
 		upgrader:         upgrader.Upgrader,
 		WebsocketClients: make(map[UserID]map[uuid.UUID]*websocket.Conn),
+		mutex:            &sync.RWMutex{},
 	}
 }
 
@@ -45,6 +46,6 @@ func RegisterHTTPEndpoints(router *mux.Router, uc match.UseCase) {
 	router.HandleFunc("/meetme/match", h.GetMatches).Methods("GET")
 	router.HandleFunc("/meetme/match/{userId}", h.DeleteMatch).Methods("DELETE", "OPTIONS")
 	router.HandleFunc("/meetme/reaction", h.AddReaction).Methods("POST")
-
+	router.HandleFunc("/meetme/match/subscribe", h.Subscribe).Methods("GET")
 	router.HandleFunc("/meetme/chat/{userId}", h.GetChatByUserId).Methods("GET")
 }
