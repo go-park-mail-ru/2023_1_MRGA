@@ -13,8 +13,8 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
-func writeMessage(ws *websocket.Conn, flag string, body app.WSMessageResponse) error {
-	response := app.WSSendResponse{
+func writeMessage(ws *websocket.Conn, flag string, body interface{}) error {
+	response := app.WSResponse{
 		Flag: flag,
 		Body: body,
 	}
@@ -27,9 +27,9 @@ func writeMessage(ws *websocket.Conn, flag string, body app.WSMessageResponse) e
 	return ws.WriteMessage(websocket.TextMessage, responseJSON)
 }
 
-func sendToClients(clients []*websocket.Conn, msgData app.WSMessageResponse) (err error) {
+func sendToClients(clients []*websocket.Conn, flag string, msgData interface{}) (err error) {
 	for _, receiverWsClient := range clients {
-		if currErr := writeMessage(receiverWsClient, "SEND", msgData); currErr != nil {
+		if currErr := writeMessage(receiverWsClient, flag, msgData); currErr != nil {
 			err = currErr
 		}
 	}
@@ -45,14 +45,14 @@ func (server *Server) sendAll(wsMsgData app.WSMsgData) (err error) {
 			continue
 		}
 
-		err = sendToClients(clientsByUser, wsMsgData.MsgData)
+		err = sendToClients(clientsByUser, wsMsgData.Flag, wsMsgData.MsgData)
 		if err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
 			return
 		}
 	}
 
-	err = sendToClients(server.userIdClients[wsMsgData.MsgData.SenderId], wsMsgData.MsgData)
+	err = sendToClients(server.userIdClients[wsMsgData.SenderId], wsMsgData.Flag, wsMsgData.MsgData)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
 		return
@@ -112,8 +112,9 @@ func (server Server) ConnectionHandler(w http.ResponseWriter, r *http.Request) {
 
 	logger.Log(http.StatusOK, constants.LogSuccess, constants.LogGetMethod, constants.LogConnectionHandler, false)
 
+	var input app.WSInput
 	for {
-		_, _, err := ws.ReadMessage()
+		_, message, err := ws.ReadMessage()
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
 				logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogWSClose, false)
@@ -121,6 +122,38 @@ func (server Server) ConnectionHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
 			}
 			return
+		}
+
+		err = json.Unmarshal(message, &input)
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
+			continue
+		}
+
+		switch input.Flag {
+		case "READ":
+			var readData app.WSReadRequest
+			err = json.Unmarshal(input.ReadData, &readData)
+			if err != nil {
+				logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+				continue
+			}
+
+			wsMsgData := app.WSMsgData{
+				Flag: "READ",
+				SenderId: userId,
+				UserIds:  readData.UserIds,
+				MsgData: app.WSReadResponse{
+					SenderId: userId,
+					ChatId: readData.ChatId,
+				},
+			}
+
+			err = server.sendAll(wsMsgData)
+			if err != nil {
+				logger.Log(http.StatusInternalServerError, err.Error(), constants.LogPostMethod, constants.LogOnMessageHandler, true)
+				continue
+			}
 		}
 	}
 }

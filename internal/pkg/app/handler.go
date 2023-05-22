@@ -46,11 +46,11 @@ var frontendHosts = []string{
 	"https://meetme-app.ru:80",
 	"https://meetme-app.ru",
 	"https://localhost",
+	"http://localhost:4545",
 	"https://localhost:8080",
 	"https://localhost:80",
 	"meetme-app.ru",
 }
-
 
 func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient, chatOptions ChatServerPackage.ServerOptions) {
 	a.Router.Handle("/metrics", promhttp.Handler())
