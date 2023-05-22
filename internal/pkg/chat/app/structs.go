@@ -78,6 +78,7 @@ type GetChatResponse struct {
 }
 
 type WSMsgData struct {
+	Flag     string
 	SenderId uint64
 	UserIds  []uint64
 	MsgData  interface{}
@@ -93,7 +94,7 @@ type WSMessageResponse struct {
 	Path        string `json:"path"`
 }
 
-type WSSendResponse struct {
+type WSResponse struct {
 	Flag string      `json:"flag"`
 	Body interface{} `json:"body"`
 }
@@ -103,12 +104,12 @@ type WSInput struct {
 	ReadData json.RawMessage `json:"readData"`
 }
 
-type WSReadDataStruct struct {
+type WSReadRequest struct {
 	UserIds []uint64 `json:"userIds"`
 	ChatId  uint64   `json:"chatId"`
 }
 
 type WSReadResponse struct {
-	Flag string           `json:"flag"`
-	Body WSReadDataStruct `json:"body"`
+	SenderId uint64 `json:"senderId"`
+	ChatId   uint64 `json:"chatId"`
 }

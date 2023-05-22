@@ -125,6 +125,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	senderId := uint64(userId)
 
 	wsMsgData := app.WSMsgData{
+		Flag: "SEND",
 		SenderId: senderId,
 		UserIds:  msgData.UserIds,
 		MsgData: app.WSMessageResponse{
@@ -280,9 +281,11 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wsMsgData := app.WSMsgData{
+		Flag: "READ",
 		SenderId: uint64(userId),
 		UserIds:  userIds,
-		MsgData: app.WSReadDataStruct{
+		MsgData: app.WSReadResponse{
+			SenderId: uint64(userId),
 			ChatId: uint64ChatId,
 		},
 	}
