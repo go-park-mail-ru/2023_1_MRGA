@@ -63,3 +63,33 @@ func ErrorRespond(w http.ResponseWriter, r *http.Request, servarErr error, statu
 		return
 	}
 }
+
+type ErrorResultWithData struct {
+	Status int                    `json:"status"`
+	Error  string                 `json:"error"`
+	Data   map[string]interface{} `json:"body"`
+}
+
+func ErrorRespondWithData(w http.ResponseWriter, r *http.Request, servarErr error, status int, data map[string]interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+
+	result := ErrorResultWithData{
+		status,
+		servarErr.Error(),
+		data,
+	}
+	w.WriteHeader(status)
+	encoder := json.NewEncoder(w)
+	err := encoder.Encode(result)
+
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+
+		_, err = w.Write([]byte(fmt.Sprintf(`{"status": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())))
+		if err != nil {
+			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
+			return
+		}
+		return
+	}
+}

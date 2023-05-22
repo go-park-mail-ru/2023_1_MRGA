@@ -88,6 +88,7 @@ func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) (re
 		return match.ReactionResult{ResultCode: match.FirstReaction}, err
 	}
 	var like uint = dataStruct.LikeReaction
+	var pass uint = dataStruct.PassReaction
 	if sideUserReaction.ReactionId == like && currentUserReactionCode == like {
 		var match1 dataStruct.Match
 		match1.Shown = false
@@ -108,7 +109,9 @@ func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) (re
 		}
 		result.ResultCode = match.NewMatch
 	}
-	if sideUserReaction.ReactionId == like && currentUserReactionCode == like {
+	fmt.Printf("sideUserReaction.ReactionId: %v, currentUserReactionCode:%v",
+		sideUserReaction.ReactionId, currentUserReactionCode)
+	if sideUserReaction.ReactionId == like && currentUserReactionCode == pass {
 		result.ResultCode = match.MissedMatch
 	}
 	err = m.userRepo.DeleteUserReaction(sideUserReaction.Id)
