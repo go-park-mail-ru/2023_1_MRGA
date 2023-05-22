@@ -398,14 +398,13 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-
 	ok, err = face_finder.IsPhotoWithFace(file)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
-
+	file.Seek(0, 0)
 	if !ok {
 		logger.Log(http.StatusBadRequest, fmt.Errorf("there is not face").Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespondWithData(w, r, fmt.Errorf("there is not face"), http.StatusBadRequest, map[string]interface{}{"problemPhoto": []int{0}})
