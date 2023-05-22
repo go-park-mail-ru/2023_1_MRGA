@@ -121,6 +121,24 @@ func (server Server) GetChat(chatData *chatpc.GetChatRequest, streamChatMsgs cha
 	return
 }
 
+func (server Server) GetChatParticipants(ctx context.Context, chatData *chatpc.GetChatParticipantsRequest) (participants *chatpc.GetChatParticipantsResponse, err error) {
+	initialChatData := app.GetInitialChatForParticipantsStruct(chatData)
+
+	var participantsStruct app.GetChatParticipantsResponse
+	participantsStruct, err = server.repository.GetChatParticipants(ctx, initialChatData)
+	if err != nil {
+		logger.Log(http.StatusInternalServerError, err.Error(), "POST", "GetChatParticipants", true)
+		return
+	}
+
+	participants = &chatpc.GetChatParticipantsResponse{
+		ChatUserIds: participantsStruct.ChatUserIds,
+	}
+
+	logger.Log(http.StatusOK, "Success", "POST", "GetChatParticipants", false)
+	return
+}
+
 func (server Server) mustEmbedUnimplementedChatServiceServer() {
 	log.Printf("Нереализованный метод")
 }

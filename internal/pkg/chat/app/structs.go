@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app/constants"
@@ -77,8 +78,10 @@ type GetChatResponse struct {
 }
 
 type WSMsgData struct {
-	UserIds []uint64
-	MsgData WSMessageResponse
+	Flag     string
+	SenderId uint64
+	UserIds  []uint64
+	MsgData  interface{}
 }
 
 type WSMessageResponse struct {
@@ -91,7 +94,22 @@ type WSMessageResponse struct {
 	Path        string `json:"path"`
 }
 
-type WSSendResponse struct {
-	Flag string            `json:"flag"`
-	Body WSMessageResponse `json:"body"`
+type WSResponse struct {
+	Flag string      `json:"flag"`
+	Body interface{} `json:"body"`
+}
+
+type WSInput struct {
+	Flag     string          `json:"flag"`
+	ReadData json.RawMessage `json:"readData"`
+}
+
+type WSReadRequest struct {
+	UserIds []uint64 `json:"userIds"`
+	ChatId  uint64   `json:"chatId"`
+}
+
+type WSReadResponse struct {
+	SenderId uint64 `json:"senderId"`
+	ChatId   uint64 `json:"chatId"`
 }

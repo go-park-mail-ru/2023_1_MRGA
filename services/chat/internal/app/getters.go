@@ -15,7 +15,7 @@ func GetMessageStruct(data *chatpc.SendMessageRequest) ChatMessage {
 			SentAt:   data.GetMsg().GetSentAt().AsTime(),
 		},
 		MessageType: MessageType(data.GetMessageType()),
-		Path: data.GetPath(),
+		Path:        data.GetPath(),
 	}
 }
 
@@ -40,7 +40,7 @@ func GetGrpcChatMessage(data MessageWithChatUsers) *chatpc.GetChatsListResponse 
 		},
 		ChatId:      uint32(data.ChatId),
 		MessageType: string(data.MessageType),
-		Path: data.Path,
+		Path:        data.Path,
 		ChatUserIds: uint32ChatUserIds,
 	}
 }
@@ -58,6 +58,13 @@ func GetInitialChatStruct(data *chatpc.GetChatRequest) GetChatRequest {
 	}
 }
 
+func GetInitialChatForParticipantsStruct(data *chatpc.GetChatParticipantsRequest) GetChatParticipantsRequest {
+	return GetChatParticipantsRequest{
+		ChatId: uint(data.GetChatId()),
+		UserId: uint(data.GetUserId()),
+	}
+}
+
 func GetGrpcMessage(data ChatMessage) *chatpc.GetChatResponse {
 	return &chatpc.GetChatResponse{
 		Msg: &chatpc.Message{
@@ -66,8 +73,8 @@ func GetGrpcMessage(data ChatMessage) *chatpc.GetChatResponse {
 			SentAt:     timestamppb.New(data.SentAt),
 			ReadStatus: data.ReadStatus,
 		},
-		MsgId: uint32(data.Id),
+		MsgId:       uint32(data.Id),
 		MessageType: string(data.MessageType),
-		Path: data.Path,
+		Path:        data.Path,
 	}
 }

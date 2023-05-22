@@ -28,6 +28,15 @@ type GetChatRequest struct {
 	UserId uint
 }
 
+type GetChatParticipantsRequest struct {
+	ChatId uint
+	UserId uint
+}
+
+type GetChatParticipantsResponse struct {
+	ChatUserIds []uint32
+}
+
 type MessageWithChatUsers struct {
 	ChatMessage
 	ChatUserIds []uint
