@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/gorilla/mux"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/mocks"
@@ -250,15 +251,65 @@ func TestHandler_DeleteMatch(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodDelete, "/meetme/match/2", nil)
 	w := httptest.NewRecorder()
-	q := req.URL.Query()
-	q.Add("userId", "2")
-	req.URL.RawQuery = q.Encode()
-	println(req.URL.String())
-	//ctx := context.WithValue(req.Context(), "userId", uint32(userId))
-	matchHandler.DeleteMatch(w, req)
+	vars := map[string]string{
+		"userId": "2",
+	}
+	req = mux.SetURLVars(req, vars)
+	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	matchHandler.DeleteMatch(w, req.WithContext(ctx))
 	resp := w.Result()
 
 	if resp.Status != "200 OK" {
+		t.Errorf("incorrect result")
+		return
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			t.Errorf(err.Error())
+			return
+		}
+	}()
+	reqBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(reqBody), &result)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !map_equal.MapEqual(result, output) {
+		t.Errorf(" wrong result, expected %#v, got %#v", output, result)
+	}
+}
+
+func TestHandler_DeleteMatch_GetError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	matchUsecaseMock := mock.NewMockUseCase(ctrl)
+	matchHandler := NewHandler(matchUsecaseMock)
+	errRepo := fmt.Errorf("something wrong")
+	userId := uint(1)
+	output := map[string]interface{}{
+		"error":  errRepo.Error(),
+		"status": 400,
+	}
+
+	matchUsecaseMock.EXPECT().DeleteMatch(userId, uint(2)).Return(errRepo)
+
+	req := httptest.NewRequest(http.MethodDelete, "/meetme/match/2", nil)
+	w := httptest.NewRecorder()
+	vars := map[string]string{
+		"userId": "2",
+	}
+	req = mux.SetURLVars(req, vars)
+	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	matchHandler.DeleteMatch(w, req.WithContext(ctx))
+	resp := w.Result()
+
+	if resp.Status != "400 Bad Request" {
 		t.Errorf("incorrect result")
 		return
 	}
