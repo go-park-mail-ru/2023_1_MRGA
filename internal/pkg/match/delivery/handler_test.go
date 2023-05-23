@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/mocks"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
 )
 
 func TestNewRecHandler(t *testing.T) {
@@ -26,7 +28,7 @@ func TestNewRecHandler(t *testing.T) {
 	}
 }
 
-func TestHandler(t *testing.T) {
+func TestHandler_GetMatches(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	matchUsecaseMock := mock.NewMockUseCase(ctrl)
@@ -77,12 +79,12 @@ func TestHandler(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if !mapEqual(result, output) {
+	if !map_equal.MapEqual(result, output) {
 		t.Errorf(" wrong result, expected %#v, got %#v", output, result)
 	}
 }
 
-func TestHandler_GetError(t *testing.T) {
+func TestHandler_GetMatches_GetError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	matchUsecaseMock := mock.NewMockUseCase(ctrl)
@@ -95,17 +97,63 @@ func TestHandler_GetError(t *testing.T) {
 	}
 	userId := uint(1)
 
-	matchUsecaseMock.EXPECT().GetMatches(userId).Return(test, nil)
-	output := map[string]interface{}{
-		"body": map[string]interface{}{
-			"matches": test,
-		},
-		"status": 200,
-	}
+	matchUsecaseMock.EXPECT().GetMatches(userId).Return(nil, errRepo)
+
 	req := httptest.NewRequest(http.MethodGet, "/meetme/match", nil)
 	w := httptest.NewRecorder()
 	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
 	matchHandler.GetMatches(w, req.WithContext(ctx))
+	resp := w.Result()
+
+	if resp.Status != "400 Bad Request" {
+		t.Errorf("incorrect result")
+		return
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			t.Errorf(err.Error())
+			return
+		}
+	}()
+	reqBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(reqBody), &result)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !map_equal.MapEqual(result, output) {
+		t.Errorf(" wrong result, expected %#v, got %#v", output, result)
+	}
+}
+
+func TestHandler_AddReaction(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	matchUsecaseMock := mock.NewMockUseCase(ctrl)
+	matchHandler := NewHandler(matchUsecaseMock)
+
+	userId := uint(1)
+	output := map[string]interface{}{
+		"body":   map[string]interface{}{},
+		"status": 200,
+	}
+	reaction := match.ReactionInp{
+		EvaluatedUserId: uint(2),
+		Reaction:        "like",
+	}
+
+	expected := []byte(`{"reaction": "like", "evaluatedUserId": 2}`)
+	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(nil)
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+	w := httptest.NewRecorder()
+	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	matchHandler.AddReaction(w, req.WithContext(ctx))
 	resp := w.Result()
 
 	if resp.Status != "200 OK" {
@@ -129,34 +177,109 @@ func TestHandler_GetError(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if !mapEqual(result, output) {
+	if !map_equal.MapEqual(result, output) {
 		t.Errorf(" wrong result, expected %#v, got %#v", output, result)
 	}
 }
 
-func mapEqual(got, expected map[string]interface{}) bool {
-	for keyGot, valueGot := range got {
-		valueExpected := expected[keyGot]
+func TestHandler_AddReaction_GetError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	matchUsecaseMock := mock.NewMockUseCase(ctrl)
+	matchHandler := NewHandler(matchUsecaseMock)
 
-		var (
-			strValueExpected string = convertToString(valueExpected)
-			strValueGot      string = convertToString(valueGot)
-		)
-		if strValueExpected != strValueGot {
-			return false
-		}
+	errRepo := fmt.Errorf("something wrong")
+	userId := uint(1)
+	output := map[string]interface{}{
+		"error":  errRepo.Error(),
+		"status": 400,
 	}
-	return true
+	reaction := match.ReactionInp{
+		EvaluatedUserId: uint(2),
+		Reaction:        "like",
+	}
+
+	expected := []byte(`{"reaction": "like", "evaluatedUserId": 2}`)
+	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(errRepo)
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+	w := httptest.NewRecorder()
+	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	matchHandler.AddReaction(w, req.WithContext(ctx))
+	resp := w.Result()
+
+	if resp.Status != "400 Bad Request" {
+		t.Errorf("incorrect result")
+		return
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			t.Errorf(err.Error())
+			return
+		}
+	}()
+	reqBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(reqBody), &result)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !map_equal.MapEqual(result, output) {
+		t.Errorf(" wrong result, expected %#v, got %#v", output, result)
+	}
 }
 
-func convertToString(val interface{}) (strVal string) {
-	switch val.(type) {
-	case string:
-		strVal = val.(string)
-	case float64:
-		strVal = fmt.Sprint(val.(float64))
-	case int:
-		strVal = fmt.Sprint(val.(int))
+func TestHandler_DeleteMatch(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	matchUsecaseMock := mock.NewMockUseCase(ctrl)
+	matchHandler := NewHandler(matchUsecaseMock)
+
+	userId := uint(1)
+	output := map[string]interface{}{
+		"body":   map[string]interface{}{},
+		"status": 200,
 	}
-	return strVal
+
+	matchUsecaseMock.EXPECT().DeleteMatch(userId, uint(2)).Return(nil)
+
+	req := httptest.NewRequest(http.MethodDelete, "/meetme/match/2", nil)
+	w := httptest.NewRecorder()
+	q := req.URL.Query()
+	q.Add("userId", "2")
+	req.URL.RawQuery = q.Encode()
+	println(req.URL.String())
+	//ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	matchHandler.DeleteMatch(w, req)
+	resp := w.Result()
+
+	if resp.Status != "200 OK" {
+		t.Errorf("incorrect result")
+		return
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			t.Errorf(err.Error())
+			return
+		}
+	}()
+	reqBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(reqBody), &result)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if !map_equal.MapEqual(result, output) {
+		t.Errorf(" wrong result, expected %#v, got %#v", output, result)
+	}
 }

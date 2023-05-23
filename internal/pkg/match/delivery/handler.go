@@ -83,20 +83,24 @@ func (h *Handler) AddReaction(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
-	userId, ok := userIdDB.(uint32)
-	if !ok {
-		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
-		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
-		return
-	}
 
 	params := mux.Vars(r)
 	matchUserIdStr := params["userId"]
 	matchUserId, err := strconv.Atoi(matchUserIdStr)
 	if err != nil {
+		println("here")
+		println(r.URL.Path)
+		println("here")
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	userIdDB := r.Context().Value("userId")
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
 

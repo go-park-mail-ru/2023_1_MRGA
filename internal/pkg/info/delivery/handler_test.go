@@ -11,6 +11,7 @@ import (
 	"github.com/golang/mock/gomock"
 
 	mock "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info/mocks"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
 )
 
 func TestNewInfoHandler(t *testing.T) {
@@ -114,7 +115,7 @@ func TestHandler(t *testing.T) {
 		if err != nil {
 			t.Errorf(err.Error())
 		}
-		if !mapEqual(result, output) {
+		if !map_equal.MapEqual(result, output) {
 			t.Errorf(" wrong result, expected %#v, got %#v", output, result)
 		}
 	}
@@ -202,36 +203,9 @@ func TestHandler_GetError(t *testing.T) {
 		if err != nil {
 			t.Errorf(err.Error())
 		}
-		if !mapEqual(result, output) {
+		if !map_equal.MapEqual(result, output) {
 			t.Errorf(" wrong result, expected %#v, got %#v", output, result)
 		}
 	}
 
-}
-
-func mapEqual(got, expected map[string]interface{}) bool {
-	for keyGot, valueGot := range got {
-		valueExpected := expected[keyGot]
-
-		var (
-			strValueExpected string = convertToString(valueExpected)
-			strValueGot      string = convertToString(valueGot)
-		)
-		if strValueExpected != strValueGot {
-			return false
-		}
-	}
-	return true
-}
-
-func convertToString(val interface{}) (strVal string) {
-	switch val.(type) {
-	case string:
-		strVal = val.(string)
-	case float64:
-		strVal = fmt.Sprint(val.(float64))
-	case int:
-		strVal = fmt.Sprint(val.(int))
-	}
-	return strVal
 }
