@@ -1,6 +1,6 @@
 package repository
 
-func (repository Repository) UploadFile(filePath string, userID uint) (uint, error) {
+func (repository Repository) UploadPhoto(filePath string, userID uint) (uint, error) {
 	file := &File{
 		Path:   filePath,
 		UserID: userID,
@@ -14,6 +14,16 @@ func (repository Repository) UploadFile(filePath string, userID uint) (uint, err
 	}
 
 	return 0, result.Error
+}
+
+func (repository Repository) UploadFile(filePath string, userID uint) error {
+	file := &File{
+		Path:   filePath,
+		UserID: userID,
+	}
+	err := repository.db.Create(&file).Error
+
+	return err
 }
 
 func (repository Repository) GetFile(id uint) (string, error) {
