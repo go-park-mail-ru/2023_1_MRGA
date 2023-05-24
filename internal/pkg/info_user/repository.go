@@ -2,6 +2,7 @@ package info_user
 
 import dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 
+//go:generate mockgen -source=repository.go -destination=mocks/repo.go -package=mock
 type IRepositoryInfo interface {
 	AddInfoUser(userInfo *dataStruct.UserInfo) error
 	GetUserInfo(userId uint) (InfoStruct, error)

@@ -47,6 +47,7 @@ func main() {
 		log.Fatalf("failed to connect env" + err.Error())
 	}
 	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
+
 	if err != nil {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
