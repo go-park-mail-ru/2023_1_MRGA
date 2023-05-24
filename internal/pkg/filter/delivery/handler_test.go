@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -68,7 +68,7 @@ func TestHandler_GetFilter(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -120,7 +120,7 @@ func TestHandler_GetFilter_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -175,7 +175,7 @@ func TestHandler_AddFilter(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -231,7 +231,7 @@ func TestHandler_AddFilter_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -289,7 +289,7 @@ func TestHandler_ChangeFilter(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -346,7 +346,7 @@ func TestHandler_ChangeFilter_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return

@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -71,7 +71,7 @@ func TestHandler_GetMatches(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -118,7 +118,7 @@ func TestHandler_GetMatches_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -173,7 +173,7 @@ func TestHandler_AddReaction(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -230,7 +230,7 @@ func TestHandler_AddReaction_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -280,7 +280,7 @@ func TestHandler_DeleteMatch(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -330,7 +330,7 @@ func TestHandler_DeleteMatch_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return

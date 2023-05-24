@@ -3,7 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -26,7 +26,7 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -71,7 +71,7 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -170,7 +170,7 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -225,7 +225,7 @@ func (h *Handler) ChangeUserStatus(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -314,7 +314,7 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)

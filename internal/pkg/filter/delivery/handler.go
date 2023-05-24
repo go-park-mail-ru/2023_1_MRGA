@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter"
@@ -89,7 +88,7 @@ func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)

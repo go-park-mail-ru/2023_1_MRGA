@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -161,13 +160,13 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		input, err := ioutil.TempFile("", "input-*.webm")
+		input, err := os.CreateTemp("", "input-*.webm")
 		if err != nil {
 			return
 		}
 		defer os.Remove(input.Name())
 
-		output, err := ioutil.TempFile("", "output-*.ogg")
+		output, err := os.CreateTemp("", "output-*.ogg")
 		if err != nil {
 			return
 		}
@@ -579,7 +578,7 @@ func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
 			return
 		}
 	}()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", err
 	}
@@ -627,7 +626,7 @@ func (h *Handler) getFileByPath(pathToFile string) (file []byte, filename string
 			return
 		}
 	}()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return
 	}

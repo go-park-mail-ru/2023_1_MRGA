@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,7 +16,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/mocks"
+	mock "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 	mockProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
@@ -79,7 +79,7 @@ func TestHandler_AddUserHashtags(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -138,7 +138,7 @@ func TestHandler_AddUserHashtags_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -198,7 +198,7 @@ func TestHandler_ChangeUserHashtags(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -257,7 +257,7 @@ func TestHandler_ChangeUserHashtags_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -310,7 +310,7 @@ func TestHandler_ChangeUserStatus(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -363,7 +363,7 @@ func TestHandler_ChangeUserStatus_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -417,7 +417,7 @@ func TestHandler_GetUserHashtags(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -470,7 +470,7 @@ func TestHandler_GetUserHashtags_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -522,7 +522,7 @@ func TestHandler_GetUserStatus(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -574,7 +574,7 @@ func TestHandler_GetUserStatus_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -645,7 +645,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -705,7 +705,7 @@ func TestHandler_GetCurrentUser_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -780,7 +780,7 @@ func TestHandler_GetInfo(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -845,7 +845,7 @@ func TestHandler_GetInfo_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -923,7 +923,7 @@ func TestHandler_GetInfoById(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -991,7 +991,7 @@ func TestHandler_GetInfoById_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1075,7 +1075,7 @@ func TestHandler_ChangeInfo(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1147,7 +1147,7 @@ func TestHandler_ChangeInfo_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1207,7 +1207,7 @@ func TestHandler_CreateInfo(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1267,7 +1267,7 @@ func TestHandler_CreateInfo_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return

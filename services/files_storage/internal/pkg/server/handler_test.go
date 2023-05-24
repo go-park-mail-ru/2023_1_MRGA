@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -35,7 +34,7 @@ func TestUploadPhoto(t *testing.T) {
 	mockService := myMocks.NewMockIService(mockCtrl)
 
 	// Создаем временный файл и записываем в него некоторые данные
-	tmpfile, err := ioutil.TempFile("", "example*.txt")
+	tmpfile, err := os.CreateTemp("", "example*.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +122,7 @@ func TestUploadFile(t *testing.T) {
 	mockService := myMocks.NewMockIService(mockCtrl)
 
 	// Создаем временный файл и записываем в него некоторые данные
-	tmpfile, err := ioutil.TempFile("", "example*.txt")
+	tmpfile, err := os.CreateTemp("", "example*.txt")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,14 +1,14 @@
 package face_finder
 
 import (
-	"io/ioutil"
 	"mime/multipart"
+	"os"
 
 	pigo "github.com/esimov/pigo/core"
 )
 
 func IsPhotoWithFace(file multipart.File) (bool, error) {
-	cascadeFile, err := ioutil.ReadFile("facefinder")
+	cascadeFile, err := os.ReadFile("facefinder")
 	if err != nil {
 		return false, err
 	}

@@ -3,7 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -24,7 +24,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -62,7 +62,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -99,7 +99,7 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
