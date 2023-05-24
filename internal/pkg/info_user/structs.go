@@ -33,7 +33,7 @@ type InfoStructAnswer struct {
 	Sex         uint   `json:"sex" structs:"sex"`
 	Description string `json:"description" structs:"description"`
 	Zodiac      string `json:"zodiac" structs:"zodiac"`
-	Job         string `json:"job" structs:"job" structs:"job"`
+	Job         string `json:"job" structs:"job"`
 	Education   string `json:"education" structs:"education"`
 	Age         int    `json:"age" structs:"age"`
 	Photos      []uint `json:"photos" structs:"photos"`

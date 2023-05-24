@@ -32,8 +32,6 @@ func TestHandler(t *testing.T) {
 	recUsecaseMock := mock.NewMockUseCase(ctrl)
 	recHandler := NewHandler(recUsecaseMock)
 
-	type callFunc func(w http.ResponseWriter, r *http.Request)
-
 	test := []string{"test1", "test2"}
 	userId := uint(1)
 	recUsecaseMock.EXPECT().GetRecommendations(userId)
