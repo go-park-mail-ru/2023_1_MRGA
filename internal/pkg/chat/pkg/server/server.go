@@ -12,6 +12,7 @@ import (
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app/constants"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
@@ -20,7 +21,7 @@ import (
 )
 
 func (server Server) CreateChatHandler(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
@@ -84,7 +85,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
@@ -125,7 +126,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 	senderId := uint64(userId)
 
 	wsMsgData := app.WSMsgData{
-		Flag: "SEND",
+		Flag:     "SEND",
 		SenderId: senderId,
 		UserIds:  msgData.UserIds,
 		MsgData: app.WSMessageResponse{
@@ -153,7 +154,7 @@ func (server Server) SendMessageHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (server Server) GetChatsListHandler(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
@@ -212,7 +213,7 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
@@ -281,12 +282,12 @@ func (server Server) GetChatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wsMsgData := app.WSMsgData{
-		Flag: "READ",
+		Flag:     "READ",
 		SenderId: uint64(userId),
 		UserIds:  userIds,
 		MsgData: app.WSReadResponse{
 			SenderId: uint64(userId),
-			ChatId: uint64ChatId,
+			ChatId:   uint64ChatId,
 		},
 	}
 

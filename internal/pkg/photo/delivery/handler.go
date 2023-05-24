@@ -17,6 +17,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/face_finder"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
@@ -41,7 +42,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := r.MultipartForm.File["files[]"]
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -131,7 +132,7 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 
 	files := r.MultipartForm.File["files[]"]
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userIdUint32, ok := userIdDB.(uint32)
 	if !ok {
 		err := errors.New("Пользователь не авторизирован")
@@ -333,7 +334,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -372,7 +373,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)

@@ -19,7 +19,7 @@ import (
 )
 
 func (h *Handler) GetMatches(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -97,7 +97,7 @@ func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)

@@ -10,6 +10,7 @@ import (
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
@@ -42,7 +43,7 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -87,7 +88,7 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -117,7 +118,7 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -140,7 +141,7 @@ func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -186,7 +187,7 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -241,7 +242,7 @@ func (h *Handler) ChangeUserStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -284,7 +285,7 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetInfo(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -330,7 +331,7 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -351,7 +352,7 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
