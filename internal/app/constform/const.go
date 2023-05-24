@@ -16,3 +16,7 @@ const (
 	Filters              //3
 	Photos               //4
 )
+
+type UserIdContext string
+
+const UserId = UserIdContext("userId")
