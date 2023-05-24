@@ -50,9 +50,10 @@ func TestHandler_GetFilter(t *testing.T) {
 		},
 		"status": 200,
 	}
+	keyContext := "userId"
 	req := httptest.NewRequest(http.MethodGet, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), keyContext, uint32(userId))
 	filterHandler.GetFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
