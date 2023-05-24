@@ -105,8 +105,8 @@ func TestHandler_GetFilter_GetError(t *testing.T) {
 	}
 	req := httptest.NewRequest(http.MethodGet, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	keyContext := "userId"
-	ctx := context.WithValue(req.Context(), keyContext, uint32(userId))
+
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.GetFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -217,7 +217,7 @@ func TestHandler_AddFilter_GetError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.AddFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -275,7 +275,7 @@ func TestHandler_ChangeFilter(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.ChangeFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -332,7 +332,7 @@ func TestHandler_ChangeFilter_GetError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.ChangeFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -359,8 +360,8 @@ func TestHandler_ChangeUser(t *testing.T) {
 	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
 	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()
-	const keyContext = "userId"
-	ctx := context.WithValue(req.Context(), keyContext, uint32(2))
+
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(2))
 	req = req.WithContext(ctx)
 	authServiceMock.EXPECT().ChangeUser(req.Context(), &authInp).Return(nil, nil)
 
@@ -413,8 +414,8 @@ func TestHandler_ChangeUser_GetError(t *testing.T) {
 	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
 	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()
-	const keyContext = "userId"
-	ctx := context.WithValue(req.Context(), keyContext, uint32(2))
+
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(2))
 	req = req.WithContext(ctx)
 	authServiceMock.EXPECT().ChangeUser(req.Context(), &authInp).Return(nil, errRepo)
 

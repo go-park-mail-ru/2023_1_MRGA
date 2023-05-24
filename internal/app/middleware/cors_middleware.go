@@ -31,7 +31,9 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 
 }
 
-var ContextUserKey = "userId"
+type UserKey string
+
+var ContextUserKey UserKey = "userId"
 var ProtectedPath = "/api/auth/"
 
 func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handler {
