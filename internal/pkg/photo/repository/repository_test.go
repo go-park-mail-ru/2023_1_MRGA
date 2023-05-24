@@ -39,6 +39,10 @@ func TestPhotoRepo_GetAvatar(t *testing.T) {
 		DriverName:           "postgres",
 		Conn:                 db,
 	}))
+	if err != nil {
+		t.Fatalf("cant open db: %s", err)
+	}
+
 	photoRepo := NewPhotoRepo(pDb)
 
 	userId := uint(1)

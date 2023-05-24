@@ -223,6 +223,7 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bodyBytes, filename, err := h.SendRequest(photoId)
+	fmt.Println("\n\n\n", filename, "\n\n\n")
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -403,7 +404,11 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	file.Seek(0, 0)
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		writer.ErrorRespondWithData(w, r, fmt.Errorf("can't seek file"), http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
 	if !ok {
 		logger.Log(http.StatusBadRequest, fmt.Errorf("there is not face").Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespondWithData(w, r, fmt.Errorf("there is not face"), http.StatusBadRequest, map[string]interface{}{"problemPhoto": []int{0}})
@@ -552,6 +557,8 @@ func (h *Handler) uploadFile(file multipart.File, filename string, userID uint) 
 func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
 	// Создаем HTTP-запрос на другой микросервис
 	requestUrl := fmt.Sprintf("http://%s:8081/api/files/%s", h.serverHost, photoId)
+
+	fmt.Println("\n\n\n", requestUrl, "\n\n\n")
 	req, err := http.NewRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, "", err
