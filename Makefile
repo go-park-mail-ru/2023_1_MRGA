@@ -16,4 +16,4 @@ cov:
 	go test -coverpkg=./... -coverprofile=cover ./... && cat cover | grep -v "mock" | grep -v  "easyjson" | grep -v "proto" > cover.out && go tool cover -func=cover.out
 
 lint:
-	golangci-lint run
+	golangci-lint run --timeout 5m
