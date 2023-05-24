@@ -104,8 +104,8 @@ func TestHandler_GetMatches_GetError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/meetme/match", nil)
 	w := httptest.NewRecorder()
-	const keyContext = "userId"
-	ctx := context.WithValue(req.Context(), keyContext, uint32(userId))
+
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	matchHandler.GetMatches(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -160,8 +160,8 @@ func TestHandler_AddReaction(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	const keyContext = "userId"
-	ctx := context.WithValue(req.Context(), keyContext, uint32(userId))
+
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	matchHandler.AddReaction(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -218,7 +218,7 @@ func TestHandler_AddReaction_GetError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	matchHandler.AddReaction(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -268,7 +268,7 @@ func TestHandler_DeleteMatch(t *testing.T) {
 		"userId": "2",
 	}
 	req = mux.SetURLVars(req, vars)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	matchHandler.DeleteMatch(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -318,7 +318,7 @@ func TestHandler_DeleteMatch_GetError(t *testing.T) {
 		"userId": "2",
 	}
 	req = mux.SetURLVars(req, vars)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	matchHandler.DeleteMatch(w, req.WithContext(ctx))
 	resp := w.Result()
 
