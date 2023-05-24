@@ -1,9 +1,6 @@
-name: CI
+name: Test on PR
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -32,21 +29,3 @@ jobs:
           echo "Tests failed"
           exit 1
         fi
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [test]
-
-    steps:
-    - name: Execute remote ssh commands
-      uses: appleboy/ssh-action@master
-      with:
-        host: 95.163.180.8
-        username: ubuntu
-        key: ${{ secrets.REMOTE_SSH_KEY }}
-        script: |
-          cd /home/ubuntu/2023_1_MRGA
-          docker-compose stop
-          git stash save
-          git pull
-          docker-compose up -d
