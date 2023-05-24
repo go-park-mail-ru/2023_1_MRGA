@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/mailru/easyjson"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/mocks"
@@ -145,14 +146,18 @@ func TestHandler_AddFilter(t *testing.T) {
 		Reason:    []string{"test"},
 	}
 	userId := uint(1)
-
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	filterUsecaseMock.EXPECT().AddFilters(userId, test).Return(nil)
 	output := map[string]interface{}{
 		"body":   map[string]interface{}{},
 		"status": 200,
 	}
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
 	filterHandler.AddFilter(w, req.WithContext(ctx))
@@ -195,6 +200,11 @@ func TestHandler_AddFilter_GetError(t *testing.T) {
 		SearchSex: uint(0),
 		Reason:    []string{"test"},
 	}
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	userId := uint(1)
 	errRepo := fmt.Errorf("something wrong")
 	filterUsecaseMock.EXPECT().AddFilters(userId, test).Return(errRepo)
@@ -202,8 +212,8 @@ func TestHandler_AddFilter_GetError(t *testing.T) {
 		"error":  errRepo.Error(),
 		"status": 400,
 	}
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
 	filterHandler.AddFilter(w, req.WithContext(ctx))
@@ -247,7 +257,11 @@ func TestHandler_ChangeFilter(t *testing.T) {
 		Reason:    []string{"test"},
 	}
 	userId := uint(1)
-
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	filterUsecaseMock.EXPECT().ChangeFilters(userId, test).Return(nil)
 	filterUsecaseMock.EXPECT().GetFilters(userId).Return(test, nil)
 	output := map[string]interface{}{
@@ -257,8 +271,7 @@ func TestHandler_ChangeFilter(t *testing.T) {
 		"status": 200,
 	}
 
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
 	filterHandler.ChangeFilter(w, req.WithContext(ctx))
@@ -303,7 +316,11 @@ func TestHandler_ChangeFilter_GetError(t *testing.T) {
 		Reason:    []string{"test"},
 	}
 	userId := uint(1)
-
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	filterUsecaseMock.EXPECT().ChangeFilters(userId, test).Return(errRepo)
 
 	output := map[string]interface{}{
@@ -311,8 +328,7 @@ func TestHandler_ChangeFilter_GetError(t *testing.T) {
 		"status": 400,
 	}
 
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
 	filterHandler.ChangeFilter(w, req.WithContext(ctx))
