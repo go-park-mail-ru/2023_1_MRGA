@@ -8,6 +8,7 @@ type UserRes struct {
 	Shown  bool   `json:"shown" structs:"shown"`
 }
 
+//easyjson:json
 type ReactionInp struct {
 	EvaluatedUserId uint   `json:"evaluatedUserId"`
 	Reaction        string `json:"reaction"`
