@@ -76,6 +76,9 @@ func (repo *Repository) makeMigrate() error {
 
 func InitRepository() (repo Repository, err error) {
 	repo.db, err = getConn()
+	if err != nil {
+		return repo, err
+	}
 
 	err = repo.makeMigrate()
 	if err != nil {
