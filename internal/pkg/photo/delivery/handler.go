@@ -300,7 +300,7 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		err = errors.New(fmt.Sprintf("Неудачная расшифровка с кодом: %d %v\n", resp.StatusCode, resp))
+		err = fmt.Errorf("Неудачная расшифровка с кодом: %d %v\n", resp.StatusCode, resp)
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
@@ -350,7 +350,6 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
-	return
 }
 
 func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {

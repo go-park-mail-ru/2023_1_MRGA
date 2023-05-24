@@ -85,7 +85,6 @@ func (h *Handler) AddReaction(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
-	return
 }
 
 func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {

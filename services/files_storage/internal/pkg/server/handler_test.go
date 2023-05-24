@@ -98,6 +98,9 @@ func TestUploadPhoto(t *testing.T) {
 
 	var uploadFileAnswer UploadPhotoResp
 	err = json.NewDecoder(body).Decode(&uploadFileAnswer)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	assert.Equal(t, UploadPhotoResp{Status: 200, Body: UploadPhoto{
 		PhotoID: futurePhotoID}}, uploadFileAnswer)
@@ -183,6 +186,9 @@ func TestUploadFile(t *testing.T) {
 
 	var uploadFileAnswer uploadFileResp
 	err = json.NewDecoder(body).Decode(&uploadFileAnswer)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	assert.Equal(t, uploadFileResp{Status: 200, Body: uploadFile{
 		PathToFile: futurePathToFile}}, uploadFileAnswer)

@@ -44,7 +44,7 @@ func (r *PhotoRepository) CheckDeletedPhoto(row dataStruct.UserPhoto) error {
 	if err != nil {
 		return err
 	}
-	if row.Avatar == true {
+	if row.Avatar {
 		var newAvatar dataStruct.UserPhoto
 		err = r.db.Last(&newAvatar, "user_id = ? AND avatar = ?", row.UserId, false).Error
 		if err != nil {

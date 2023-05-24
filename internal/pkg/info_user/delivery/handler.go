@@ -59,7 +59,6 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
-	return
 }
 
 func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
