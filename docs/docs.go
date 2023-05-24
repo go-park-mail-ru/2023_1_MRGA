@@ -23,7 +23,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/meetme/city": {
+        "/api/auth/city": {
             "get": {
                 "description": "returned list of cities",
                 "tags": [
@@ -46,7 +46,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/meetme/login": {
+        "/api/auth/login": {
             "post": {
                 "description": "authorise existing user with username/email and password",
                 "tags": [
@@ -75,7 +75,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/meetme/logout": {
+        "/api/auth/logout": {
             "post": {
                 "description": "user can log out and end session",
                 "tags": [
@@ -93,7 +93,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/meetme/recommendations": {
+        "/api/auth/recommendations": {
             "get": {
                 "description": "now just return info_user 10 or fewer users",
                 "tags": [
@@ -113,7 +113,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/meetme/register": {
+        "/api/auth/register": {
             "post": {
                 "description": "create new account with unique username and email",
                 "tags": [
@@ -142,7 +142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/meetme/user": {
+        "/api/auth/user": {
             "get": {
                 "description": "you can get info_user about current user",
                 "produces": [
@@ -240,7 +240,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "5.159.100.59",
-	BasePath:         "/meetme/",
+	BasePath:         "/api/auth/",
 	Schemes:          []string{"http"},
 	Title:            "MRGA",
 	Description:      "Meetme backend documentation",

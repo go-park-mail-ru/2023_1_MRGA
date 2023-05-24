@@ -57,19 +57,6 @@ services: # имеджи, которые запустятся по вашему 
     networks:
       - service-network
 
-
-volumes: # часть настроек для хранения данных
-  postgresdb-data:
-    driver: local
-  redis-data:
-    driver: local
-  postgresstore-data:
-    driver: local
-  postgreschat-data:
-    driver: local
-  grafana-storage:
-  prometheus_data:
-
   server-backend:
     image: golang:1.20.4-alpine3.16
     volumes:
@@ -152,7 +139,7 @@ volumes: # часть настроек для хранения данных
     # Change latest with your target version, if needed
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - "3100:3000"
     volumes:
       # Use your plugin folder (e.g. redshift-datasource)
       - grafana-storage:/var/lib/grafana
@@ -181,6 +168,18 @@ volumes: # часть настроек для хранения данных
       TZ: "Europe/Moscow"
     networks:
       - default
+
+volumes: # часть настроек для хранения данных
+  postgresdb-data:
+    driver: local
+  redis-data:
+    driver: local
+  postgresstore-data:
+    driver: local
+  postgreschat-data:
+    driver: local
+  grafana-storage:
+  prometheus_data:
 
 networks:
   service-network:
