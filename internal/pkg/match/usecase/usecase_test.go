@@ -125,7 +125,7 @@ func TestMatchUseCase_PostReaction(t *testing.T) {
 	matchRepoMock.EXPECT().AddMatchRow(match2).Return(nil)
 	matchRepoMock.EXPECT().DeleteUserReaction(uint(0)).Return(nil)
 
-	err := matchUsecase.PostReaction(userId, reactionInp)
+	_, err := matchUsecase.PostReaction(userId, reactionInp)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -171,7 +171,7 @@ func TestMatchUseCase_PostReaction_GetError(t *testing.T) {
 	matchRepoMock.EXPECT().GetUserReaction(EvaluatedUserId, userId).Return(reaction2, nil)
 	matchRepoMock.EXPECT().AddMatchRow(match1).Return(errRepo)
 
-	err := matchUsecase.PostReaction(userId, reactionInp)
+	_, err := matchUsecase.PostReaction(userId, reactionInp)
 	if err == nil {
 		t.Errorf("unexpected err: %s", err)
 		return

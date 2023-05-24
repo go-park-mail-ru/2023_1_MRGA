@@ -48,3 +48,4 @@ func RegisterHTTPEndpoints(router *mux.Router, uc match.UseCase) {
 	router.HandleFunc("/meetme/reaction", h.AddReaction).Methods("POST")
 	router.HandleFunc("/meetme/match/subscribe", h.Subscribe).Methods("GET")
 
+}

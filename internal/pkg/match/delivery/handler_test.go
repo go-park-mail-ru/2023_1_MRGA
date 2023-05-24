@@ -149,7 +149,7 @@ func TestHandler_AddReaction(t *testing.T) {
 	}
 
 	expected := []byte(`{"reaction": "like", "evaluatedUserId": 2}`)
-	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(nil)
+	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(match.ReactionResult{ResultCode: 1}, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()
@@ -201,7 +201,7 @@ func TestHandler_AddReaction_GetError(t *testing.T) {
 	}
 
 	expected := []byte(`{"reaction": "like", "evaluatedUserId": 2}`)
-	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(errRepo)
+	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(match.ReactionResult{ResultCode: 1}, errRepo)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()

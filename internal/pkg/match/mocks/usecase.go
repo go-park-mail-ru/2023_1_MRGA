@@ -48,21 +48,6 @@ func (mr *MockUseCaseMockRecorder) DeleteMatch(userId, userMatchId interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMatch", reflect.TypeOf((*MockUseCase)(nil).DeleteMatch), userId, userMatchId)
 }
 
-// GetChatByEmail mocks base method.
-func (m *MockUseCase) GetChatByEmail(usrId, userId uint) (match.ChatAnswer, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetChatByEmail", usrId, userId)
-	ret0, _ := ret[0].(match.ChatAnswer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetChatByEmail indicates an expected call of GetChatByEmail.
-func (mr *MockUseCaseMockRecorder) GetChatByEmail(usrId, userId interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChatByEmail", reflect.TypeOf((*MockUseCase)(nil).GetChatByEmail), usrId, userId)
-}
-
 // GetMatches mocks base method.
 func (m *MockUseCase) GetMatches(userId uint) ([]match.UserRes, error) {
 	m.ctrl.T.Helper()
@@ -79,11 +64,12 @@ func (mr *MockUseCaseMockRecorder) GetMatches(userId interface{}) *gomock.Call {
 }
 
 // PostReaction mocks base method.
-func (m *MockUseCase) PostReaction(userId uint, reaction match.ReactionInp) error {
+func (m *MockUseCase) PostReaction(userId uint, reaction match.ReactionInp) (match.ReactionResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PostReaction", userId, reaction)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(match.ReactionResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // PostReaction indicates an expected call of PostReaction.
