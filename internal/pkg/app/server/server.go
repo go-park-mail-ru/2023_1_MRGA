@@ -23,7 +23,7 @@ type ServerOptions struct {
 func GetServerOptions() (opts ServerOptions) {
 	flag.StringVar(&opts.Host, "h", "0.0.0.0", "set the server's host")
 	flag.StringVar(&opts.Port, "p", "8080", "set the server's port")
-	flag.IntVar(&opts.MaxHeaderBytes, "m", 1, "set the server's max header bytes in MB")
+	flag.IntVar(&opts.MaxHeaderBytes, "m", 20, "set the server's max header bytes in MB")
 	readTimeout := flag.Int64("rt", 10, "set the server's read timeout in seconds")
 	writeTimout := flag.Int("wt", 60, "set the server's read timeout in seconds")
 	flag.Parse()

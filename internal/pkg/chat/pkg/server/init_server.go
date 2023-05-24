@@ -44,7 +44,7 @@ func (server Server) InitClient() (chatClient chatpc.ChatServiceClient, chatClie
 func (server *Server) InitRouter(pathPrefix string) {
 	server.router = mux.NewRouter().PathPrefix(pathPrefix).Subrouter()
 
-	// С префиксом /meetme/chats все ниже
+	// С префиксом /api/auth/chats все ниже
 	server.router.HandleFunc("/create", server.CreateChatHandler).Methods("POST")
 	server.router.HandleFunc("/{chat_id}/send", server.SendMessageHandler).Methods("POST")
 	server.router.HandleFunc("/list", server.GetChatsListHandler).Methods("GET")

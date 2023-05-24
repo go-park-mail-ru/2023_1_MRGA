@@ -43,9 +43,8 @@ func NewHandler(useCase match.UseCase) *Handler {
 func RegisterHTTPEndpoints(router *mux.Router, uc match.UseCase) {
 	h := NewHandler(uc)
 
-	router.HandleFunc("/meetme/match", h.GetMatches).Methods("GET")
-	router.HandleFunc("/meetme/match/{userId}", h.DeleteMatch).Methods("DELETE", "OPTIONS")
-	router.HandleFunc("/meetme/reaction", h.AddReaction).Methods("POST")
-	router.HandleFunc("/meetme/match/subscribe", h.Subscribe).Methods("GET")
-
+	router.HandleFunc("/api/auth/match", h.GetMatches).Methods("GET")
+	router.HandleFunc("/api/auth/match/{userId}", h.DeleteMatch).Methods("DELETE", "OPTIONS")
+	router.HandleFunc("/api/auth/reaction", h.AddReaction).Methods("POST")
+	router.HandleFunc("/api/auth/match/subscribe", h.Subscribe).Methods("GET")
 }

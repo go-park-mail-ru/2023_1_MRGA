@@ -197,7 +197,7 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 		defer convertedFile.Close()
 
 		// Upload the file
-		pathToFile, err := uploadFile(convertedFile, strings.TrimSuffix(fileHeader.Filename, filepath.Ext(fileHeader.Filename))+".ogg", userId)
+		pathToFile, err := h.uploadFile(convertedFile, strings.TrimSuffix(fileHeader.Filename, filepath.Ext(fileHeader.Filename))+".ogg", userId)
 		if err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
@@ -247,7 +247,7 @@ func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyBytes, filename, err := getFileByPath(pathToFile)
+	bodyBytes, filename, err := h.getFileByPath(pathToFile)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -272,7 +272,7 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyBytes, _, err := getFileByPath(pathToFile)
+	bodyBytes, _, err := h.getFileByPath(pathToFile)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -490,7 +490,7 @@ func (h *Handler) SendPhoto(file multipart.File, filename string, userID uint) (
 	return answer.Body.PhotoID, nil
 }
 
-func uploadFile(file multipart.File, filename string, userID uint) (pathToFile string, err error) {
+func (h *Handler) uploadFile(file multipart.File, filename string, userID uint) (pathToFile string, err error) {
 	requestBody := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(requestBody)
 	userIdField, err := writerFile.CreateFormField("userID")
@@ -516,7 +516,8 @@ func uploadFile(file multipart.File, filename string, userID uint) (pathToFile s
 		return
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:8081/api/v2/files/upload", requestBody)
+	requestUrl := fmt.Sprintf("http://%s:8081/api/v2/files/upload", h.serverHost)
+	req, err := http.NewRequest("POST", requestUrl, requestBody)
 	if err != nil {
 		return
 	}
@@ -597,9 +598,10 @@ func convertToOgg(inputPath, outputPath string) error {
 	return nil
 }
 
-func getFileByPath(pathToFile string) (file []byte, filename string, err error) {
+func (h *Handler) getFileByPath(pathToFile string) (file []byte, filename string, err error) {
 	// Создаем HTTP-запрос на другой микросервис
-	req, err := http.NewRequest("GET", "http://localhost:8081/api/files/"+pathToFile, nil)
+	requestUrl := fmt.Sprintf("http://%s:8081/api/files/%s", h.serverHost, pathToFile)
+	req, err := http.NewRequest("GET", requestUrl, nil)
 	if err != nil {
 		return
 	}

@@ -17,9 +17,9 @@
     "version": "1.0"
   },
   "host": "5.159.100.59",
-  "basePath": "/meetme/",
+  "basePath": "/api/auth/",
   "paths": {
-    "/meetme/city": {
+    "/api/auth/city": {
       "get": {
         "description": "returned list of cities",
         "tags": [
@@ -42,7 +42,7 @@
         }
       }
     },
-    "/meetme/login": {
+    "/api/auth/login": {
       "post": {
         "description": "authorise existing user with username/email and password",
         "tags": [
@@ -71,7 +71,7 @@
         }
       }
     },
-    "/meetme/logout": {
+    "/api/auth/logout": {
       "post": {
         "description": "user can log out and end session",
         "tags": [
@@ -89,7 +89,7 @@
         }
       }
     },
-    "/meetme/recommendations": {
+    "/api/auth/recommendations": {
       "get": {
         "description": "now just return other 10 or fewer users",
         "tags": [
@@ -109,7 +109,7 @@
         }
       }
     },
-    "/meetme/register": {
+    "/api/auth/register": {
       "post": {
         "description": "create new account with unique username and email",
         "tags": [
@@ -138,7 +138,7 @@
         }
       }
     },
-    "/meetme/user": {
+    "/api/auth/user": {
       "get": {
         "description": "you can get info about current user",
         "produces": [

@@ -172,7 +172,7 @@ func (h *Handler) handleWebsocketConnection(ws *websocket.Conn, userID UserID) {
 	defer func(ws *websocket.Conn) {
 		err := ws.Close()
 		if err != nil {
-			logger.Log(http.StatusBadRequest, err.Error(), "WEBSOCKET", "/meetme/match/subscribe", true)
+			logger.Log(http.StatusBadRequest, err.Error(), "WEBSOCKET", "/api/auth/match/subscribe", true)
 		}
 	}(ws)
 
