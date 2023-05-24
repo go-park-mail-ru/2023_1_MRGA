@@ -2,6 +2,7 @@ package filter
 
 import dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
 
+//go:generate mockgen -source=repository.go -destination=mocks/repo.go -package=mock
 type IRepositoryFilter interface {
 	GetReasonById(reasonId []uint) ([]string, error)
 	GetReasonId(reason []string) ([]uint, error)

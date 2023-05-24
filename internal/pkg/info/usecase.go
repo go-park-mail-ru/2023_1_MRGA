@@ -1,5 +1,6 @@
 package info
 
+//go:generate mockgen -source=usecase.go -destination=mocks/usecase.go -package=mock
 type UseCase interface {
 	GetHashtags() ([]string, error)
 	GetZodiacs() ([]string, error)

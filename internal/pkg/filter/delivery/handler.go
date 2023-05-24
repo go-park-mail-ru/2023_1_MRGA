@@ -31,6 +31,7 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 	var filterInp filter.FilterInput
 	err = json.Unmarshal(reqBody, &filterInp)
 	if err != nil {
+
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		err = fmt.Errorf("cant parse json")
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -44,7 +45,6 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
 		return
 	}
-
 	err = h.useCase.AddFilters(uint(userId), filterInp)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)

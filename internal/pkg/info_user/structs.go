@@ -2,6 +2,7 @@ package info_user
 
 import "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
 
+//easyjson:json
 type InfoStruct struct {
 	Name        string `json:"name" structs:"name"`
 	City        string `json:"city" structs:"city"`
@@ -38,6 +39,7 @@ type InfoStructAnswer struct {
 	Photos      []uint `json:"photos" structs:"photos"`
 }
 
+//easyjson:json
 type InfoChange struct {
 	Name        string `json:"name" structs:"name"`
 	City        string `json:"city" structs:"city"`
@@ -48,10 +50,12 @@ type InfoChange struct {
 	Education   string `json:"education" structs:"education"`
 }
 
+//easyjson:json
 type HashtagInp struct {
 	Hashtag []string `json:"hashtag" structs:"hashtag"`
 }
 
+//easyjson:json
 type StatusInp struct {
 	Status string `json:"status" structs:"status"`
 }
