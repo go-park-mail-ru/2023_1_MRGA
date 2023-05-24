@@ -35,7 +35,7 @@ import (
 
 // @host 5.159.100.59
 // @schemes http
-// @BasePath /meetme/
+// @BasePath /api/auth/
 func main() {
 	logger.Init(servicedefault.NameService)
 	log.Println("Application is starting")
@@ -85,7 +85,7 @@ func main() {
 	chatServerOptions := ChatServerPackage.ServerOptions{
 		Addr:       chatServiceHost,
 		Port:       3030,
-		PathPrefix: "/meetme/chats",
+		PathPrefix: "/api/auth/chats",
 	}
 
 	serv := new(server.Server)

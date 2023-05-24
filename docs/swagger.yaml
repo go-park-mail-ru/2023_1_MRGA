@@ -1,4 +1,4 @@
-basePath: /meetme/
+basePath: /api/auth/
 definitions:
   app.LoginInput:
     properties:
@@ -57,7 +57,7 @@ info:
   title: MRGA
   version: "1.0"
 paths:
-  /meetme/city:
+  /api/auth/city:
     get:
       description: returned list of cities
       responses:
@@ -72,7 +72,7 @@ paths:
       summary: get list of cities for registration
       tags:
         - info_user
-  /meetme/login:
+  /api/auth/login:
     post:
       description: authorise existing user with username/email and password
       parameters:
@@ -91,7 +91,7 @@ paths:
       summary: authorise user
       tags:
         - Registration
-  /meetme/logout:
+  /api/auth/logout:
     post:
       description: user can log out and end session
       responses:
@@ -103,7 +103,7 @@ paths:
       summary: Logout authorised user
       tags:
         - Registration
-  /meetme/recommendations:
+  /api/auth/recommendations:
     get:
       description: now just return info_user 10 or fewer users
       responses:
@@ -116,7 +116,7 @@ paths:
       summary: return recommendations for user
       tags:
         - Recommendations
-  /meetme/register:
+  /api/auth/register:
     post:
       description: create new account with unique username and email
       parameters:
@@ -135,7 +135,7 @@ paths:
       summary: Register new user
       tags:
         - Registration
-  /meetme/user:
+  /api/auth/user:
     get:
       description: you can get info_user about current user
       produces:

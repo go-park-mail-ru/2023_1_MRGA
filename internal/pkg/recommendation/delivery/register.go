@@ -19,6 +19,6 @@ func NewHandler(useCase recommendation.UseCase) *Handler {
 func RegisterHTTPEndpoints(router *mux.Router, uc recommendation.UseCase) {
 	h := NewHandler(uc)
 
-	router.HandleFunc("/meetme/recommendation", h.GetRecommendations).Methods("GET")
+	router.HandleFunc("/api/auth/recommendation", h.GetRecommendations).Methods("GET")
 
 }

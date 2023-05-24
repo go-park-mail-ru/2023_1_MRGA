@@ -21,18 +21,18 @@ func NewHandler(useCase info_user.UseCase, compServ complaintProto.ComplaintsCli
 
 func RegisterHTTPEndpoints(router *mux.Router, ic info_user.UseCase, compServ complaintProto.ComplaintsClient) {
 	h := NewHandler(ic, compServ)
-	router.HandleFunc("/meetme/info-user/{userId}", h.GetInfoById).Methods("GET")
+	router.HandleFunc("/api/auth/info-user/{userId}", h.GetInfoById).Methods("GET")
 
-	router.HandleFunc("/meetme/user", h.GetCurrentUser).Methods("GET")
+	router.HandleFunc("/api/auth/user", h.GetCurrentUser).Methods("GET")
 
-	router.HandleFunc("/meetme/info-user", h.GetInfo).Methods("GET")
-	router.HandleFunc("/meetme/info-user", h.ChangeInfo).Methods("PUT", "OPTIONS")
-	router.HandleFunc("/meetme/info-user", h.CreateInfo).Methods("POST")
+	router.HandleFunc("/api/auth/info-user", h.GetInfo).Methods("GET")
+	router.HandleFunc("/api/auth/info-user", h.ChangeInfo).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/api/auth/info-user", h.CreateInfo).Methods("POST")
 
-	router.HandleFunc("/meetme/hashtags-user", h.AddUserHashtags).Methods("POST")
-	router.HandleFunc("/meetme/hashtags-user", h.GetUserHashtags).Methods("GET")
-	router.HandleFunc("/meetme/hashtags-user", h.ChangeUserHashtags).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/api/auth/hashtags-user", h.AddUserHashtags).Methods("POST")
+	router.HandleFunc("/api/auth/hashtags-user", h.GetUserHashtags).Methods("GET")
+	router.HandleFunc("/api/auth/hashtags-user", h.ChangeUserHashtags).Methods("PUT", "OPTIONS")
 
-	router.HandleFunc("/meetme/status-user", h.GetUserStatus).Methods("GET")
-	router.HandleFunc("/meetme/status-user", h.ChangeUserStatus).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/api/auth/status-user", h.GetUserStatus).Methods("GET")
+	router.HandleFunc("/api/auth/status-user", h.ChangeUserStatus).Methods("PUT", "OPTIONS")
 }

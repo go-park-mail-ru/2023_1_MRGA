@@ -19,5 +19,5 @@ func NewHandler(compService complaintProto.ComplaintsClient) *Handler {
 func RegisterHTTPEndpoints(router *mux.Router, compServ complaintProto.ComplaintsClient) {
 	h := NewHandler(compServ)
 
-	router.HandleFunc("/meetme/complain", h.Complain).Methods("POST")
+	router.HandleFunc("/api/auth/complain", h.Complain).Methods("POST")
 }

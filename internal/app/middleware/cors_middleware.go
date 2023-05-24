@@ -32,7 +32,7 @@ func CorsMiddleware(allowedHosts []string, next http.Handler) http.Handler {
 }
 
 var ContextUserKey = "userId"
-var ProtectedPath = "/meetme/"
+var ProtectedPath = "/api/auth/"
 
 func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
