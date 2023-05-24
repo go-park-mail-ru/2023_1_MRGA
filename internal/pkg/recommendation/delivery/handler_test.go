@@ -11,6 +11,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
 )
@@ -43,7 +44,7 @@ func TestHandler(t *testing.T) {
 	}
 	req := httptest.NewRequest(http.MethodGet, "/meetme/recommendation", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	recHandler.GetRecommendations(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -89,7 +90,7 @@ func TestHandler_GetError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/meetme/recommendation", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	recHandler.GetRecommendations(w, req.WithContext(ctx))
 	resp := w.Result()
 

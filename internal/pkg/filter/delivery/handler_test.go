@@ -13,6 +13,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/mailru/easyjson"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
@@ -50,10 +51,9 @@ func TestHandler_GetFilter(t *testing.T) {
 		},
 		"status": 200,
 	}
-	keyContext := "userId"
 	req := httptest.NewRequest(http.MethodGet, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), keyContext, uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.GetFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -105,7 +105,8 @@ func TestHandler_GetFilter_GetError(t *testing.T) {
 	}
 	req := httptest.NewRequest(http.MethodGet, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	keyContext := "userId"
+	ctx := context.WithValue(req.Context(), keyContext, uint32(userId))
 	filterHandler.GetFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -160,7 +161,7 @@ func TestHandler_AddFilter(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.AddFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 

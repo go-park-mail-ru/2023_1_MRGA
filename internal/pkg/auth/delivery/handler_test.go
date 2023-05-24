@@ -359,7 +359,7 @@ func TestHandler_ChangeUser(t *testing.T) {
 	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
 	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()
-	keyContext := "userId"
+	const keyContext = "userId"
 	ctx := context.WithValue(req.Context(), keyContext, uint32(2))
 	req = req.WithContext(ctx)
 	authServiceMock.EXPECT().ChangeUser(req.Context(), &authInp).Return(nil, nil)
@@ -413,7 +413,7 @@ func TestHandler_ChangeUser_GetError(t *testing.T) {
 	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
 	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()
-	keyContext := "userId"
+	const keyContext = "userId"
 	ctx := context.WithValue(req.Context(), keyContext, uint32(2))
 	req = req.WithContext(ctx)
 	authServiceMock.EXPECT().ChangeUser(req.Context(), &authInp).Return(nil, errRepo)
