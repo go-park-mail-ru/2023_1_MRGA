@@ -15,6 +15,7 @@ import (
 	"github.com/mailru/easyjson"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
 	mock "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
@@ -64,7 +65,7 @@ func TestHandler_AddUserHashtags(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserHashtags(userId).Return(testInp, nil)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.AddUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -123,7 +124,7 @@ func TestHandler_AddUserHashtags_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().AddHashtags(userId, test).Return(errRepo)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.AddUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -183,7 +184,7 @@ func TestHandler_ChangeUserHashtags(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserHashtags(userId).Return(testInp, nil)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.ChangeUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
