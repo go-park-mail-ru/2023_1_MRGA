@@ -88,9 +88,6 @@ func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {
 	matchUserIdStr := params["userId"]
 	matchUserId, err := strconv.Atoi(matchUserIdStr)
 	if err != nil {
-		println("here")
-		println(r.URL.Path)
-		println("here")
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return

@@ -250,11 +250,6 @@ func TestPhotoUseCase_ChangePhoto_GetError(t *testing.T) {
 	photoId := uint(1)
 	userId := uint(1)
 	errRepo := fmt.Errorf("something wrong")
-	//photoRow := dataStruct.UserPhoto{
-	//	Photo:  photoId,
-	//	UserId: userId,
-	//	Avatar: false,
-	//}
 
 	photoRepoMock.EXPECT().GetPhotos(userId).Return([]uint{2, 3}, nil)
 	photoRepoMock.EXPECT().GetAvatar(userId).Return(uint(1), nil)

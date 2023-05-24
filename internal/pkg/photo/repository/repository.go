@@ -17,11 +17,11 @@ func NewPhotoRepo(db *gorm.DB) *PhotoRepository {
 }
 
 func (r *PhotoRepository) SavePhoto(row dataStruct.UserPhoto) error {
-	//err := r.CheckPhoto(row)
-	//if err != nil {
-	//	return err
-	//}
-	err := r.db.Create(&row).Error
+	err := r.CheckPhoto(row)
+	if err != nil {
+		return err
+	}
+	err = r.db.Create(&row).Error
 	return err
 }
 
