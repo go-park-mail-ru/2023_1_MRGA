@@ -13,6 +13,16 @@ type ReactionInp struct {
 	Reaction        string `json:"reaction"`
 }
 
+const (
+	MissedMatch = iota
+	NewMatch
+	FirstReaction
+)
+
+type ReactionResult struct {
+	ResultCode int
+}
+
 type ChatAnswer struct {
 	UserId uint   `json:"userId" structs:"userId"`
 	Name   string `json:"name" structs:"name"`

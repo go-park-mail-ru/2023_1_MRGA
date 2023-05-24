@@ -6,12 +6,16 @@ import (
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 )
 
-func GetMessageStruct(data *chatpc.SendMessageRequest) Message {
-	return Message{
-		ChatId:   uint(data.GetChatId()),
-		SenderId: uint(data.GetMsg().GetSenderId()),
-		Content:  data.GetMsg().GetContent(),
-		SentAt:   data.GetMsg().GetSentAt().AsTime(),
+func GetMessageStruct(data *chatpc.SendMessageRequest) ChatMessage {
+	return ChatMessage{
+		Message: Message{
+			ChatId:   uint(data.GetChatId()),
+			SenderId: uint(data.GetMsg().GetSenderId()),
+			Content:  data.GetMsg().GetContent(),
+			SentAt:   data.GetMsg().GetSentAt().AsTime(),
+		},
+		MessageType: MessageType(data.GetMessageType()),
+		Path:        data.GetPath(),
 	}
 }
 
@@ -35,6 +39,8 @@ func GetGrpcChatMessage(data MessageWithChatUsers) *chatpc.GetChatsListResponse 
 			ReadStatus: data.ReadStatus,
 		},
 		ChatId:      uint32(data.ChatId),
+		MessageType: string(data.MessageType),
+		Path:        data.Path,
 		ChatUserIds: uint32ChatUserIds,
 	}
 }
@@ -52,7 +58,14 @@ func GetInitialChatStruct(data *chatpc.GetChatRequest) GetChatRequest {
 	}
 }
 
-func GetGrpcMessage(data Message) *chatpc.GetChatResponse {
+func GetInitialChatForParticipantsStruct(data *chatpc.GetChatParticipantsRequest) GetChatParticipantsRequest {
+	return GetChatParticipantsRequest{
+		ChatId: uint(data.GetChatId()),
+		UserId: uint(data.GetUserId()),
+	}
+}
+
+func GetGrpcMessage(data ChatMessage) *chatpc.GetChatResponse {
 	return &chatpc.GetChatResponse{
 		Msg: &chatpc.Message{
 			SenderId:   uint32(data.SenderId),
@@ -60,6 +73,8 @@ func GetGrpcMessage(data Message) *chatpc.GetChatResponse {
 			SentAt:     timestamppb.New(data.SentAt),
 			ReadStatus: data.ReadStatus,
 		},
-		MsgId: uint32(data.Id),
+		MsgId:       uint32(data.Id),
+		MessageType: string(data.MessageType),
+		Path:        data.Path,
 	}
 }

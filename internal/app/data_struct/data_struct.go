@@ -93,7 +93,11 @@ type Hashtag struct {
 	Hashtag string `json:"hashtag"`
 }
 
-///Match
+// /Match
+const (
+	LikeReaction = iota + 1
+	PassReaction
+)
 
 type UserReaction struct {
 	Id         uint `sql:"unique;type:uuid;primary_key;servicedefault:" json:"userReactionId" gorm:"primaryKey;unique"`
