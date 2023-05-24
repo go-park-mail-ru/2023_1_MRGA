@@ -1,5 +1,6 @@
 package info
 
+//go:generate mockgen -source=repository.go -destination=mocks/repo.go -package=mock
 type IRepositoryInfo interface {
 	GetHashtagId(nameHashtag []string) ([]uint, error)
 	GetEducationId(nameEducation string) (uint, error)

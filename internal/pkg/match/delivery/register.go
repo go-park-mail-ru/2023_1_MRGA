@@ -47,5 +47,4 @@ func RegisterHTTPEndpoints(router *mux.Router, uc match.UseCase) {
 	router.HandleFunc("/api/auth/match/{userId}", h.DeleteMatch).Methods("DELETE", "OPTIONS")
 	router.HandleFunc("/api/auth/reaction", h.AddReaction).Methods("POST")
 	router.HandleFunc("/api/auth/match/subscribe", h.Subscribe).Methods("GET")
-	router.HandleFunc("/api/auth/chat/{userId}", h.GetChatByUserId).Methods("GET")
 }

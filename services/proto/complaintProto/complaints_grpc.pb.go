@@ -22,6 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 // ComplaintsClient is the client API for Complaints service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+//go:generate mockgen -source=complaints_grpc.pb.go -destination=mocks/comp_mock.go -package=mock
 type ComplaintsClient interface {
 	Complain(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Response, error)
 	CheckBanned(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Response, error)

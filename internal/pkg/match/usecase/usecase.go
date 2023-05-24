@@ -118,19 +118,6 @@ func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) (re
 	return result, err
 }
 
-func (m *MatchUseCase) GetChatByEmail(userId uint, matchUserId uint) (result match.ChatAnswer, err error) {
-	if err != nil {
-		return
-	}
-
-	err = m.userRepo.ChangeStatusMatch(userId, matchUserId)
-	if err != nil {
-		return
-	}
-	result, err = m.userRepo.GetChat(matchUserId)
-	return
-}
-
 func (m *MatchUseCase) DeleteMatch(userId uint, matchUserId uint) error {
 	err := m.userRepo.DeleteMatch(userId, matchUserId)
 	if err != nil {
