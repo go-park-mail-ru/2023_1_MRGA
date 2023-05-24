@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/chat/app/constants"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
@@ -90,7 +91,7 @@ func (server *Server) removeClient(userId uint64, ws *websocket.Conn) {
 }
 
 func (server Server) ConnectionHandler(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	gotUserId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, constants.ErrSessionExpired, r.Method, r.URL.Path, true)
@@ -140,12 +141,12 @@ func (server Server) ConnectionHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			wsMsgData := app.WSMsgData{
-				Flag: "READ",
+				Flag:     "READ",
 				SenderId: userId,
 				UserIds:  readData.UserIds,
 				MsgData: app.WSReadResponse{
 					SenderId: userId,
-					ChatId: readData.ChatId,
+					ChatId:   readData.ChatId,
 				},
 			}
 

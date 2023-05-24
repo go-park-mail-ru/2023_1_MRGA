@@ -12,9 +12,19 @@ import (
 
 func RunCronJobs(db *gorm.DB) {
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(1).Day().Do(func() {
-		repository.CleanCount(db)
-		log.Println("count is cleaned")
+	_, err := s.Every(1).Day().Do(func() {
+		err := repository.CleanCount(db)
+		if err != nil {
+			log.Println("error while cleaning count:", err)
+			return
+		} else {
+			log.Println("count is cleaned")
+		}
+
 	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	s.StartBlocking()
 }

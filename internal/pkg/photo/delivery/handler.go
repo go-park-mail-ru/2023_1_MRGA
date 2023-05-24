@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -18,6 +17,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/face_finder"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
@@ -42,7 +42,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := r.MultipartForm.File["files[]"]
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -132,7 +132,7 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 
 	files := r.MultipartForm.File["files[]"]
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userIdUint32, ok := userIdDB.(uint32)
 	if !ok {
 		err := errors.New("Пользователь не авторизирован")
@@ -161,13 +161,13 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		input, err := ioutil.TempFile("", "input-*.webm")
+		input, err := os.CreateTemp("", "input-*.webm")
 		if err != nil {
 			return
 		}
 		defer os.Remove(input.Name())
 
-		output, err := ioutil.TempFile("", "output-*.ogg")
+		output, err := os.CreateTemp("", "output-*.ogg")
 		if err != nil {
 			return
 		}
@@ -300,7 +300,7 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		err = errors.New(fmt.Sprintf("Неудачная расшифровка с кодом: %d %v\n", resp.StatusCode, resp))
+		err = fmt.Errorf("Неудачная расшифровка с кодом: %d %v\n", resp.StatusCode, resp)
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
@@ -334,7 +334,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -350,7 +350,6 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
-	return
 }
 
 func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
@@ -374,7 +373,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -404,7 +403,11 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	file.Seek(0, 0)
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		writer.ErrorRespondWithData(w, r, fmt.Errorf("can't seek file"), http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
 	if !ok {
 		logger.Log(http.StatusBadRequest, fmt.Errorf("there is not face").Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespondWithData(w, r, fmt.Errorf("there is not face"), http.StatusBadRequest, map[string]interface{}{"problemPhoto": []int{0}})
@@ -553,6 +556,7 @@ func (h *Handler) uploadFile(file multipart.File, filename string, userID uint) 
 func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
 	// Создаем HTTP-запрос на другой микросервис
 	requestUrl := fmt.Sprintf("http://%s:8081/api/files/%s", h.serverHost, photoId)
+
 	req, err := http.NewRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, "", err
@@ -573,7 +577,7 @@ func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
 			return
 		}
 	}()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", err
 	}
@@ -621,7 +625,7 @@ func (h *Handler) getFileByPath(pathToFile string) (file []byte, filename string
 			return
 		}
 	}()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return
 	}

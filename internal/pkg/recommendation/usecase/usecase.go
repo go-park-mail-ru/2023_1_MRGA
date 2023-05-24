@@ -40,6 +40,9 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 	}
 
 	history, err := r.repo.GetUserHistory(userId)
+	if err != nil {
+		return nil, err
+	}
 	if len(history) == 0 {
 		history = append(history, 0)
 	}

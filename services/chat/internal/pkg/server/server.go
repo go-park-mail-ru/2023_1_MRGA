@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
@@ -137,8 +136,4 @@ func (server Server) GetChatParticipants(ctx context.Context, chatData *chatpc.G
 
 	logger.Log(http.StatusOK, "Success", "POST", "GetChatParticipants", false)
 	return
-}
-
-func (server Server) mustEmbedUnimplementedChatServiceServer() {
-	log.Printf("Нереализованный метод")
 }

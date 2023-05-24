@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/recommendation/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
 )
@@ -32,8 +33,6 @@ func TestHandler(t *testing.T) {
 	recUsecaseMock := mock.NewMockUseCase(ctrl)
 	recHandler := NewHandler(recUsecaseMock)
 
-	type callFunc func(w http.ResponseWriter, r *http.Request)
-
 	test := []string{"test1", "test2"}
 	userId := uint(1)
 	recUsecaseMock.EXPECT().GetRecommendations(userId)
@@ -45,7 +44,7 @@ func TestHandler(t *testing.T) {
 	}
 	req := httptest.NewRequest(http.MethodGet, "/meetme/recommendation", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	recHandler.GetRecommendations(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -60,7 +59,7 @@ func TestHandler(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -91,7 +90,7 @@ func TestHandler_GetError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/meetme/recommendation", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	recHandler.GetRecommendations(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -106,7 +105,7 @@ func TestHandler_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -20,7 +19,7 @@ import (
 )
 
 func (h *Handler) GetMatches(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -85,7 +84,6 @@ func (h *Handler) AddReaction(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
-	return
 }
 
 func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {
@@ -99,7 +97,7 @@ func (h *Handler) DeleteMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)

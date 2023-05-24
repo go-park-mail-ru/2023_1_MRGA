@@ -20,8 +20,7 @@ type ServerOptions struct {
 }
 
 type Server struct {
-	clientConn *grpc.ClientConn
-	router     *mux.Router
+	router *mux.Router
 
 	clientTarget string
 
