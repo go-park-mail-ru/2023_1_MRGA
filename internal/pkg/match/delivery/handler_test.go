@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
+	"github.com/mailru/easyjson"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/match/mocks"
@@ -147,11 +148,15 @@ func TestHandler_AddReaction(t *testing.T) {
 		EvaluatedUserId: uint(2),
 		Reaction:        "like",
 	}
+	rawTest, err := easyjson.Marshal(reaction)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 
-	expected := []byte(`{"reaction": "like", "evaluatedUserId": 2}`)
 	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(match.ReactionResult{ResultCode: 1}, nil)
 
-	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
 	matchHandler.AddReaction(w, req.WithContext(ctx))
@@ -200,10 +205,15 @@ func TestHandler_AddReaction_GetError(t *testing.T) {
 		Reaction:        "like",
 	}
 
-	expected := []byte(`{"reaction": "like", "evaluatedUserId": 2}`)
+	rawTest, err := easyjson.Marshal(reaction)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
 	matchUsecaseMock.EXPECT().PostReaction(userId, reaction).Return(match.ReactionResult{ResultCode: 1}, errRepo)
 
-	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
 	matchHandler.AddReaction(w, req.WithContext(ctx))
