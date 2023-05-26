@@ -125,7 +125,7 @@ func (r *MatchRepository) DeleteMatch(userId, userMatchId uint) error {
 	if err != nil {
 		return err
 	}
-	err = r.db.Delete(&dataStruct.Match{}, "id=?", match.Id).Error
+	err = r.db.Delete(&dataStruct.Match{}, "id=?", match2.Id).Error
 	return err
 }
 
