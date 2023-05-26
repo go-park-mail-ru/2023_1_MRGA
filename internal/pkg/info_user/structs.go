@@ -1,3 +1,4 @@
+//go:generate easyjson -all structs.go
 package info_user
 
 import "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
