@@ -48,7 +48,7 @@ func TestHandler_Login(t *testing.T) {
 	authOut := &authProto.UserResponse{
 		Token: "token",
 	}
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -107,7 +107,7 @@ func TestHandler_Login_GetError(t *testing.T) {
 		Token: "token",
 	}
 
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -162,7 +162,7 @@ func TestHandler_Logout(t *testing.T) {
 		Token: userToken,
 	}
 
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -219,7 +219,7 @@ func TestHandler_Logout_GetError(t *testing.T) {
 		Token: userToken,
 	}
 
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -276,7 +276,7 @@ func TestHandler_Register(t *testing.T) {
 		Birthday: "01-01-1000",
 	}
 
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -336,7 +336,7 @@ func TestHandler_Register_GetError(t *testing.T) {
 		Birthday: "01-01-1000",
 	}
 
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -397,7 +397,7 @@ func TestHandler_ChangeUser(t *testing.T) {
 		Birthday: "01-01-1000",
 	}
 
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -457,7 +457,7 @@ func TestHandler_ChangeUser_GetError(t *testing.T) {
 		Birthday: "01-01-1000",
 	}
 
-	rawTest, err := easyjson.Marshal(authInp)
+	rawTest, err := easyjson.Marshal(&authInp)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
