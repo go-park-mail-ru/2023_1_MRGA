@@ -22,6 +22,6 @@ func CalculateAge(birthDay string) (int, error) {
 }
 
 func CalculateBirthYear(age int) string {
-	dataResult := time.Now().Add(-24 * 364 * time.Hour)
-	return fmt.Sprintf("%d-0%d-0%d", dataResult.Year()-age, dataResult.Month(), dataResult.Day())
+	dataResult := time.Now()
+	return fmt.Sprintf("%d-01-01", dataResult.Year()-age)
 }
