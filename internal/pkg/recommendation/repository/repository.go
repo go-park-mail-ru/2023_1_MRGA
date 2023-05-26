@@ -30,18 +30,18 @@ func (r *RecRepository) GetRecommendation(userId uint, history []uint, reasons [
 	}
 	err = r.db.Table("users u").Select("ui.user_id").
 		Joins("JOIN user_infos ui on u.id = ui.user_id").
-		Joins("join user_hashtags uh on u.id = uh.user_id").
-		Joins("join user_reasons ur on u.id = ur.user_id").
-		Joins("LEFT Join complaints c on c.user_id = u.id").
-		Where("c.count is NULL or c.count < ?", 5).
-		Where("ui.user_id NOT IN ?", history).
-		Where("ui.sex IN ?", sexSlice).
-		Where("hashtag_id IN ?", hashtags).
-		Where("reason_id IN ?", reasons).
+		//Joins("join user_hashtags uh on u.id = uh.user_id").
+		//Joins("join user_reasons ur on u.id = ur.user_id").
+		//Joins("LEFT Join complaints c on c.user_id = u.id").
+		//Where("c.count is NULL or c.count < ?", 5).
+		//Where("ui.user_id NOT IN ?", history).
+		//Where("ui.sex IN ?", sexSlice).
+		//Where("hashtag_id IN ?", hashtags).
+		//Where("reason_id IN ?", reasons).
 		Where("ui.user_id!=?", userId).
 		Where("u.birth_day BETWEEN ? AND ?", ageCalc.CalculateBirthYear(filters.MaxAge), ageCalc.CalculateBirthYear(filters.MinAge)).
 		Group("ui.user_id").
-		Order("COUNT(uh.hashtag_id) desc").
+		//Order("COUNT(uh.hashtag_id) desc").
 		Find(&users).Error
 	if err != nil {
 		return users, err
