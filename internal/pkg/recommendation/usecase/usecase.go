@@ -59,16 +59,16 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 			return nil, err
 		}
 
-		//hashtagsUser, err := r.infoUserUseCase.GetUserHashtags(rec.UserId)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//user.Hashtags = hashtagsUser
-		//
-		//user.Photos, err = r.photoUseCase.GetAllPhotos(rec.UserId)
-		//if err != nil {
-		//	return nil, err
-		//}
+		hashtagsUser, err := r.infoUserUseCase.GetUserHashtags(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
+		user.Hashtags = hashtagsUser
+
+		user.Photos, err = r.photoUseCase.GetAllPhotos(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
 		result = append(result, user)
 	}
 
