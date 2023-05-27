@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/data_struct"
@@ -85,4 +87,50 @@ func (r *RecRepository) GetUserHistory(userId uint) ([]uint, error) {
 	var users []uint
 	err := r.db.Table("user_histories").Select("user_profile_id").Where("user_id = ? ", userId).Find(&users).Error
 	return users, err
+}
+
+func (r *RecRepository) GetLikes(userId uint, history []uint, reasons []uint, filters dataStruct.UserFilter) (users []recommendation.UserRecommend, err error) {
+	var sexSlice []uint
+	switch filters.SearchSex {
+	case 0:
+		sexSlice = append(sexSlice, 0)
+	case 1:
+		sexSlice = append(sexSlice, 1)
+	case 2:
+		sexSlice = append(sexSlice, 0, 1)
+	}
+	err = r.db.Table("users u").Select("ui.user_id").
+		Joins("JOIN user_infos ui on u.id = ui.user_id").
+		Joins("join user_reasons ur on u.id = ur.user_id").
+		Joins("Join user_reactions r on ui.user_id=r.user_id").
+		Joins("LEFT Join complaints c on c.user_id = u.id").
+		Where("c.count is NULL or c.count < ?", 5).
+		Where("r.user_from_id= ?", userId).
+		Where("ui.user_id NOT IN ?", history).
+		Where("ui.sex IN ?", sexSlice).
+		Where("reason_id IN ?", reasons).
+		Where("u.birth_day BETWEEN ? AND ?", ageCalc.CalculateBirthYear(filters.MaxAge), ageCalc.CalculateBirthYear(filters.MinAge)).
+		Group("ui.user_id").
+		Find(&users).Error
+	if err != nil {
+		return users, err
+	}
+	return users, err
+}
+
+func (r *RecRepository) CheckStatus(userId uint) error {
+	var status string
+	print(userId)
+	err := r.db.Table("statuses s").Select("s.name").
+		Joins("Join users u on u.status=s.id").
+		Where("u.id=?", userId).
+		Find(&status).Error
+	if err != nil {
+		return err
+	}
+	if status == "ProMax" {
+		return nil
+	}
+	err = fmt.Errorf("you dont have ProMax Status")
+	return err
 }
