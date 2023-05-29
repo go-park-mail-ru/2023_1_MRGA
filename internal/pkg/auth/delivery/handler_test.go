@@ -5,11 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/mailru/easyjson"
+
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 
 	"github.com/golang/mock/gomock"
 
@@ -45,8 +48,13 @@ func TestHandler_Login(t *testing.T) {
 	authOut := &authProto.UserResponse{
 		Token: "token",
 	}
-	expected := []byte(`{"email": "email", "password": "pass"}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/login", bytes.NewBuffer([]byte(expected)))
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/login", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	authServiceMock.EXPECT().Login(req.Context(), &authInp).Return(authOut, nil)
@@ -98,8 +106,14 @@ func TestHandler_Login_GetError(t *testing.T) {
 	authOut := &authProto.UserResponse{
 		Token: "token",
 	}
-	expected := []byte(`{"email": "email", "password": "pass"}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	authServiceMock.EXPECT().Login(req.Context(), &authInp).Return(authOut, errRepo)
@@ -147,8 +161,14 @@ func TestHandler_Logout(t *testing.T) {
 	authInp := authProto.UserToken{
 		Token: userToken,
 	}
-	expected := []byte(`{"email": "email", "password": "pass"}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	req.AddCookie(&http.Cookie{Name: "session_token", Value: userToken})
@@ -198,8 +218,14 @@ func TestHandler_Logout_GetError(t *testing.T) {
 	authInp := authProto.UserToken{
 		Token: userToken,
 	}
-	expected := []byte(`{"email": "email", "password": "pass"}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	req.AddCookie(&http.Cookie{Name: "session_token", Value: userToken})
@@ -249,11 +275,17 @@ func TestHandler_Register(t *testing.T) {
 		Password: "pass",
 		Birthday: "01-01-1000",
 	}
+
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	authOut := &authProto.UserResponse{
 		Token: "token",
 	}
-	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	authServiceMock.EXPECT().Register(req.Context(), &authInp).Return(authOut, nil)
@@ -303,11 +335,18 @@ func TestHandler_Register_GetError(t *testing.T) {
 		Password: "pass",
 		Birthday: "01-01-1000",
 	}
+
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
 	authOut := &authProto.UserResponse{
 		Token: "token",
 	}
-	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	authServiceMock.EXPECT().Register(req.Context(), &authInp).Return(authOut, errRepo)
@@ -357,8 +396,14 @@ func TestHandler_ChangeUser(t *testing.T) {
 		Password: "pass",
 		Birthday: "01-01-1000",
 	}
-	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
-	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(2))
@@ -411,8 +456,14 @@ func TestHandler_ChangeUser_GetError(t *testing.T) {
 		Password: "pass",
 		Birthday: "01-01-1000",
 	}
-	expected := []byte(`{"email": "email", "password": "pass", "birthday": "01-01-1000"}`)
-	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
+
+	rawTest, err := easyjson.Marshal(&authInp)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
+	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
 	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(2))
