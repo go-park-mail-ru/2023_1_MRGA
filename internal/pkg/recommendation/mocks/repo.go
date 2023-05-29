@@ -35,6 +35,35 @@ func (m *MockIRepositoryRec) EXPECT() *MockIRepositoryRecMockRecorder {
 	return m.recorder
 }
 
+// CheckStatus mocks base method.
+func (m *MockIRepositoryRec) CheckStatus(userId uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckStatus", userId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckStatus indicates an expected call of CheckStatus.
+func (mr *MockIRepositoryRecMockRecorder) CheckStatus(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckStatus", reflect.TypeOf((*MockIRepositoryRec)(nil).CheckStatus), userId)
+}
+
+// GetLikes mocks base method.
+func (m *MockIRepositoryRec) GetLikes(userId uint, history, reasons []uint, filters dataStruct.UserFilter) ([]recommendation.UserRecommend, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLikes", userId, history, reasons, filters)
+	ret0, _ := ret[0].([]recommendation.UserRecommend)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLikes indicates an expected call of GetLikes.
+func (mr *MockIRepositoryRecMockRecorder) GetLikes(userId, history, reasons, filters interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLikes", reflect.TypeOf((*MockIRepositoryRec)(nil).GetLikes), userId, history, reasons, filters)
+}
+
 // GetRecommendation mocks base method.
 func (m *MockIRepositoryRec) GetRecommendation(userId uint, history, reasons, hashtags []uint, filters dataStruct.UserFilter) ([]recommendation.UserRecommend, error) {
 	m.ctrl.T.Helper()

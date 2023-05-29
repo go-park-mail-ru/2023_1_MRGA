@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-//go:generate mockgen -source=auth_grpc.pb.go -destination=mocks/try.go -package=mock
+//go:generate mockgen -source=auth_grpc.pb.go -destination=mocks/auth_mock.go -package=mock
 type AuthClient interface {
 	Register(ctx context.Context, in *UserRegisterInfo, opts ...grpc.CallOption) (*UserResponse, error)
 	Login(ctx context.Context, in *UserLoginInfo, opts ...grpc.CallOption) (*UserResponse, error)

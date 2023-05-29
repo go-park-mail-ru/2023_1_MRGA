@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -58,7 +57,7 @@ var hits = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "hits",
 }, []string{"status", "path"})
 
-var httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+var httpDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Name: "http_response_time_seconds",
 	Help: "Duration of HTTP requests.",
 }, []string{"path"})
@@ -67,7 +66,7 @@ var authHints = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "auth_hits",
 }, []string{"error", "path"})
 
-var authHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+var authHttpDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Name: "auth_http_response_time_seconds",
 	Help: "Duration of HTTP requests.",
 }, []string{"path"})
@@ -76,7 +75,7 @@ var compHints = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "comp_hits",
 }, []string{"error", "path"})
 
-var compHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+var compHttpDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Name: "comp_http_response_time_seconds",
 	Help: "Duration of HTTP requests.",
 }, []string{"path"})
