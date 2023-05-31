@@ -280,11 +280,11 @@ func easyjson6a975c40DecodeGithubComGoParkMailRu20231MRGAGitInternalPkgPhoto1(in
 			continue
 		}
 		switch key {
-		case "Status":
+		case "status":
 			out.Status = int(in.Int())
-		case "Error":
+		case "error":
 			out.Error = string(in.String())
-		case "Body":
+		case "body":
 			easyjson6a975c40Decode2(in, &out.Body)
 		default:
 			in.SkipRecursive()
@@ -301,17 +301,17 @@ func easyjson6a975c40EncodeGithubComGoParkMailRu20231MRGAGitInternalPkgPhoto1(ou
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Status\":"
+		const prefix string = ",\"status\":"
 		out.RawString(prefix[1:])
 		out.Int(int(in.Status))
 	}
-	{
-		const prefix string = ",\"Error\":"
+	if in.Error != "" {
+		const prefix string = ",\"error\":"
 		out.RawString(prefix)
 		out.String(string(in.Error))
 	}
 	{
-		const prefix string = ",\"Body\":"
+		const prefix string = ",\"body\":"
 		out.RawString(prefix)
 		easyjson6a975c40Encode2(out, in.Body)
 	}
@@ -341,7 +341,9 @@ func (v *ResponseUploadFile) UnmarshalJSON(data []byte) error {
 func (v *ResponseUploadFile) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson6a975c40DecodeGithubComGoParkMailRu20231MRGAGitInternalPkgPhoto1(l, v)
 }
-func easyjson6a975c40Decode2(in *jlexer.Lexer, out *struct{ PathToFile string }) {
+func easyjson6a975c40Decode2(in *jlexer.Lexer, out *struct {
+	PathToFile string `json:"pathToFile"`
+}) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -360,7 +362,7 @@ func easyjson6a975c40Decode2(in *jlexer.Lexer, out *struct{ PathToFile string })
 			continue
 		}
 		switch key {
-		case "PathToFile":
+		case "pathToFile":
 			out.PathToFile = string(in.String())
 		default:
 			in.SkipRecursive()
@@ -372,12 +374,14 @@ func easyjson6a975c40Decode2(in *jlexer.Lexer, out *struct{ PathToFile string })
 		in.Consumed()
 	}
 }
-func easyjson6a975c40Encode2(out *jwriter.Writer, in struct{ PathToFile string }) {
+func easyjson6a975c40Encode2(out *jwriter.Writer, in struct {
+	PathToFile string `json:"pathToFile"`
+}) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"PathToFile\":"
+		const prefix string = ",\"pathToFile\":"
 		out.RawString(prefix[1:])
 		out.String(string(in.PathToFile))
 	}
@@ -402,11 +406,11 @@ func easyjson6a975c40DecodeGithubComGoParkMailRu20231MRGAGitInternalPkgPhoto2(in
 			continue
 		}
 		switch key {
-		case "Status":
+		case "status":
 			out.Status = int(in.Int())
-		case "Error":
+		case "error":
 			out.Error = string(in.String())
-		case "Body":
+		case "body":
 			easyjson6a975c40Decode3(in, &out.Body)
 		default:
 			in.SkipRecursive()
@@ -423,17 +427,17 @@ func easyjson6a975c40EncodeGithubComGoParkMailRu20231MRGAGitInternalPkgPhoto2(ou
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Status\":"
+		const prefix string = ",\"status\":"
 		out.RawString(prefix[1:])
 		out.Int(int(in.Status))
 	}
-	{
-		const prefix string = ",\"Error\":"
+	if in.Error != "" {
+		const prefix string = ",\"error\":"
 		out.RawString(prefix)
 		out.String(string(in.Error))
 	}
 	{
-		const prefix string = ",\"Body\":"
+		const prefix string = ",\"body\":"
 		out.RawString(prefix)
 		easyjson6a975c40Encode3(out, in.Body)
 	}
@@ -463,7 +467,9 @@ func (v *AnswerPhoto) UnmarshalJSON(data []byte) error {
 func (v *AnswerPhoto) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson6a975c40DecodeGithubComGoParkMailRu20231MRGAGitInternalPkgPhoto2(l, v)
 }
-func easyjson6a975c40Decode3(in *jlexer.Lexer, out *struct{ PhotoID uint }) {
+func easyjson6a975c40Decode3(in *jlexer.Lexer, out *struct {
+	PhotoID uint `json:"photoID"`
+}) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -482,7 +488,7 @@ func easyjson6a975c40Decode3(in *jlexer.Lexer, out *struct{ PhotoID uint }) {
 			continue
 		}
 		switch key {
-		case "PhotoID":
+		case "photoID":
 			out.PhotoID = uint(in.Uint())
 		default:
 			in.SkipRecursive()
@@ -494,12 +500,14 @@ func easyjson6a975c40Decode3(in *jlexer.Lexer, out *struct{ PhotoID uint }) {
 		in.Consumed()
 	}
 }
-func easyjson6a975c40Encode3(out *jwriter.Writer, in struct{ PhotoID uint }) {
+func easyjson6a975c40Encode3(out *jwriter.Writer, in struct {
+	PhotoID uint `json:"photoID"`
+}) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"PhotoID\":"
+		const prefix string = ",\"photoID\":"
 		out.RawString(prefix[1:])
 		out.Uint(uint(in.PhotoID))
 	}
