@@ -2,19 +2,19 @@
 package photo
 
 type AnswerPhoto struct {
-	Status int
-	Error  string
+	Status int    `json:"status"`
+	Error  string `json:"error,omitempty"`
 	Body   struct {
-		PhotoID uint
-	}
+		PhotoID uint `json:"photoID"`
+	} `json:"body"`
 }
 
 type ResponseUploadFile struct {
-	Status int
-	Error  string
+	Status int    `json:"status"`
+	Error  string `json:"error,omitempty"`
 	Body   struct {
-		PathToFile string
-	}
+		PathToFile string `json:"pathToFile"`
+	} `json:"body"`
 }
 
 type VoiceResponse struct {
