@@ -6,10 +6,14 @@ import (
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (h *Handler) GetRecommendations(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetRecommendationsHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
@@ -32,6 +36,9 @@ func (h *Handler) GetRecommendations(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetLikes(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetLikesHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {

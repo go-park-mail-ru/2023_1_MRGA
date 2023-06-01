@@ -8,9 +8,13 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
 	chatpc "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/chat"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 )
 
 func (server Server) CreateChat(ctx context.Context, initialChatData *chatpc.CreateChatRequest) (outputChatData *chatpc.CreateChatResponse, err error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "chatServer", "CreateChat", nil)
+	defer span.End()
+
 	var userIds []app.ChatUser
 	for _, grpcUserId := range initialChatData.GetUserIds() {
 		userId := uint(grpcUserId)
@@ -52,6 +56,9 @@ func (server Server) CreateChat(ctx context.Context, initialChatData *chatpc.Cre
 }
 
 func (server Server) SendMessage(ctx context.Context, newMsg *chatpc.SendMessageRequest) (outputMsgData *chatpc.SendMessageResponse, err error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "chatServer", "SendMessage", nil)
+	defer span.End()
+
 	msg := app.GetMessageStruct(newMsg)
 
 	msgId, err := server.repository.SendMessage(ctx, msg)
@@ -67,9 +74,12 @@ func (server Server) SendMessage(ctx context.Context, newMsg *chatpc.SendMessage
 }
 
 func (server Server) GetChatsList(userData *chatpc.GetChatsListRequest, streamRecentMsgs chatpc.ChatService_GetChatsListServer) (err error) {
+	ctx, span := tracejaeger.NewSpan(streamRecentMsgs.Context(), "chatServer", "GetChatsList", nil)
+	defer span.End()
+
 	resentMessagesRequest := app.GetInitialUserStruct(userData)
 
-	recentMessages, err := server.repository.GetChatsList(resentMessagesRequest)
+	recentMessages, err := server.repository.GetChatsList(ctx, resentMessagesRequest)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChatsList", true)
 		return err
@@ -88,10 +98,13 @@ func (server Server) GetChatsList(userData *chatpc.GetChatsListRequest, streamRe
 }
 
 func (server Server) GetChat(chatData *chatpc.GetChatRequest, streamChatMsgs chatpc.ChatService_GetChatServer) (err error) {
+	ctx, span := tracejaeger.NewSpan(streamChatMsgs.Context(), "chatServer", "GetChat", nil)
+	defer span.End()
+
 	initialChatData := app.GetInitialChatStruct(chatData)
 
 	var isMemberOfChat bool
-	isMemberOfChat, err = server.repository.IsMemberOfChat(initialChatData.UserId, initialChatData.ChatId)
+	isMemberOfChat, err = server.repository.IsMemberOfChat(ctx, initialChatData.UserId, initialChatData.ChatId)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChat", true)
 		return err
@@ -103,7 +116,7 @@ func (server Server) GetChat(chatData *chatpc.GetChatRequest, streamChatMsgs cha
 	}
 
 	var chatMsgs []app.ChatMessage
-	chatMsgs, err = server.repository.GetChat(initialChatData)
+	chatMsgs, err = server.repository.GetChat(ctx, initialChatData)
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), "GET", "GetChat", true)
 		return err
@@ -121,6 +134,9 @@ func (server Server) GetChat(chatData *chatpc.GetChatRequest, streamChatMsgs cha
 }
 
 func (server Server) GetChatParticipants(ctx context.Context, chatData *chatpc.GetChatParticipantsRequest) (participants *chatpc.GetChatParticipantsResponse, err error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "chatServer", "GetChatParticipants", nil)
+	defer span.End()
+
 	initialChatData := app.GetInitialChatForParticipantsStruct(chatData)
 
 	var participantsStruct app.GetChatParticipantsResponse

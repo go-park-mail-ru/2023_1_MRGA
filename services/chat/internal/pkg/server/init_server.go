@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/chat/internal/app"
@@ -37,7 +38,7 @@ func (server *Server) RunServer() error {
 		log.Fatalf("Ошибка в создании tpc-соединения сервера: %v", err)
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()))
 	chatpc.RegisterChatServiceServer(s, server)
 
 	log.Printf("gRPC-микросервис чатов успешно запущен\n")

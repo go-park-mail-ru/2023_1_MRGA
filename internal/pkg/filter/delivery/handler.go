@@ -9,10 +9,14 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "AddFilterHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -58,6 +62,9 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetFilter(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetFilterHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
@@ -80,6 +87,9 @@ func (h *Handler) GetFilter(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "ChangeFilterHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {

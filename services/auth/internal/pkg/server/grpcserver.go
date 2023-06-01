@@ -10,6 +10,7 @@ import (
 	authRepo "github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg"
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/pkg/data_struct"
 	auth "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 )
 
 type GRPCServer struct {
@@ -23,6 +24,9 @@ func NewGPRCServer(authRepo authRepo.UserRepo) *GRPCServer {
 }
 
 func (s *GRPCServer) Register(ctx context.Context, req *auth.UserRegisterInfo) (*auth.UserResponse, error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "Register", nil)
+	defer span.End()
+
 	user := dataStruct.User{Email: req.Email, Password: req.Password, BirthDay: req.Birthday}
 
 	hashedPass, err := CreatePass(user.Password)
@@ -50,6 +54,9 @@ func (s *GRPCServer) Register(ctx context.Context, req *auth.UserRegisterInfo) (
 }
 
 func (s *GRPCServer) Login(ctx context.Context, req *auth.UserLoginInfo) (*auth.UserResponse, error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "Login", nil)
+	defer span.End()
+
 	if req.Email == "" {
 		err := fmt.Errorf("email is empty")
 		return nil, err
@@ -77,6 +84,9 @@ func (s *GRPCServer) Login(ctx context.Context, req *auth.UserLoginInfo) (*auth.
 }
 
 func (s *GRPCServer) CheckSession(ctx context.Context, req *auth.UserToken) (*auth.UserResponse, error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "CheckSession", nil)
+	defer span.End()
+
 	userId, err := s.AuthRepo.CheckSession(req.Token)
 	if err != nil {
 		return nil, err
@@ -89,6 +99,9 @@ func (s *GRPCServer) CheckSession(ctx context.Context, req *auth.UserToken) (*au
 }
 
 func (s *GRPCServer) Logout(ctx context.Context, req *auth.UserToken) (*auth.Response, error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "Logout", nil)
+	defer span.End()
+
 	err := s.AuthRepo.DeleteToken(req.Token)
 	if err != nil {
 		return nil, err
@@ -100,6 +113,9 @@ func (s *GRPCServer) Logout(ctx context.Context, req *auth.UserToken) (*auth.Res
 }
 
 func (s *GRPCServer) ChangeUser(ctx context.Context, req *auth.UserChangeInfo) (*auth.Response, error) {
+	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "ChangeUser", nil)
+	defer span.End()
+
 	user := dataStruct.User{Id: uint(req.UserId), Email: req.Email, Password: req.Password, BirthDay: req.Birthday}
 	if user.Password != "" {
 		hashedPass, err := CreatePass(user.Password)
