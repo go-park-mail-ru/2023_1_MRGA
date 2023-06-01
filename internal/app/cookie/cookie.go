@@ -7,12 +7,12 @@ import (
 
 func SetCookie(w http.ResponseWriter, nameCookie string, value string, expTime time.Duration) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     nameCookie,
-		Value:    value,
-		Expires:  time.Now().Add(expTime),
-		Path:     "/",
-		Secure:   true,
-		SameSite: http.SameSiteNoneMode,
+		Name:    nameCookie,
+		Value:   value,
+		Expires: time.Now().Add(expTime),
+		Path:    "/",
+		//Secure:   true,
+		//SameSite: http.SameSiteNoneMode,
 	})
 }
 
