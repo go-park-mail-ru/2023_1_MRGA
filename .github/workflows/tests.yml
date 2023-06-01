@@ -29,6 +29,11 @@ jobs:
         go get -u github.com/mailru/easyjson/...
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
+    - name: Check easyjson installation
+      run: |
+        go env GOPATH
+        ls $(go env GOPATH)/bin
+
     - name: Generate mocks and JSON serializers
       run: go generate ./...
 
