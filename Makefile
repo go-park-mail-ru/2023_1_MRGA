@@ -20,3 +20,6 @@ lint:
 
 test-integration:
 	go test ./... -tags=integration
+
+generate:
+	go generate ./...

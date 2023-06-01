@@ -25,10 +25,10 @@ jobs:
       run: go install github.com/golang/mock/mockgen@latest
 
     - name: Install easyjson
-      run: go get -u github.com/mailru/easyjson/...
+      run: go install github.com/mailru/easyjson/...
 
     - name: Generate mocks and JSON serializers
-      run: go generate ./...
+      run: make generate
 
     - name: Check for uncommitted changes
       run: |
