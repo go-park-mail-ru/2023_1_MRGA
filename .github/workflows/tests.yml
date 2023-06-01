@@ -46,11 +46,8 @@ jobs:
     - name: Run linter
       run: make lint
 
-    - name: Run tests with coverage
-      run: |
-        go mod tidy
-        make cov
-        if [ $? -ne 0 ]; then
-          echo "Tests failed"
-          exit 1
-        fi
+    - name: Run unit tests
+      run: make test
+      
+    - name: Run integration tests
+      run: make test-integration
