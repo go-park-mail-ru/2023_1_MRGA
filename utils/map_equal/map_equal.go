@@ -18,13 +18,13 @@ func MapEqual(got, expected map[string]interface{}) bool {
 }
 
 func convertToString(val interface{}) (strVal string) {
-	switch val.(type) {
+	switch v := val.(type) {
 	case string:
-		strVal = val.(string)
+		strVal = v
 	case float64:
-		strVal = fmt.Sprint(val.(float64))
+		strVal = fmt.Sprint(v)
 	case int:
-		strVal = fmt.Sprint(val.(int))
+		strVal = fmt.Sprint(v)
 	}
 	return strVal
 }

@@ -21,6 +21,10 @@ func TestNewUserRepo(t *testing.T) {
 		DriverName:           "postgres",
 		Conn:                 db,
 	}))
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
 	defer db.Close()
 	userRepo := NewPhotoRepo(pDb)
 	if userRepo != nil {
@@ -39,6 +43,10 @@ func TestPhotoRepo_GetAvatar(t *testing.T) {
 		DriverName:           "postgres",
 		Conn:                 db,
 	}))
+	if err != nil {
+		t.Fatalf("cant open db: %s", err)
+	}
+
 	photoRepo := NewPhotoRepo(pDb)
 
 	userId := uint(1)
@@ -72,6 +80,9 @@ func TestPhotoRepo_GetAvatar_GetError(t *testing.T) {
 		DriverName:           "postgres",
 		Conn:                 db,
 	}))
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
 	photoRepo := NewPhotoRepo(pDb)
 
 	userId := uint(1)
@@ -102,6 +113,9 @@ func TestPhotoRepo_GetPhotos(t *testing.T) {
 		DriverName:           "postgres",
 		Conn:                 db,
 	}))
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
 	photoRepo := NewPhotoRepo(pDb)
 
 	userId := uint(1)
@@ -132,6 +146,10 @@ func TestPhotoRepo_GetPhotos_GetError(t *testing.T) {
 		DriverName:           "postgres",
 		Conn:                 db,
 	}))
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
 	photoRepo := NewPhotoRepo(pDb)
 
 	userId := uint(1)

@@ -1,3 +1,4 @@
+//go:generate easyjson -all structs.go
 package match
 
 type UserRes struct {
@@ -8,6 +9,7 @@ type UserRes struct {
 	Shown  bool   `json:"shown" structs:"shown"`
 }
 
+//easyjson:json
 type ReactionInp struct {
 	EvaluatedUserId uint   `json:"evaluatedUserId"`
 	Reaction        string `json:"reaction"`

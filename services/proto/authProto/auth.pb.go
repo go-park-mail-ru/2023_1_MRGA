@@ -3,6 +3,7 @@
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.12
 // source: auth.proto
+//go:generate easyjson -all auth.pb.go
 
 package authProto
 

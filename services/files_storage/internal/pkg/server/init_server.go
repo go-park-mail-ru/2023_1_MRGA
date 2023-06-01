@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/app"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/app/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -25,6 +26,10 @@ type Server struct {
 
 func (server Server) getRouter() *mux.Router {
 	router := mux.NewRouter()
+
+	router.Use(func(h http.Handler) http.Handler {
+		return middleware.JaegerMW(h)
+	})
 
 	router.HandleFunc("/api/v1/files/upload", server.UploadPhoto).Methods("POST")
 	router.HandleFunc("/api/v2/files/upload", server.UploadFile).Methods("POST")

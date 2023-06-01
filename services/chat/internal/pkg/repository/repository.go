@@ -76,9 +76,9 @@ func (repo Repository) SendMessage(ctx context.Context, newMsg app.ChatMessage) 
 	return
 }
 
-func (repo Repository) GetChatsList(userData app.GetChatsListRequest) (recentMsgs []app.MessageWithChatUsers, err error) {
+func (repo Repository) GetChatsList(ctx context.Context, userData app.GetChatsListRequest) (recentMsgs []app.MessageWithChatUsers, err error) {
 	var msgs []app.ChatMessage
-	subQuery := repo.db.Select("MAX(sent_at) as max_sent_at, chat_id").Table("messages").Group("chat_id")
+	subQuery := repo.db.WithContext(ctx).Select("MAX(sent_at) as max_sent_at, chat_id").Table("messages").Group("chat_id")
 	err = repo.db.Table("messages").
 		Joins("INNER JOIN chat_users ON chat_users.user_id = ? AND chat_users.chat_id = messages.chat_id", userData.UserId).
 		Joins("INNER JOIN (?) AS m ON messages.chat_id = m.chat_id AND messages.sent_at = m.max_sent_at", subQuery).
@@ -93,7 +93,7 @@ func (repo Repository) GetChatsList(userData app.GetChatsListRequest) (recentMsg
 	for _, recentMsg := range msgs {
 		chatId := recentMsg.ChatId
 		var chatUsers []uint
-		err = repo.db.Table("chat_users").
+		err = repo.db.WithContext(ctx).Table("chat_users").
 			Select("user_id").
 			Where("chat_id = ? AND user_id <> ?", chatId, userData.UserId).
 			Find(&chatUsers).Error
@@ -110,12 +110,12 @@ func (repo Repository) GetChatsList(userData app.GetChatsListRequest) (recentMsg
 	return
 }
 
-func (repo Repository) GetChat(chatData app.GetChatRequest) (chatMsgs []app.ChatMessage, err error) {
-	repo.db.Model(&app.Message{}).
+func (repo Repository) GetChat(ctx context.Context, chatData app.GetChatRequest) (chatMsgs []app.ChatMessage, err error) {
+	repo.db.WithContext(ctx).Model(&app.Message{}).
 		Where("chat_id = ? AND sender_id <> ? AND read_status = ?", chatData.ChatId, chatData.UserId, false).
 		Update("read_status", true)
 
-	err = repo.db.Model(&app.Message{}).
+	err = repo.db.WithContext(ctx).Model(&app.Message{}).
 		Joins("LEFT JOIN media ON messages.id = media.message_id").
 		Select("messages.*, media.message_type, media.path").
 		Where("chat_id = ?", chatData.ChatId).
@@ -136,10 +136,10 @@ func (repo Repository) GetChatParticipants(ctx context.Context, initialChatData 
 	return
 }
 
-func (repo Repository) IsMemberOfChat(userId uint, chatId uint) (result bool, err error) {
+func (repo Repository) IsMemberOfChat(ctx context.Context, userId uint, chatId uint) (result bool, err error) {
 	var count int64
 
-	err = repo.db.Model(&app.ChatUser{}).
+	err = repo.db.WithContext(ctx).Model(&app.ChatUser{}).
 		Where("user_id = ? AND chat_id = ?", userId, chatId).
 		Count(&count).Error
 

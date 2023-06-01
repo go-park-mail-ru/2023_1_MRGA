@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
+	"os"
+	"strconv"
 
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/joho/godotenv"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -23,13 +28,30 @@ func main() {
 		log.Fatalf("failed to connect env" + err.Error())
 	}
 
+	ctx := context.Background()
+
+	tracingDisabled, err := strconv.ParseBool(os.Getenv("TRACING_DISABLED"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	prv, err := tracejaeger.NewProvider(tracejaeger.ProviderConfig{
+		JaegerEndpoint: "http://localhost:14268/api/traces",
+		ServiceName:    "complaintsServer",
+		Disabled:       tracingDisabled,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer prv.Close(ctx)
+
 	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect db" + err.Error())
 	}
 
 	log.Println("Application terminate")
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()))
 	compRepo := repository.NewRepo(db)
 	srv := server.NewGPRCServer(compRepo)
 	complaintProto.RegisterComplaintsServer(s, srv)

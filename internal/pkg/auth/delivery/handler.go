@@ -3,18 +3,23 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/cookie"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
+	parentCtx, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "RegisterHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -24,7 +29,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -40,7 +45,9 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	answerBody, err := h.AuthService.Register(r.Context(), &userJson)
+	ctx, span := tracejaeger.NewSpan(parentCtx, "mainServer", "Register", nil)
+	answerBody, err := h.AuthService.Register(ctx, &userJson)
+	span.End()
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -53,6 +60,9 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+	parentCtx, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "LoginHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -62,7 +72,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -77,7 +87,9 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userToken, err := h.AuthService.Login(r.Context(), &logInp)
+	ctx, span := tracejaeger.NewSpan(parentCtx, "mainServer", "Login", nil)
+	userToken, err := h.AuthService.Login(ctx, &logInp)
+	span.End()
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -90,6 +102,9 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
+	parentCtx, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "ChangeUserHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -99,7 +114,7 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -115,7 +130,7 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -124,7 +139,9 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userJson.UserId = userId
-	_, err = h.AuthService.ChangeUser(r.Context(), &userJson)
+	ctx, span := tracejaeger.NewSpan(parentCtx, "mainServer", "ChangeUser", nil)
+	_, err = h.AuthService.ChangeUser(ctx, &userJson)
+	span.End()
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -136,6 +153,9 @@ func (h *Handler) ChangeUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	parentCtx, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "LogoutHandler", nil)
+	defer parentSpan.End()
+
 	userToken, err := cookie.GetValueCookie(r, servicedefault.SessionTokenCookieName)
 	if err != nil {
 		if err == http.ErrNoCookie {
@@ -151,7 +171,9 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	reqBody := authProto.UserToken{
 		Token: userToken,
 	}
-	_, err = h.AuthService.Logout(r.Context(), &reqBody)
+	ctx, span := tracejaeger.NewSpan(parentCtx, "mainServer", "Logout", nil)
+	_, err = h.AuthService.Logout(ctx, &reqBody)
+	span.End()
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)

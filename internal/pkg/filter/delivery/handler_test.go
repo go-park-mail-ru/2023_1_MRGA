@@ -5,13 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/mailru/easyjson"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
@@ -51,7 +53,7 @@ func TestHandler_GetFilter(t *testing.T) {
 	}
 	req := httptest.NewRequest(http.MethodGet, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.GetFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -66,7 +68,7 @@ func TestHandler_GetFilter(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -103,7 +105,8 @@ func TestHandler_GetFilter_GetError(t *testing.T) {
 	}
 	req := httptest.NewRequest(http.MethodGet, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.GetFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -118,7 +121,7 @@ func TestHandler_GetFilter_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -145,16 +148,20 @@ func TestHandler_AddFilter(t *testing.T) {
 		Reason:    []string{"test"},
 	}
 	userId := uint(1)
-
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	filterUsecaseMock.EXPECT().AddFilters(userId, test).Return(nil)
 	output := map[string]interface{}{
 		"body":   map[string]interface{}{},
 		"status": 200,
 	}
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.AddFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -169,7 +176,7 @@ func TestHandler_AddFilter(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -195,6 +202,11 @@ func TestHandler_AddFilter_GetError(t *testing.T) {
 		SearchSex: uint(0),
 		Reason:    []string{"test"},
 	}
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	userId := uint(1)
 	errRepo := fmt.Errorf("something wrong")
 	filterUsecaseMock.EXPECT().AddFilters(userId, test).Return(errRepo)
@@ -202,10 +214,10 @@ func TestHandler_AddFilter_GetError(t *testing.T) {
 		"error":  errRepo.Error(),
 		"status": 400,
 	}
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.AddFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -220,7 +232,7 @@ func TestHandler_AddFilter_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -247,7 +259,11 @@ func TestHandler_ChangeFilter(t *testing.T) {
 		Reason:    []string{"test"},
 	}
 	userId := uint(1)
-
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	filterUsecaseMock.EXPECT().ChangeFilters(userId, test).Return(nil)
 	filterUsecaseMock.EXPECT().GetFilters(userId).Return(test, nil)
 	output := map[string]interface{}{
@@ -257,10 +273,9 @@ func TestHandler_ChangeFilter(t *testing.T) {
 		"status": 200,
 	}
 
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.ChangeFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -275,7 +290,7 @@ func TestHandler_ChangeFilter(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -303,7 +318,11 @@ func TestHandler_ChangeFilter_GetError(t *testing.T) {
 		Reason:    []string{"test"},
 	}
 	userId := uint(1)
-
+	rawTest, err := easyjson.Marshal(test)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 	filterUsecaseMock.EXPECT().ChangeFilters(userId, test).Return(errRepo)
 
 	output := map[string]interface{}{
@@ -311,10 +330,9 @@ func TestHandler_ChangeFilter_GetError(t *testing.T) {
 		"status": 400,
 	}
 
-	expected := []byte(`{"minAge": 20, "maxAge": 20, "sexSearch": 0, "reason": ["test"]}`)
-	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer([]byte(expected)))
+	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	filterHandler.ChangeFilter(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -329,7 +347,7 @@ func TestHandler_ChangeFilter_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return

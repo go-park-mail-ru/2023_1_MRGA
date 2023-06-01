@@ -53,6 +53,10 @@ var frontendHosts = []string{
 }
 
 func (a *Application) InitRoutes(db *gorm.DB, authServ authProto.AuthClient, compServ complaintProto.ComplaintsClient, chatOptions ChatServerPackage.ServerOptions) {
+	a.Router.Use(func(h http.Handler) http.Handler {
+		return middleware.JaegerMW(h)
+	})
+
 	a.Router.Handle("/metrics", promhttp.Handler())
 
 	a.Router.Use(func(h http.Handler) http.Handler {

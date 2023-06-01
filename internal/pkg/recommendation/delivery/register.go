@@ -20,5 +20,5 @@ func RegisterHTTPEndpoints(router *mux.Router, uc recommendation.UseCase) {
 	h := NewHandler(uc)
 
 	router.HandleFunc("/api/auth/recommendation", h.GetRecommendations).Methods("GET")
-
+	router.HandleFunc("/api/auth/likes", h.GetLikes).Methods("GET")
 }

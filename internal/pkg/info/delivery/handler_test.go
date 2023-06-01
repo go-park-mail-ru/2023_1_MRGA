@@ -3,7 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -105,7 +105,7 @@ func TestHandler(t *testing.T) {
 				return
 			}
 		}()
-		reqBody, err := ioutil.ReadAll(resp.Body)
+		reqBody, err := io.ReadAll(resp.Body)
 		if err != nil {
 			t.Errorf(err.Error())
 			return
@@ -193,7 +193,7 @@ func TestHandler_GetError(t *testing.T) {
 				return
 			}
 		}()
-		reqBody, err := ioutil.ReadAll(resp.Body)
+		reqBody, err := io.ReadAll(resp.Body)
 		if err != nil {
 			t.Errorf(err.Error())
 			return

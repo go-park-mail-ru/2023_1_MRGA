@@ -59,6 +59,9 @@ func (m *MatchUseCase) PostReaction(userId uint, reaction match.ReactionInp) (re
 			return result, fmt.Errorf("you cant like people today. Try tomorrow")
 		}
 		err = m.userRepo.IncrementLikeCount(userId)
+		if err != nil {
+			return result, err
+		}
 	}
 
 	userToId := reaction.EvaluatedUserId

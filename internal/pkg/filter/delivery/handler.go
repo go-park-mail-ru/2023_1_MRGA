@@ -3,15 +3,20 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/filter"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "AddFilterHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -21,7 +26,7 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -38,7 +43,7 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -57,7 +62,10 @@ func (h *Handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetFilter(w http.ResponseWriter, r *http.Request) {
-	userIdDB := r.Context().Value("userId")
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetFilterHandler", nil)
+	defer parentSpan.End()
+
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -79,6 +87,9 @@ func (h *Handler) GetFilter(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "ChangeFilterHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -88,7 +99,7 @@ func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -104,7 +115,7 @@ func (h *Handler) ChangeFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)

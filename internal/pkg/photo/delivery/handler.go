@@ -2,11 +2,11 @@ package delivery
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -17,14 +17,20 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/photo"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/face_finder"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "AddPhotoHandler", nil)
+	defer span.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -42,7 +48,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := r.MultipartForm.File["files[]"]
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -86,7 +92,7 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		photoId, err := h.SendPhoto(file, fileHeader.Filename, uint(userId))
+		photoId, err := h.SendPhoto(ctx, file, fileHeader.Filename, uint(userId))
 		if err != nil {
 			logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 			err = fmt.Errorf("cant parse json")
@@ -114,6 +120,9 @@ func (h *Handler) AddPhoto(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "AddFilesHandler", nil)
+	defer span.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -132,7 +141,7 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 
 	files := r.MultipartForm.File["files[]"]
 
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userIdUint32, ok := userIdDB.(uint32)
 	if !ok {
 		err := errors.New("Пользователь не авторизирован")
@@ -161,13 +170,13 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		input, err := ioutil.TempFile("", "input-*.webm")
+		input, err := os.CreateTemp("", "input-*.webm")
 		if err != nil {
 			return
 		}
 		defer os.Remove(input.Name())
 
-		output, err := ioutil.TempFile("", "output-*.ogg")
+		output, err := os.CreateTemp("", "output-*.ogg")
 		if err != nil {
 			return
 		}
@@ -197,7 +206,7 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 		defer convertedFile.Close()
 
 		// Upload the file
-		pathToFile, err := h.uploadFile(convertedFile, strings.TrimSuffix(fileHeader.Filename, filepath.Ext(fileHeader.Filename))+".ogg", userId)
+		pathToFile, err := h.uploadFile(ctx, convertedFile, strings.TrimSuffix(fileHeader.Filename, filepath.Ext(fileHeader.Filename))+".ogg", userId)
 		if err != nil {
 			logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
@@ -214,6 +223,9 @@ func (h *Handler) AddFiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "GetPhotoHandler", nil)
+	defer span.End()
+
 	params := mux.Vars(r)
 	photoId, ok := params["photo"]
 	if !ok {
@@ -222,7 +234,7 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyBytes, filename, err := h.SendRequest(photoId)
+	bodyBytes, filename, err := h.SendRequest(ctx, photoId)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -238,6 +250,9 @@ func (h *Handler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "GetFileHandler", nil)
+	defer span.End()
+
 	vars := mux.Vars(r)
 	pathToFile, ok := vars["pathToFile"]
 	if !ok {
@@ -247,7 +262,7 @@ func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyBytes, filename, err := h.getFileByPath(pathToFile)
+	bodyBytes, filename, err := h.getFileByPath(ctx, pathToFile)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -263,6 +278,9 @@ func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "GetTranscriptionHandler", nil)
+	defer span.End()
+
 	vars := mux.Vars(r)
 	pathToFile, ok := vars["pathToFile"]
 	if !ok {
@@ -272,7 +290,7 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyBytes, _, err := h.getFileByPath(pathToFile)
+	bodyBytes, _, err := h.getFileByPath(ctx, pathToFile)
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -280,7 +298,8 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 	}
 
 	OAUTH_TOKEN := os.Getenv("OAUTH_TOKEN")
-	req, err := http.NewRequest("POST", "https://voice.mcs.mail.ru/asr", bytes.NewReader(bodyBytes))
+	ctxChild, spanChild := tracejaeger.NewSpan(ctx, "mainServer", "GetTranscription", nil)
+	req, err := http.NewRequestWithContext(ctxChild, "POST", "https://voice.mcs.mail.ru/asr", bytes.NewReader(bodyBytes))
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
@@ -290,8 +309,9 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 	req.Header.Add("Content-Type", "audio/ogg; codecs=opus")
 	req.Header.Add("Authorization", "Bearer "+OAUTH_TOKEN)
 
-	client := &http.Client{}
+	client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	resp, err := client.Do(req)
+	spanChild.End()
 	if err != nil {
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
@@ -300,7 +320,7 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		err = errors.New(fmt.Sprintf("Неудачная расшифровка с кодом: %d %v\n", resp.StatusCode, resp))
+		err = fmt.Errorf("Неудачная расшифровка с кодом: %d %v\n", resp.StatusCode, resp)
 		logger.Log(http.StatusInternalServerError, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
@@ -321,6 +341,9 @@ func (h *Handler) GetTranscription(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "DeletePhotoHandler", nil)
+	defer parentSpan.End()
+
 	params := mux.Vars(r)
 	photoIdStr, ok := params["photo"]
 	if !ok {
@@ -334,7 +357,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -350,10 +373,12 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Log(http.StatusOK, "Success", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, map[string]interface{}{})
-	return
 }
 
 func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "ChangePhotoHandler", nil)
+	defer span.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -374,7 +399,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
 		return
 	}
-	userIdDB := r.Context().Value("userId")
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
 		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
@@ -404,14 +429,18 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 		writer.ErrorRespond(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	file.Seek(0, 0)
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		writer.ErrorRespondWithData(w, r, fmt.Errorf("can't seek file"), http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
 	if !ok {
 		logger.Log(http.StatusBadRequest, fmt.Errorf("there is not face").Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespondWithData(w, r, fmt.Errorf("there is not face"), http.StatusBadRequest, map[string]interface{}{"problemPhoto": []int{0}})
 		return
 	}
 
-	photoId, err := h.SendPhoto(file, "file", uint(userId))
+	photoId, err := h.SendPhoto(ctx, file, "file", uint(userId))
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
@@ -429,8 +458,7 @@ func (h *Handler) ChangePhoto(w http.ResponseWriter, r *http.Request) {
 	writer.Respond(w, r, map[string]interface{}{})
 }
 
-func (h *Handler) SendPhoto(file multipart.File, filename string, userID uint) (uint, error) {
-
+func (h *Handler) SendPhoto(ctx context.Context, file multipart.File, filename string, userID uint) (uint, error) {
 	requestBody := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(requestBody)
 	userIdField, err := writerFile.CreateFormField("userID")
@@ -456,15 +484,17 @@ func (h *Handler) SendPhoto(file multipart.File, filename string, userID uint) (
 		return 0, err
 	}
 	requestUrl := fmt.Sprintf("http://%s:8081/api/v1/files/upload", h.serverHost)
-	req, err := http.NewRequest("POST", requestUrl, requestBody)
+	ctx, span := tracejaeger.NewSpan(ctx, "mainServer", "SendPhoto", nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", requestUrl, requestBody)
 	if err != nil {
 		return 0, err
 	}
 	req.Header.Set("Content-Type", writerFile.FormDataContentType())
 
 	// Отправляем запрос и проверяем статус ответа
-	client := &http.Client{}
+	client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	resp, err := client.Do(req)
+	span.End()
 	if err != nil {
 		return 0, err
 	}
@@ -490,7 +520,7 @@ func (h *Handler) SendPhoto(file multipart.File, filename string, userID uint) (
 	return answer.Body.PhotoID, nil
 }
 
-func (h *Handler) uploadFile(file multipart.File, filename string, userID uint) (pathToFile string, err error) {
+func (h *Handler) uploadFile(ctx context.Context, file multipart.File, filename string, userID uint) (pathToFile string, err error) {
 	requestBody := &bytes.Buffer{}
 	writerFile := multipart.NewWriter(requestBody)
 	userIdField, err := writerFile.CreateFormField("userID")
@@ -517,15 +547,17 @@ func (h *Handler) uploadFile(file multipart.File, filename string, userID uint) 
 	}
 
 	requestUrl := fmt.Sprintf("http://%s:8081/api/v2/files/upload", h.serverHost)
-	req, err := http.NewRequest("POST", requestUrl, requestBody)
+	ctx, span := tracejaeger.NewSpan(ctx, "mainServer", "uploadFile", nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", requestUrl, requestBody)
 	if err != nil {
 		return
 	}
 	req.Header.Set("Content-Type", writerFile.FormDataContentType())
 
 	// Отправляем запрос и проверяем статус ответа
-	client := &http.Client{}
+	client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	resp, err := client.Do(req)
+	span.End()
 	if err != nil {
 		return
 	}
@@ -550,17 +582,20 @@ func (h *Handler) uploadFile(file multipart.File, filename string, userID uint) 
 	return answer.Body.PathToFile, nil
 }
 
-func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
+func (h *Handler) SendRequest(ctx context.Context, photoId string) ([]byte, string, error) {
 	// Создаем HTTP-запрос на другой микросервис
+	ctx, span := tracejaeger.NewSpan(ctx, "mainServer", "SendRequest", nil)
 	requestUrl := fmt.Sprintf("http://%s:8081/api/files/%s", h.serverHost, photoId)
-	req, err := http.NewRequest("GET", requestUrl, nil)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", requestUrl, nil)
 	if err != nil {
 		return nil, "", err
 	}
 
 	// Отправляем запрос и проверяем статус ответа
-	client := &http.Client{}
+	client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	resp, err := client.Do(req)
+	span.End()
 	if err != nil {
 		return nil, "", err
 	}
@@ -573,7 +608,7 @@ func (h *Handler) SendRequest(photoId string) ([]byte, string, error) {
 			return
 		}
 	}()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", err
 	}
@@ -598,17 +633,19 @@ func convertToOgg(inputPath, outputPath string) error {
 	return nil
 }
 
-func (h *Handler) getFileByPath(pathToFile string) (file []byte, filename string, err error) {
+func (h *Handler) getFileByPath(ctx context.Context, pathToFile string) (file []byte, filename string, err error) {
 	// Создаем HTTP-запрос на другой микросервис
+	ctx, span := tracejaeger.NewSpan(ctx, "mainServer", "getFileByPath", nil)
 	requestUrl := fmt.Sprintf("http://%s:8081/api/files/%s", h.serverHost, pathToFile)
-	req, err := http.NewRequest("GET", requestUrl, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", requestUrl, nil)
 	if err != nil {
 		return
 	}
 
 	// Отправляем запрос и проверяем статус ответа
-	client := &http.Client{}
+	client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	resp, err := client.Do(req)
+	span.End()
 	if err != nil {
 		return
 	}
@@ -621,7 +658,7 @@ func (h *Handler) getFileByPath(pathToFile string) (file []byte, filename string
 			return
 		}
 	}()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return
 	}

@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,8 +15,9 @@ import (
 	"github.com/mailru/easyjson"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/constform"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/middleware"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/mocks"
+	mock "github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 	mockProto "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto/mocks"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/map_equal"
@@ -64,7 +65,7 @@ func TestHandler_AddUserHashtags(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserHashtags(userId).Return(testInp, nil)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.AddUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -79,7 +80,7 @@ func TestHandler_AddUserHashtags(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -123,7 +124,7 @@ func TestHandler_AddUserHashtags_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().AddHashtags(userId, test).Return(errRepo)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.AddUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -138,7 +139,7 @@ func TestHandler_AddUserHashtags_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -183,7 +184,7 @@ func TestHandler_ChangeUserHashtags(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserHashtags(userId).Return(testInp, nil)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.ChangeUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -198,7 +199,7 @@ func TestHandler_ChangeUserHashtags(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -242,7 +243,7 @@ func TestHandler_ChangeUserHashtags_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().ChangeUserHashtags(userId, test).Return(errRepo)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.ChangeUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -257,7 +258,7 @@ func TestHandler_ChangeUserHashtags_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -295,7 +296,7 @@ func TestHandler_ChangeUserStatus(t *testing.T) {
 	compUsecaseMock.EXPECT().ChangeUserStatus(userId, test).Return(nil)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.ChangeUserStatus(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -310,7 +311,7 @@ func TestHandler_ChangeUserStatus(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -348,7 +349,7 @@ func TestHandler_ChangeUserStatus_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().ChangeUserStatus(userId, test).Return(errRepo)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.ChangeUserStatus(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -363,7 +364,7 @@ func TestHandler_ChangeUserStatus_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -402,7 +403,7 @@ func TestHandler_GetUserHashtags(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserHashtags(userId).Return(testInp, nil)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.GetUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -417,7 +418,7 @@ func TestHandler_GetUserHashtags(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -455,7 +456,7 @@ func TestHandler_GetUserHashtags_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserHashtags(userId).Return(testInp, errRepo)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.GetUserHashtags(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -470,7 +471,7 @@ func TestHandler_GetUserHashtags_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -507,7 +508,7 @@ func TestHandler_GetUserStatus(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserStatus(userId).Return(test.Status, nil)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.GetUserStatus(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -522,7 +523,7 @@ func TestHandler_GetUserStatus(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -559,7 +560,7 @@ func TestHandler_GetUserStatus_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserStatus(userId).Return(test.Status, errRepo)
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
 	w := httptest.NewRecorder()
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	compHandler.GetUserStatus(w, req.WithContext(ctx))
 	resp := w.Result()
 
@@ -574,7 +575,7 @@ func TestHandler_GetUserStatus_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -626,7 +627,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserById(userId).Return(test, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 	compServiceMock.EXPECT().CheckBanned(req.Context(), compInp).Return(&banned, nil)
 	w := httptest.NewRecorder()
@@ -645,7 +646,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -686,7 +687,7 @@ func TestHandler_GetCurrentUser_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().GetUserById(userId).Return(test, errRepo)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
@@ -705,7 +706,7 @@ func TestHandler_GetCurrentUser_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -761,7 +762,7 @@ func TestHandler_GetInfo(t *testing.T) {
 	compUsecaseMock.EXPECT().GetInfo(userId).Return(test, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
@@ -780,7 +781,7 @@ func TestHandler_GetInfo(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -826,7 +827,7 @@ func TestHandler_GetInfo_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().GetInfo(userId).Return(test, errRepo)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
@@ -845,7 +846,7 @@ func TestHandler_GetInfo_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -901,7 +902,7 @@ func TestHandler_GetInfoById(t *testing.T) {
 	compUsecaseMock.EXPECT().GetInfo(userId).Return(test, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 	vars := map[string]string{
 		"userId": "1",
@@ -923,7 +924,7 @@ func TestHandler_GetInfoById(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -969,7 +970,7 @@ func TestHandler_GetInfoById_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().GetInfo(userId).Return(test, errRepo)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 	vars := map[string]string{
 		"userId": "1",
@@ -991,7 +992,7 @@ func TestHandler_GetInfoById_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1056,7 +1057,7 @@ func TestHandler_ChangeInfo(t *testing.T) {
 	compUsecaseMock.EXPECT().ChangeInfo(userId, testInp).Return(test, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
@@ -1075,7 +1076,7 @@ func TestHandler_ChangeInfo(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1128,7 +1129,7 @@ func TestHandler_ChangeInfo_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().ChangeInfo(userId, testInp).Return(test, errRepo)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
@@ -1147,7 +1148,7 @@ func TestHandler_ChangeInfo_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1188,7 +1189,7 @@ func TestHandler_CreateInfo(t *testing.T) {
 	compUsecaseMock.EXPECT().AddInfo(userId, testInp).Return(nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
@@ -1207,7 +1208,7 @@ func TestHandler_CreateInfo(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
@@ -1248,7 +1249,7 @@ func TestHandler_CreateInfo_GetError(t *testing.T) {
 	compUsecaseMock.EXPECT().AddInfo(userId, testInp).Return(errRepo)
 
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", bytes.NewBuffer(rawTest))
-	ctx := context.WithValue(req.Context(), "userId", uint32(userId))
+	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
 
 	w := httptest.NewRecorder()
@@ -1267,7 +1268,7 @@ func TestHandler_CreateInfo_GetError(t *testing.T) {
 			return
 		}
 	}()
-	reqBody, err := ioutil.ReadAll(resp.Body)
+	reqBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf(err.Error())
 		return
