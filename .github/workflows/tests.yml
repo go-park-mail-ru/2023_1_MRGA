@@ -25,7 +25,9 @@ jobs:
       run: go install github.com/golang/mock/mockgen@v1.6.0
 
     - name: Install easyjson
-      run: go get -u github.com/mailru/easyjson/...
+      run: |
+        go get -u github.com/mailru/easyjson/...
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
     - name: Generate mocks and JSON serializers
       run: go generate ./...
