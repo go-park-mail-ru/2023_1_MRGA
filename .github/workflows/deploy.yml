@@ -21,6 +21,23 @@ jobs:
     - name: Install make
       run: sudo apt-get install -y make
 
+    - name: Install mockgen
+      run: go install github.com/golang/mock/mockgen@latest
+
+    - name: Install easyjson
+      run: go get -u github.com/mailru/easyjson/...
+
+    - name: Generate mocks and JSON serializers
+      run: go generate ./...
+
+    - name: Check for uncommitted changes
+      run: |
+        if [[ $(git diff --stat) != '' ]]; then
+          echo "Found uncommitted changes after running go generate. Please commit the changes."
+          git diff
+          exit 1
+        fi
+
     - name: Install golangci-lint
       run: |
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.2
@@ -52,5 +69,6 @@ jobs:
           cd /home/ubuntu/2023_1_MRGA
           docker-compose stop
           git stash save
+          git checkout main
           git pull origin
           docker-compose up -d
