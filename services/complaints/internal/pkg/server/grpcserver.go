@@ -20,7 +20,7 @@ func NewGPRCServer(compRepo compRepo.CompRepo) *GRPCServer {
 }
 
 func (s *GRPCServer) Complain(ctx context.Context, req *complaintProto.UserId) (*complaintProto.Response, error) {
-	ctx, span := tracejaeger.NewSpan(ctx, "complaintsServer", "Complain", nil)
+	_, span := tracejaeger.NewSpan(ctx, "complaintsServer", "Complain", nil)
 	defer span.End()
 
 	userId := uint(req.UserId)
@@ -56,7 +56,7 @@ func (s *GRPCServer) Complain(ctx context.Context, req *complaintProto.UserId) (
 }
 
 func (s *GRPCServer) CheckBanned(ctx context.Context, req *complaintProto.UserId) (*complaintProto.Response, error) {
-	ctx, span := tracejaeger.NewSpan(ctx, "complaintsServer", "CheckBanned", nil)
+	_, span := tracejaeger.NewSpan(ctx, "complaintsServer", "CheckBanned", nil)
 	defer span.End()
 
 	userId := uint(req.UserId)

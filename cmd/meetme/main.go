@@ -85,7 +85,6 @@ func main() {
 	connAuth, err := grpc.Dial(
 		authServiceHost+":8082",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
 		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()),
 		middleware.AuthWithClientUnaryInterceptor(),
@@ -105,7 +104,6 @@ func main() {
 	connComp, err := grpc.Dial(
 		complaintsServiceHost+":8083",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
 		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()),
 		middleware.CompWithClientUnaryInterceptor(),

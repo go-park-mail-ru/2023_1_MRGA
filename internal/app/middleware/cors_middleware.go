@@ -54,7 +54,7 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 			Token: token,
 		}
 		ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "CheckSession", nil)
-		userResp, err := authServ.CheckSession(r.Context(), &reqBody)
+		userResp, err := authServ.CheckSession(ctx, &reqBody)
 		span.End()
 		if err != nil {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)

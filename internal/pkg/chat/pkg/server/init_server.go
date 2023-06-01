@@ -33,7 +33,6 @@ type Server struct {
 func (server Server) InitClient() (chatClient chatpc.ChatServiceClient, chatClientConn *grpc.ClientConn, err error) {
 	chatClientConn, err = grpc.Dial(
 		server.clientTarget,
-		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
 		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),

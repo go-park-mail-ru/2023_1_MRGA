@@ -24,7 +24,7 @@ func NewGPRCServer(authRepo authRepo.UserRepo) *GRPCServer {
 }
 
 func (s *GRPCServer) Register(ctx context.Context, req *auth.UserRegisterInfo) (*auth.UserResponse, error) {
-	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "Register", nil)
+	_, span := tracejaeger.NewSpan(ctx, "authServer", "Register", nil)
 	defer span.End()
 
 	user := dataStruct.User{Email: req.Email, Password: req.Password, BirthDay: req.Birthday}
@@ -54,7 +54,7 @@ func (s *GRPCServer) Register(ctx context.Context, req *auth.UserRegisterInfo) (
 }
 
 func (s *GRPCServer) Login(ctx context.Context, req *auth.UserLoginInfo) (*auth.UserResponse, error) {
-	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "Login", nil)
+	_, span := tracejaeger.NewSpan(ctx, "authServer", "Login", nil)
 	defer span.End()
 
 	if req.Email == "" {
@@ -84,7 +84,7 @@ func (s *GRPCServer) Login(ctx context.Context, req *auth.UserLoginInfo) (*auth.
 }
 
 func (s *GRPCServer) CheckSession(ctx context.Context, req *auth.UserToken) (*auth.UserResponse, error) {
-	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "CheckSession", nil)
+	_, span := tracejaeger.NewSpan(ctx, "authServer", "CheckSession", nil)
 	defer span.End()
 
 	userId, err := s.AuthRepo.CheckSession(req.Token)
@@ -99,7 +99,7 @@ func (s *GRPCServer) CheckSession(ctx context.Context, req *auth.UserToken) (*au
 }
 
 func (s *GRPCServer) Logout(ctx context.Context, req *auth.UserToken) (*auth.Response, error) {
-	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "Logout", nil)
+	_, span := tracejaeger.NewSpan(ctx, "authServer", "Logout", nil)
 	defer span.End()
 
 	err := s.AuthRepo.DeleteToken(req.Token)
@@ -113,7 +113,7 @@ func (s *GRPCServer) Logout(ctx context.Context, req *auth.UserToken) (*auth.Res
 }
 
 func (s *GRPCServer) ChangeUser(ctx context.Context, req *auth.UserChangeInfo) (*auth.Response, error) {
-	ctx, span := tracejaeger.NewSpan(ctx, "authServer", "ChangeUser", nil)
+	_, span := tracejaeger.NewSpan(ctx, "authServer", "ChangeUser", nil)
 	defer span.End()
 
 	user := dataStruct.User{Id: uint(req.UserId), Email: req.Email, Password: req.Password, BirthDay: req.Birthday}
