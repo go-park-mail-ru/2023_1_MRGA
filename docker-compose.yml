@@ -11,8 +11,8 @@ services: # имеджи, которые запустятся по вашему 
     networks:
       - service-network
     environment:
-      POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
+      POSTGRES_PASSWORD: "marga_password"
+      POSTGRES_DB: "mrga"
       POSTGRES_USER: "mrga_user"
       PGPORT: 5432
       TZ: "Europe/Moscow"
@@ -28,7 +28,7 @@ services: # имеджи, которые запустятся по вашему 
       - service-network
     environment:
       POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
+      POSTGRES_DB: "mrga_storage"
       POSTGRES_USER: "mrga_user"
       PGPORT: 5433
       TZ: "Europe/Moscow"
@@ -40,7 +40,7 @@ services: # имеджи, которые запустятся по вашему 
         target: /var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
+      POSTGRES_DB: "mrga_chat"
       POSTGRES_USER: "mrga_user"
       PGPORT: 5434
       TZ: "Europe/Moscow"

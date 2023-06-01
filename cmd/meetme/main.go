@@ -58,7 +58,7 @@ func main() {
 	}
 
 	prv, err := tracejaeger.NewProvider(tracejaeger.ProviderConfig{
-		JaegerEndpoint: "http://localhost:14268/api/traces",
+		JaegerEndpoint: "http://meetme-app.ru:14268/api/traces",
 		ServiceName:    "mainServer",
 		Disabled:       tracingDisabled,
 	})

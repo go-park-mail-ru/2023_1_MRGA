@@ -58,8 +58,8 @@ require (
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7
-	github.com/sirupsen/logrus v1.9.0
-	golang.org/x/tools v0.7.0 // indirect
+	github.com/sirupsen/logrus v1.9.2
+	golang.org/x/tools v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
