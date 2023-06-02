@@ -74,3 +74,55 @@ func (r *RecUseCase) GetRecommendations(userId uint) ([]recommendation.Recommend
 
 	return result, err
 }
+
+func (r *RecUseCase) CheckProStatus(userId uint) error {
+	err := r.repo.CheckStatus(userId)
+	return err
+}
+
+func (r *RecUseCase) GetLikes(userId uint) ([]recommendation.Recommendation, error) {
+	filters, err := r.filterUseCase.GetUserFilters(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	reasons, err := r.filterUseCase.GetUserReasonsId(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	history, err := r.repo.GetUserHistory(userId)
+	if err != nil {
+		return nil, err
+	}
+	if len(history) == 0 {
+		history = append(history, 0)
+	}
+
+	recs, err := r.repo.GetLikes(userId, history, reasons, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []recommendation.Recommendation
+	for _, rec := range recs {
+		user, err := r.repo.GetRecommendedUser(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
+
+		hashtagsUser, err := r.infoUserUseCase.GetUserHashtags(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
+		user.Hashtags = hashtagsUser
+
+		user.Photos, err = r.photoUseCase.GetAllPhotos(rec.UserId)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, user)
+	}
+
+	return result, err
+}

@@ -149,21 +149,6 @@ func (mr *MockIRepositoryMatchMockRecorder) GetAge(userId interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAge", reflect.TypeOf((*MockIRepositoryMatch)(nil).GetAge), userId)
 }
 
-// GetChat mocks base method.
-func (m *MockIRepositoryMatch) GetChat(userId uint) (match.ChatAnswer, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetChat", userId)
-	ret0, _ := ret[0].(match.ChatAnswer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetChat indicates an expected call of GetChat.
-func (mr *MockIRepositoryMatchMockRecorder) GetChat(userId interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChat", reflect.TypeOf((*MockIRepositoryMatch)(nil).GetChat), userId)
-}
-
 // GetIdReaction mocks base method.
 func (m *MockIRepositoryMatch) GetIdReaction(reaction string) (uint, error) {
 	m.ctrl.T.Helper()

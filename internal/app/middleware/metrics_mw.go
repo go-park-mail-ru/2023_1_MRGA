@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -56,18 +55,18 @@ var fooCount = prometheus.NewCounter(prometheus.CounterOpts{
 
 var hits = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "hits",
-}, []string{"status", "path"})
+}, []string{"method", "status", "path"})
 
-var httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+var httpDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Name: "http_response_time_seconds",
 	Help: "Duration of HTTP requests.",
-}, []string{"path"})
+}, []string{"method", "status", "path"})
 
 var authHints = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "auth_hits",
 }, []string{"error", "path"})
 
-var authHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+var authHttpDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Name: "auth_http_response_time_seconds",
 	Help: "Duration of HTTP requests.",
 }, []string{"path"})
@@ -76,7 +75,7 @@ var compHints = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "comp_hits",
 }, []string{"error", "path"})
 
-var compHttpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+var compHttpDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Name: "comp_http_response_time_seconds",
 	Help: "Duration of HTTP requests.",
 }, []string{"path"})
@@ -124,8 +123,9 @@ func MetricsMW(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, r)
 		duration := time.Since(start)
 		st := rw.statusCode
-		httpDuration.WithLabelValues(r.URL.String()).Observe(duration.Seconds())
-		hits.WithLabelValues(strconv.Itoa(st), r.URL.String()).Inc()
+		url := choosePath(r.URL.String())
+		httpDuration.WithLabelValues(r.Method, strconv.Itoa(st), url).Observe(duration.Seconds())
+		hits.WithLabelValues(r.Method, strconv.Itoa(st), url).Inc()
 	})
 }
 
@@ -181,3 +181,42 @@ func compClientInterceptor(
 func CompWithClientUnaryInterceptor() grpc.DialOption {
 	return grpc.WithUnaryInterceptor(compClientInterceptor)
 }
+
+const (
+	urlSavesFile      = "/api/auth/file/services/files_storage/saved_files/"
+	urlInfoUserById   = "/api/auth/info-user/"
+	urlPhotoById      = "/api/auth/photo/"
+	urlMatchDelete    = "/api/auth/match/"
+	urlMatchSubscribe = "/api/auth/match/subscribe"
+	urlFileById       = "/api/auth/file/"
+)
+
+func choosePath(url string) string {
+	switch {
+	case strings.Contains(url, urlSavesFile):
+		return urlSavesFile + "{pathToFile:.*}"
+	case strings.Contains(url, urlInfoUserById):
+		return urlInfoUserById + "{id}"
+	case strings.Contains(url, urlPhotoById):
+		return urlPhotoById + "{id}"
+	case strings.Contains(url, urlChats):
+		switch {
+		case strings.Contains(url, urlChatMess):
+			return urlChats + "{id}" + urlChatMess
+		case strings.Contains(url, urlChatSend):
+			return urlChats + "{id}" + urlChatSend
+		}
+	case strings.Contains(url, urlMatchDelete) && !strings.Contains(url, urlMatchSubscribe):
+		return urlMatchDelete + "{id}"
+	case strings.Contains(url, urlFileById):
+		return urlFileById + "{id}"
+	}
+
+	return url
+}
+
+const (
+	urlChats    = "/api/auth/chats/"
+	urlChatMess = "/messages"
+	urlChatSend = "/send"
+)

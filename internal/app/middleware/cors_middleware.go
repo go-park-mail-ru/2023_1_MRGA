@@ -11,6 +11,7 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/app/servicedefault"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
@@ -52,14 +53,24 @@ func AuthMiddleware(authServ authProto.AuthClient, next http.Handler) http.Handl
 		reqBody := authProto.UserToken{
 			Token: token,
 		}
-		userResp, err := authServ.CheckSession(r.Context(), &reqBody)
+		ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", "CheckSession", nil)
+		userResp, err := authServ.CheckSession(ctx, &reqBody)
+		span.End()
 		if err != nil {
 			logger.Log(http.StatusUnauthorized, err.Error(), r.Method, r.URL.Path, true)
 			writer.ErrorRespond(w, r, err, http.StatusUnauthorized)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), ContextUserKey, userResp.UserId)
+		ctx = context.WithValue(r.Context(), ContextUserKey, userResp.UserId)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func JaegerMW(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx, span := tracejaeger.NewSpan(r.Context(), "mainServer", r.RequestURI, nil)
+		defer span.End()
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

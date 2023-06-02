@@ -1,9 +1,15 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
+	"os"
+	"strconv"
 	"time"
+
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
+	"github.com/joho/godotenv"
 
 	repositoryPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/repository"
 	serverPackage "github.com/go-park-mail-ru/2023_1_MRGA.git/services/files_storage/internal/pkg/server"
@@ -28,6 +34,28 @@ func getServerOptions() (opts serverPackage.ServerOptions) {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("failed to connect env" + err.Error())
+	}
+
+	ctx := context.Background()
+
+	tracingDisabled, err := strconv.ParseBool(os.Getenv("TRACING_DISABLED"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	prv, err := tracejaeger.NewProvider(tracejaeger.ProviderConfig{
+		JaegerEndpoint: "http://meetme-app.ru:14268/api/traces",
+		ServiceName:    "filesStorageServer",
+		Disabled:       tracingDisabled,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer prv.Close(ctx)
+
 	repo, err := repositoryPackage.InitRepository()
 	if err != nil {
 		log.Fatal(err.Error())

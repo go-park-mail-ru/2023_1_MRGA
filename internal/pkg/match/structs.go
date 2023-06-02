@@ -1,3 +1,4 @@
+//go:generate easyjson -all structs.go
 package match
 
 type UserRes struct {

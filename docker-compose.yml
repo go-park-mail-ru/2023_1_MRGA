@@ -11,8 +11,8 @@ services: # имеджи, которые запустятся по вашему 
     networks:
       - service-network
     environment:
-      POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
+      POSTGRES_PASSWORD: "marga_password"
+      POSTGRES_DB: "mrga"
       POSTGRES_USER: "mrga_user"
       PGPORT: 5432
       TZ: "Europe/Moscow"
@@ -28,7 +28,7 @@ services: # имеджи, которые запустятся по вашему 
       - service-network
     environment:
       POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
+      POSTGRES_DB: "mrga_storage"
       POSTGRES_USER: "mrga_user"
       PGPORT: 5433
       TZ: "Europe/Moscow"
@@ -40,7 +40,7 @@ services: # имеджи, которые запустятся по вашему 
         target: /var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: "mrga_password"
-      POSTGRES_DB: "mrgadb"
+      POSTGRES_DB: "mrga_chat"
       POSTGRES_USER: "mrga_user"
       PGPORT: 5434
       TZ: "Europe/Moscow"
@@ -61,7 +61,11 @@ services: # имеджи, которые запустятся по вашему 
       - service-network
     environment:
       TZ: "Europe/Moscow"
-
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14268:14268"
   server-backend:
     image: yakwilik/golang_ffmpeg
     volumes:
@@ -179,7 +183,6 @@ services: # имеджи, которые запустятся по вашему 
       TZ: "Europe/Moscow"
     networks:
       - default
-
 volumes: # часть настроек для хранения данных
   postgresdb-data:
     driver: local
@@ -191,6 +194,7 @@ volumes: # часть настроек для хранения данных
     driver: local
   grafana-storage:
   prometheus_data:
+  jaeger:
 
 networks:
   service-network:

@@ -34,6 +34,35 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 	return m.recorder
 }
 
+// CheckProStatus mocks base method.
+func (m *MockUseCase) CheckProStatus(userId uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckProStatus", userId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckProStatus indicates an expected call of CheckProStatus.
+func (mr *MockUseCaseMockRecorder) CheckProStatus(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckProStatus", reflect.TypeOf((*MockUseCase)(nil).CheckProStatus), userId)
+}
+
+// GetLikes mocks base method.
+func (m *MockUseCase) GetLikes(userId uint) ([]recommendation.Recommendation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLikes", userId)
+	ret0, _ := ret[0].([]recommendation.Recommendation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLikes indicates an expected call of GetLikes.
+func (mr *MockUseCaseMockRecorder) GetLikes(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLikes", reflect.TypeOf((*MockUseCase)(nil).GetLikes), userId)
+}
+
 // GetRecommendations mocks base method.
 func (m *MockUseCase) GetRecommendations(userId uint) ([]recommendation.Recommendation, error) {
 	m.ctrl.T.Helper()

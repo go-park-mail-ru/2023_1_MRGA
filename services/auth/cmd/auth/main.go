@@ -1,21 +1,25 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
+	"os"
+	"strconv"
 
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-redis/redis"
 	"github.com/joho/godotenv"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/app/dsn"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg/repository"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/auth/internal/pkg/server"
 	api "github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/authProto"
+	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/env_getter"
 )
 
 func main() {
@@ -25,6 +29,23 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connect env" + err.Error())
 	}
+
+	ctx := context.Background()
+
+	tracingDisabled, err := strconv.ParseBool(os.Getenv("TRACING_DISABLED"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	prv, err := tracejaeger.NewProvider(tracejaeger.ProviderConfig{
+		JaegerEndpoint: "http://meetme-app.ru:14268/api/traces",
+		ServiceName:    "authServer",
+		Disabled:       tracingDisabled,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer prv.Close(ctx)
 
 	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
 	if err != nil {
@@ -44,7 +65,8 @@ func main() {
 	}
 
 	log.Println("Application terminate")
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()))
+
 	authRepo := repository.NewRepo(db, client)
 	srv := server.NewGPRCServer(authRepo)
 	api.RegisterAuthServer(s, srv)

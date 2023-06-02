@@ -6,6 +6,7 @@ import (
 	compRepo "github.com/go-park-mail-ru/2023_1_MRGA.git/services/complaints/internal/pkg"
 	dataStruct "github.com/go-park-mail-ru/2023_1_MRGA.git/services/complaints/pkg/data_struct"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 )
 
 type GRPCServer struct {
@@ -19,6 +20,9 @@ func NewGPRCServer(compRepo compRepo.CompRepo) *GRPCServer {
 }
 
 func (s *GRPCServer) Complain(ctx context.Context, req *complaintProto.UserId) (*complaintProto.Response, error) {
+	_, span := tracejaeger.NewSpan(ctx, "complaintsServer", "Complain", nil)
+	defer span.End()
+
 	userId := uint(req.UserId)
 	count, err := s.CompRepo.CheckCountComplaint(userId)
 	if err != nil {
@@ -52,6 +56,9 @@ func (s *GRPCServer) Complain(ctx context.Context, req *complaintProto.UserId) (
 }
 
 func (s *GRPCServer) CheckBanned(ctx context.Context, req *complaintProto.UserId) (*complaintProto.Response, error) {
+	_, span := tracejaeger.NewSpan(ctx, "complaintsServer", "CheckBanned", nil)
+	defer span.End()
+
 	userId := uint(req.UserId)
 	count, err := s.CompRepo.CheckCountComplaint(userId)
 	if err != nil {

@@ -22,7 +22,7 @@ func Respond(w http.ResponseWriter, r *http.Request, data map[string]interface{}
 		http.StatusOK,
 		data,
 	}
-
+	w.WriteHeader(http.StatusOK)
 	encoder := json.NewEncoder(w)
 	err := encoder.Encode(result)
 	if err != nil {

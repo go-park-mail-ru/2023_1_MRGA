@@ -17,3 +17,9 @@ cov:
 
 lint:
 	golangci-lint run --timeout 5m
+
+test-integration:
+	go test ./... -tags=integration
+
+generate:
+	go generate ./...

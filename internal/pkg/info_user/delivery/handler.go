@@ -14,10 +14,14 @@ import (
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/internal/pkg/info_user"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/services/proto/complaintProto"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/logger"
+	tracejaeger "github.com/go-park-mail-ru/2023_1_MRGA.git/utils/trace_jaeger"
 	"github.com/go-park-mail-ru/2023_1_MRGA.git/utils/writer"
 )
 
 func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "CreateInfoHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -63,6 +67,9 @@ func (h *Handler) CreateInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "AddUserHashtagsHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -118,6 +125,9 @@ func (h *Handler) AddUserHashtags(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetUserHashtagsHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
@@ -141,6 +151,9 @@ func (h *Handler) GetUserHashtags(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetUserStatusHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
@@ -162,6 +175,9 @@ func (h *Handler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "ChangeUserHashtagsHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -217,6 +233,9 @@ func (h *Handler) ChangeUserHashtags(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ChangeUserStatus(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "ChangeUserStatusHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -262,6 +281,9 @@ func (h *Handler) ChangeUserStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetInfoByIdHandler", nil)
+	defer parentSpan.End()
+
 	params := mux.Vars(r)
 	userIdStr := params["userId"]
 	userId, err := strconv.Atoi(userIdStr)
@@ -285,6 +307,9 @@ func (h *Handler) GetInfoById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetInfo(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetInfoHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
@@ -306,6 +331,9 @@ func (h *Handler) GetInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "ChangeInfoHandler", nil)
+	defer parentSpan.End()
+
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -352,6 +380,9 @@ func (h *Handler) ChangeInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	parentCtx, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetCurrentUserHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {
@@ -369,7 +400,9 @@ func (c *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 
 	user.UserId = uint(userId)
 	compInp := &complaintProto.UserId{UserId: userId}
-	banned, err := c.compService.CheckBanned(r.Context(), compInp)
+	ctx, span := tracejaeger.NewSpan(parentCtx, "mainServer", "Complain", nil)
+	banned, err := c.compService.CheckBanned(ctx, compInp)
+	span.End()
 	if err != nil {
 		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
 		writer.ErrorRespond(w, r, err, http.StatusBadRequest)

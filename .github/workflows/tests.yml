@@ -20,6 +20,24 @@ jobs:
       
     - name: Install make
       run: sudo apt-get install -y make
+
+    - name: Install mockgen
+      run: go install github.com/golang/mock/mockgen@v1.6.0
+
+    - name: Install easyjson
+      run: |
+        go install github.com/mailru/easyjson/...
+
+    - name: Generate mocks and JSON serializers
+      run: make generate
+
+    - name: Check for uncommitted changes
+      run: |
+        if [[ $(git diff --stat) != '' ]]; then
+          echo "Found uncommitted changes after running go generate. Please commit the changes."
+          git diff
+          exit 1
+        fi
     
     - name: Install golangci-lint
       run: |
@@ -28,11 +46,5 @@ jobs:
     - name: Run linter
       run: make lint
 
-    - name: Run tests with coverage
-      run: |
-        go mod tidy
-        make cov
-        if [ $? -ne 0 ]; then
-          echo "Tests failed"
-          exit 1
-        fi
+    - name: Run unit tests
+      run: make test
