@@ -57,7 +57,7 @@ func TestHandler_Login(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/meetme/login", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
-	authServiceMock.EXPECT().Login(req.Context(), &authInp).Return(authOut, nil)
+	authServiceMock.EXPECT().Login(gomock.All(), &authInp).Return(authOut, nil)
 
 	authHandler.Login(w, req)
 	resp := w.Result()
@@ -116,7 +116,7 @@ func TestHandler_Login_GetError(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
-	authServiceMock.EXPECT().Login(req.Context(), &authInp).Return(authOut, errRepo)
+	authServiceMock.EXPECT().Login(gomock.All(), &authInp).Return(authOut, errRepo)
 
 	authHandler.Login(w, req)
 	resp := w.Result()
@@ -172,7 +172,7 @@ func TestHandler_Logout(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	req.AddCookie(&http.Cookie{Name: "session_token", Value: userToken})
-	authServiceMock.EXPECT().Logout(req.Context(), &authInp).Return(nil, nil)
+	authServiceMock.EXPECT().Logout(gomock.All(), &authInp).Return(nil, nil)
 
 	authHandler.Logout(w, req)
 	resp := w.Result()
@@ -229,7 +229,7 @@ func TestHandler_Logout_GetError(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	req.AddCookie(&http.Cookie{Name: "session_token", Value: userToken})
-	authServiceMock.EXPECT().Logout(req.Context(), &authInp).Return(nil, errRepo)
+	authServiceMock.EXPECT().Logout(gomock.All(), &authInp).Return(nil, errRepo)
 
 	authHandler.Logout(w, req)
 	resp := w.Result()
@@ -288,7 +288,7 @@ func TestHandler_Register(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
-	authServiceMock.EXPECT().Register(req.Context(), &authInp).Return(authOut, nil)
+	authServiceMock.EXPECT().Register(gomock.All(), &authInp).Return(authOut, nil)
 
 	authHandler.Register(w, req)
 	resp := w.Result()
@@ -349,7 +349,7 @@ func TestHandler_Register_GetError(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/meetme/reaction", bytes.NewBuffer(rawTest))
 	w := httptest.NewRecorder()
 
-	authServiceMock.EXPECT().Register(req.Context(), &authInp).Return(authOut, errRepo)
+	authServiceMock.EXPECT().Register(gomock.All(), &authInp).Return(authOut, errRepo)
 
 	authHandler.Register(w, req)
 	resp := w.Result()
@@ -408,7 +408,7 @@ func TestHandler_ChangeUser(t *testing.T) {
 
 	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(2))
 	req = req.WithContext(ctx)
-	authServiceMock.EXPECT().ChangeUser(req.Context(), &authInp).Return(nil, nil)
+	authServiceMock.EXPECT().ChangeUser(gomock.All(), &authInp).Return(nil, nil)
 
 	authHandler.ChangeUser(w, req)
 	resp := w.Result()
@@ -468,7 +468,7 @@ func TestHandler_ChangeUser_GetError(t *testing.T) {
 
 	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(2))
 	req = req.WithContext(ctx)
-	authServiceMock.EXPECT().ChangeUser(req.Context(), &authInp).Return(nil, errRepo)
+	authServiceMock.EXPECT().ChangeUser(gomock.All(), &authInp).Return(nil, errRepo)
 
 	authHandler.ChangeUser(w, req)
 	resp := w.Result()

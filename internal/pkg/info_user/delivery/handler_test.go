@@ -629,7 +629,7 @@ func TestHandler_GetCurrentUser(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/meetme/filters", nil)
 	ctx := context.WithValue(req.Context(), middleware.ContextUserKey, uint32(userId))
 	req = req.WithContext(ctx)
-	compServiceMock.EXPECT().CheckBanned(req.Context(), compInp).Return(&banned, nil)
+	compServiceMock.EXPECT().CheckBanned(gomock.Any(), compInp).Return(&banned, nil)
 	w := httptest.NewRecorder()
 
 	compHandler.GetCurrentUser(w, req)

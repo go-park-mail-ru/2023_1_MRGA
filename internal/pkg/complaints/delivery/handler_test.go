@@ -43,7 +43,7 @@ func TestHandler_Complain(t *testing.T) {
 	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()
 
-	CompServiceMock.EXPECT().Complain(req.Context(), &authInp).Return(nil, nil)
+	CompServiceMock.EXPECT().Complain(gomock.All(), &authInp).Return(nil, nil)
 
 	CompHandler.Complain(w, req)
 	resp := w.Result()
@@ -93,7 +93,7 @@ func TestHandler_Complain_GetError(t *testing.T) {
 	req := httptest.NewRequest(http.MethodDelete, "/meetme/reaction", bytes.NewBuffer([]byte(expected)))
 	w := httptest.NewRecorder()
 
-	CompServiceMock.EXPECT().Complain(req.Context(), &authInp).Return(nil, errRepo)
+	CompServiceMock.EXPECT().Complain(gomock.All(), &authInp).Return(nil, errRepo)
 
 	CompHandler.Complain(w, req)
 	resp := w.Result()
