@@ -118,10 +118,42 @@ func (r *RecRepository) GetLikes(userId uint, history []uint, reasons []uint, fi
 	return users, err
 }
 
+func (r *RecRepository) GetLikesCount(userId uint, history []uint, reasons []uint, filters dataStruct.UserFilter) (count uint, err error) {
+	var sexSlice []uint
+
+	switch filters.SearchSex {
+	case 0:
+		sexSlice = append(sexSlice, 0)
+	case 1:
+		sexSlice = append(sexSlice, 1)
+	case 2:
+		sexSlice = append(sexSlice, 0, 1)
+	}
+
+	var returnedCount int64
+	err = r.db.Table("users u").
+		Joins("JOIN user_infos ui on u.id = ui.user_id").
+		Joins("join user_reasons ur on u.id = ur.user_id").
+		Joins("Join user_reactions r on ui.user_id=r.user_id").
+		Joins("LEFT Join complaints c on c.user_id = u.id").
+		Where("c.count is NULL or c.count < ?", 5).
+		Where("r.user_from_id= ?", userId).
+		Where("ui.user_id NOT IN ?", history).
+		Where("ui.sex IN ?", sexSlice).
+		Where("reason_id IN ?", reasons).
+		Where("u.birth_day BETWEEN ? AND ?", ageCalc.CalculateBirthYear(filters.MaxAge), ageCalc.CalculateBirthYear(filters.MinAge)).
+		Group("ui.user_id").
+		Count(&returnedCount).Error
+	count = uint(returnedCount)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (r *RecRepository) CheckStatus(userId uint) error {
 	var status string
-	print(userId)
-	err := r.db.Table("statuses s").Select("s.name").
+	err := r.db.Table("statuses s").Select("s.status").
 		Joins("Join users u on u.status=s.id").
 		Where("u.id=?", userId).
 		Find(&status).Error
@@ -133,4 +165,15 @@ func (r *RecRepository) CheckStatus(userId uint) error {
 	}
 	err = fmt.Errorf("you dont have ProMax Status")
 	return err
+}
+
+func (r *RecRepository) GetStatus(userId uint) (status string, err error) {
+	err = r.db.Table("statuses s").Select("s.status").
+		Joins("Join users u on u.status=s.id").
+		Where("u.id=?", userId).
+		Find(&status).Error
+	if err != nil {
+		return
+	}
+	return
 }

@@ -10,5 +10,7 @@ type IRepositoryRec interface {
 	GetUserHistory(userId uint) ([]uint, error)
 
 	GetLikes(userId uint, history []uint, reasons []uint, filters dataStruct.UserFilter) (users []UserRecommend, err error)
+	GetLikesCount(userId uint, history []uint, reasons []uint, filters dataStruct.UserFilter) (count uint, err error)
 	CheckStatus(userId uint) error
+	GetStatus(userId uint) (string, error)
 }

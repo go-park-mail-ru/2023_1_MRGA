@@ -63,6 +63,21 @@ func (mr *MockUseCaseMockRecorder) GetLikes(userId interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLikes", reflect.TypeOf((*MockUseCase)(nil).GetLikes), userId)
 }
 
+// GetLikesCount mocks base method.
+func (m *MockUseCase) GetLikesCount(userId uint) (uint, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLikesCount", userId)
+	ret0, _ := ret[0].(uint)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLikesCount indicates an expected call of GetLikesCount.
+func (mr *MockUseCaseMockRecorder) GetLikesCount(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLikesCount", reflect.TypeOf((*MockUseCase)(nil).GetLikesCount), userId)
+}
+
 // GetRecommendations mocks base method.
 func (m *MockUseCase) GetRecommendations(userId uint) ([]recommendation.Recommendation, error) {
 	m.ctrl.T.Helper()
@@ -76,4 +91,19 @@ func (m *MockUseCase) GetRecommendations(userId uint) ([]recommendation.Recommen
 func (mr *MockUseCaseMockRecorder) GetRecommendations(userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRecommendations", reflect.TypeOf((*MockUseCase)(nil).GetRecommendations), userId)
+}
+
+// GetStatus mocks base method.
+func (m *MockUseCase) GetStatus(userId uint) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStatus", userId)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStatus indicates an expected call of GetStatus.
+func (mr *MockUseCaseMockRecorder) GetStatus(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStatus", reflect.TypeOf((*MockUseCase)(nil).GetStatus), userId)
 }

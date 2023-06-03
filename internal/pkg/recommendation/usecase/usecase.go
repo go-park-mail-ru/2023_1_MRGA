@@ -80,6 +80,11 @@ func (r *RecUseCase) CheckProStatus(userId uint) error {
 	return err
 }
 
+func (r *RecUseCase) GetStatus(userId uint) (string, error) {
+	status, err := r.repo.GetStatus(userId)
+	return status, err
+}
+
 func (r *RecUseCase) GetLikes(userId uint) ([]recommendation.Recommendation, error) {
 	filters, err := r.filterUseCase.GetUserFilters(userId)
 	if err != nil {
@@ -125,4 +130,31 @@ func (r *RecUseCase) GetLikes(userId uint) ([]recommendation.Recommendation, err
 	}
 
 	return result, err
+}
+
+func (r *RecUseCase) GetLikesCount(userId uint) (count uint, err error) {
+	filters, err := r.filterUseCase.GetUserFilters(userId)
+	if err != nil {
+		return
+	}
+
+	reasons, err := r.filterUseCase.GetUserReasonsId(userId)
+	if err != nil {
+		return
+	}
+
+	history, err := r.repo.GetUserHistory(userId)
+	if err != nil {
+		return
+	}
+	if len(history) == 0 {
+		history = append(history, 0)
+	}
+
+	count, err = r.repo.GetLikesCount(userId, history, reasons, filters)
+	if err != nil {
+		return
+	}
+
+	return
 }
