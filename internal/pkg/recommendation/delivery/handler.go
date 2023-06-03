@@ -68,3 +68,40 @@ func (h *Handler) GetLikes(w http.ResponseWriter, r *http.Request) {
 	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path, false)
 	writer.Respond(w, r, result)
 }
+
+func (h *Handler) GetLikesCount(w http.ResponseWriter, r *http.Request) {
+	userIdDB := r.Context().Value(middleware.ContextUserKey)
+	userId, ok := userIdDB.(uint32)
+	if !ok {
+		logger.Log(http.StatusBadRequest, "", r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, nil, http.StatusBadRequest)
+		return
+	}
+
+	var status string
+	status, err := h.useCase.GetStatus(uint(userId))
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	count, err := h.useCase.GetLikesCount(uint(userId))
+	if err != nil {
+		logger.Log(http.StatusBadRequest, err.Error(), r.Method, r.URL.Path, true)
+		writer.ErrorRespond(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	result := make(map[string]interface{})
+	result["count"] = count
+
+	var access bool = false
+	if status == "ProMax" {
+		access = true
+	}
+	result["access"] = access
+
+	logger.Log(http.StatusOK, "give user information", r.Method, r.URL.Path, false)
+	writer.Respond(w, r, result)
+}

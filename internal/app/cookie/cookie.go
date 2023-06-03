@@ -11,8 +11,8 @@ func SetCookie(w http.ResponseWriter, nameCookie string, value string, expTime t
 		Value:    value,
 		Expires:  time.Now().Add(expTime),
 		Path:     "/",
-		Secure:   true,
-		SameSite: http.SameSiteNoneMode,
+		// Secure:   true,
+		// SameSite: http.SameSiteNoneMode,
 	})
 }
 

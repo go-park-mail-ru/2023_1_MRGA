@@ -64,6 +64,21 @@ func (mr *MockIRepositoryRecMockRecorder) GetLikes(userId, history, reasons, fil
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLikes", reflect.TypeOf((*MockIRepositoryRec)(nil).GetLikes), userId, history, reasons, filters)
 }
 
+// GetLikesCount mocks base method.
+func (m *MockIRepositoryRec) GetLikesCount(userId uint, history, reasons []uint, filters dataStruct.UserFilter) (uint, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLikesCount", userId, history, reasons, filters)
+	ret0, _ := ret[0].(uint)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLikesCount indicates an expected call of GetLikesCount.
+func (mr *MockIRepositoryRecMockRecorder) GetLikesCount(userId, history, reasons, filters interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLikesCount", reflect.TypeOf((*MockIRepositoryRec)(nil).GetLikesCount), userId, history, reasons, filters)
+}
+
 // GetRecommendation mocks base method.
 func (m *MockIRepositoryRec) GetRecommendation(userId uint, history, reasons, hashtags []uint, filters dataStruct.UserFilter) ([]recommendation.UserRecommend, error) {
 	m.ctrl.T.Helper()
@@ -92,6 +107,21 @@ func (m *MockIRepositoryRec) GetRecommendedUser(userId uint) (recommendation.Rec
 func (mr *MockIRepositoryRecMockRecorder) GetRecommendedUser(userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRecommendedUser", reflect.TypeOf((*MockIRepositoryRec)(nil).GetRecommendedUser), userId)
+}
+
+// GetStatus mocks base method.
+func (m *MockIRepositoryRec) GetStatus(userId uint) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStatus", userId)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStatus indicates an expected call of GetStatus.
+func (mr *MockIRepositoryRecMockRecorder) GetStatus(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStatus", reflect.TypeOf((*MockIRepositoryRec)(nil).GetStatus), userId)
 }
 
 // GetUserHistory mocks base method.
