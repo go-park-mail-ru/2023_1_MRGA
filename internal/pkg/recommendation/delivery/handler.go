@@ -70,6 +70,9 @@ func (h *Handler) GetLikes(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetLikesCount(w http.ResponseWriter, r *http.Request) {
+	_, parentSpan := tracejaeger.NewSpan(r.Context(), "mainServer", "GetLikesCountHandler", nil)
+	defer parentSpan.End()
+
 	userIdDB := r.Context().Value(middleware.ContextUserKey)
 	userId, ok := userIdDB.(uint32)
 	if !ok {

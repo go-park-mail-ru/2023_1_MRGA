@@ -61,6 +61,11 @@ services: # имеджи, которые запустятся по вашему 
       - service-network
     environment:
       TZ: "Europe/Moscow"
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14268:14268"
   server-backend:
     image: yakwilik/golang_ffmpeg
     volumes:
@@ -189,8 +194,6 @@ volumes: # часть настроек для хранения данных
     driver: local
   grafana-storage:
   prometheus_data:
-  jaeger:
-
 networks:
   service-network:
     driver: bridge
